@@ -1,0 +1,83 @@
+.App {
+	color: #fff;
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	display: flex;
+	flex-direction: row;
+	overflow: hidden;
+	font-family: 'Corbel', sans-serif;
+}
+
+.main {
+	height: 100%;
+	flex: 1;
+	overflow-y: scroll;
+	background-color: #36393f;
+}
+
+.main-content {
+	margin: 8px 16px;
+}
+
+.sidebar {
+	background-color: #202225;
+	width: 250px;
+	overflow-y: scroll;
+}
+
+.sidebar-header {
+	font-size: 70px;
+	text-align: center;
+	margin-bottom: 32px;
+}
+
+.sidebar-footer {
+	position: absolute;
+	bottom: 8px;
+	left: 12px;
+	opacity: 0.2;
+	font-size: 14px;
+}
+
+.sidebar ul {
+	list-style: none;
+	padding: 0;
+}
+
+::-webkit-scrollbar {
+    width: 0;  /* Remove scrollbar space */
+    background: transparent;  /* Optional: just make scrollbar invisible */
+}
+
+.menu-item a {
+	text-decoration: none;
+	display: block;
+	color: #fff;
+	padding: 14px 16px;
+	margin: 8px 8px 0px 8px;
+	border-radius: 32px;
+	transition: background-color 0.1s ease;
+}
+
+.menu-item a:hover {
+	background-color: #36393f;
+}
+
+.menu-item .active {
+	background-color: #36393f;
+}
+
+.menu-item .icon {
+	width: 25px;
+	display: inline-block;
+	text-align: left;
+}
+
+h1 {
+	margin: 20px 0px 16px 0px;
+}
+
+h3 {
+	margin: 8px 0px;
+}
