@@ -5,6 +5,7 @@ const Speaker = require('./speaker');
 module.exports = function TwitchTTS(configuration) {
     const channelName = configuration.channelName;
     const ignoreExclamationPrefix = configuration.ignoreExclamationPrefix || false;
+    const readUsername = configuration.readUsername || true;
     const languages = configuration.languages || ['id', 'en', 'ja'];
 
     const speaker = new Speaker();
@@ -44,7 +45,8 @@ module.exports = function TwitchTTS(configuration) {
         speaker.addToQueue({
             name: tags.username,
             message: userMessage,
-            language: googleTranslateLanguage
+            language: googleTranslateLanguage,
+            readUsername: readUsername
         });
     });
     

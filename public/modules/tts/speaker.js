@@ -27,7 +27,7 @@ module.exports = function Speaker(queueLimit = 5) {
 
         _isSpeaking = true;
         const name = currentMessage.name;
-        const message = `${name}, ${currentMessage.message}`;
+        const message = currentMessage.readUsername ? `${name}, ${currentMessage.message}` : currentMessage.message;
         const language = currentMessage.language;
 
         // Use Google Translate to speak the message

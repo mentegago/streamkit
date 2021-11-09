@@ -1,6 +1,8 @@
 const path = require('path');
 
 const { app, BrowserWindow, nativeTheme } = require('electron');
+if (require('electron-squirrel-startup')) return app.quit();
+
 const isDev = require('electron-is-dev');
 
 function createWindow() {

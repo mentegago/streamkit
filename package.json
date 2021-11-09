@@ -1,6 +1,6 @@
 {
   "name": "mentega-streamkit",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "private": true,
   "author": {
     "name": "Mentega",
@@ -23,7 +23,8 @@
     "react-scripts": "4.0.3",
     "react-world-flags": "^1.4.0",
     "tmi.js": "^1.8.5",
-    "web-vitals": "^1.1.2"
+    "web-vitals": "^1.1.2",
+    "electron-is-dev": "^2.0.0"
   },
   "main": "public/electron.js",
   "homepage": "./",
@@ -65,12 +66,13 @@
     "concurrently": "^6.3.0",
     "cross-env": "^7.0.3",
     "electron": "^15.3.0",
-    "electron-is-dev": "^2.0.0",
     "wait-on": "^6.0.0"
   },
   "config": {
     "forge": {
-      "packagerConfig": {},
+      "packagerConfig": {
+        "asar": true
+      },
       "makers": [
         {
           "name": "@electron-forge/maker-squirrel",
