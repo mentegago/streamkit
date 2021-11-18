@@ -1,0 +1,142 @@
+import 'dart:collection';
+import 'package:flutter/services.dart';
+
+import 'package:flutter_js/flutter_js.dart';
+import 'package:just_audio/just_audio.dart';
+
+import 'models/chat_to_speech_configuration.dart';
+import 'enums/language.dart';
+import 'twitch.dart';
+
+class ChatToSpeechMessage {
+  final String name;
+  final String message;
+  final Language? language;
+
+  ChatToSpeechMessage(
+      {required this.name, required this.message, this.language});
+}
+
+class ChatToSpeechHandler {
+  final maxQueueLength = 5;
+
+  final _runtime = getJavascriptRuntime();
+  final _twitch = Twitch();
+  final _messageQueue = Queue<ChatToSpeechMessage>();
+
+  ChatToSpeechConfiguration? _configuration;
+  bool _isSpeaking = false;
+
+  Set<String> get channels => _twitch.channels;
+  Stream<String> get joinStream => _twitch.joinStream;
+
+  ChatToSpeechHandler() {
+    // Load Franc
+    rootBundle.loadString('assets/franc-min.js').then((script) {
+      _runtime.evaluate(script);
+    });
+
+    _listenTwitchMessages();
+  }
+
+  void updateConfiguration(ChatToSpeechConfiguration configuration) {
+    if (configuration.enabled) {
+      _twitch.setChannels(configuration.channels);
+    } else {
+      _twitch.leaveAllChannels();
+    }
+
+    _configuration = configuration;
+  }
+
+  void _listenTwitchMessages() {
+    _twitch.messageStream.listen((message) {
+      _addMessageToQueue(ChatToSpeechMessage(
+          name: message.userState.displayName,
+          message: message.emotelessMessage));
+    });
+  }
+
+  Future<Duration?> _speak(
+      {required String text, required Language language}) async {
+    final url = Uri(
+        scheme: "https",
+        host: "translate.google.com",
+        path: "translate_tts",
+        queryParameters: {
+          "ie": "UTF-8",
+          "q": text,
+          "tl": language.google,
+          "client": "tw-ob"
+        });
+
+    final player = AudioPlayer();
+    await player.setUrl(url.toString());
+    await player.play();
+
+    await player.playerStateStream.firstWhere((event) =>
+        event.processingState == ProcessingState.completed ||
+        event.processingState == ProcessingState.idle);
+
+    player.dispose();
+    _readQueue();
+  }
+
+  void _readQueue() {
+    if (_messageQueue.isEmpty) {
+      _isSpeaking = false;
+      return;
+    }
+
+    _isSpeaking = true;
+    final message = _messageQueue.removeFirst();
+    final language = message.language ?? _getLanguage(text: message.message);
+    final text = (_configuration?.readUsername ?? true)
+        ? message.name + ", " + message.message
+        : message.message;
+
+    _speak(text: text, language: language);
+  }
+
+  void _addMessageToQueue(ChatToSpeechMessage message) {
+    if ((_configuration?.ignoreExclamationMark ?? true) &&
+        message.message.startsWith('!')) {
+      return;
+    }
+
+    _messageQueue.add(message);
+
+    // Keep queue below max queue limit.
+    while (_messageQueue.length > maxQueueLength) {
+      _messageQueue.removeFirst();
+    }
+
+    if (!_isSpeaking) {
+      _readQueue();
+    }
+  }
+
+  // Get language from Franc JavaScript library.
+  Language _getLanguage({required String text}) {
+    String francText = text;
+
+    while (francText.length < 30 && francText.isNotEmpty) {
+      francText += " " + text;
+    }
+
+    String languages = (_configuration?.languages ?? [])
+        .map((lang) => "'" + lang.franc + "'")
+        .join(", ");
+
+    final textLanguage = _runtime
+        .evaluate("franc('" +
+            francText.replaceAll('\'', '\\\'') +
+            "', { whitelist: [$languages] })")
+        .stringResult;
+
+    return LanguageParser.fromFranc(textLanguage) ??
+        ((_configuration?.languages ?? []).isNotEmpty
+            ? (_configuration?.languages ?? []).first
+            : Language.indonesian);
+  }
+}
