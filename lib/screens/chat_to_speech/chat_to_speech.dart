@@ -2,17 +2,45 @@ import 'dart:async';
 
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/services.dart';
+import 'package:flag/flag.dart';
 
 import 'chat_to_speech_vm.dart';
 import '../../modules/chat_to_speech/enums/language.dart';
 
-class ChatToSpeech extends StatelessWidget {
+class ChatToSpeech extends StatefulWidget {
   final ChatToSpeechViewModel viewModel;
 
   const ChatToSpeech({Key? key, required this.viewModel}) : super(key: key);
 
   @override
+  State<ChatToSpeech> createState() => _ChatToSpeechState();
+}
+
+class _ChatToSpeechState extends State<ChatToSpeech> {
+  StreamSubscription<String>? _errorSubscription;
+
+  @override
+  void dispose() {
+    _errorSubscription?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    _errorSubscription = widget.viewModel.error.listen((error) {
+      showDialog(
+          context: context,
+          builder: (context) => ContentDialog(
+                title: const Text("Oops..."),
+                content: Text(error),
+                actions: [
+                  Button(
+                      child: const Text("Ok"),
+                      onPressed: () => Navigator.of(context).pop())
+                ],
+              ));
+    });
+
     return ScaffoldPage(
         header: const PageHeader(title: Text("Twitch Chat to Speech")),
         content: Container(
@@ -24,7 +52,7 @@ class ChatToSpeech extends StatelessWidget {
               TextBox(
                 inputFormatters: [ChannelTextFormatter()],
                 header: "Channel name",
-                controller: viewModel.channelController,
+                controller: widget.viewModel.channelController,
                 placeholder:
                     "The name of the channel you want the TTS to read on",
               ),
@@ -41,24 +69,26 @@ class ChatToSpeech extends StatelessWidget {
                       children: [
                         StreamBuilder<bool>(
                             initialData: false,
-                            stream: viewModel.readUsername,
+                            stream: widget.viewModel.readUsername,
                             builder: (context, snapshot) {
                               return Checkbox(
                                   checked: snapshot.data,
                                   onChanged: (bool? value) {
-                                    viewModel.updateUsername(value ?? false);
+                                    widget.viewModel
+                                        .updateUsername(value ?? false);
                                   },
                                   content: const Text("Read username"));
                             }),
                         StreamBuilder<bool>(
                             initialData: false,
-                            stream: viewModel.ignoreExclamationMark,
+                            stream: widget.viewModel.ignoreExclamationMark,
                             builder: (context, snapshot) {
                               return Checkbox(
                                   checked: snapshot.data,
                                   onChanged: (bool? value) {
-                                    viewModel.updateIgnoreExclamationMark(
-                                        value ?? false);
+                                    widget.viewModel
+                                        .updateIgnoreExclamationMark(
+                                            value ?? false);
                                   },
                                   content: const Text(
                                       "Ignore messages starting with \"!\""));
@@ -74,32 +104,36 @@ class ChatToSpeech extends StatelessWidget {
                       children: [
                         LanguageCheckbox(
                             language: Language.indonesian,
-                            viewModel: viewModel),
+                            viewModel: widget.viewModel),
                         LanguageCheckbox(
-                            language: Language.english, viewModel: viewModel),
+                            language: Language.english,
+                            viewModel: widget.viewModel),
                         LanguageCheckbox(
-                            language: Language.japanese, viewModel: viewModel),
+                            language: Language.japanese,
+                            viewModel: widget.viewModel),
                       ],
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 24),
-              StreamBuilder<ChatToSpeechState>(
-                  stream: viewModel.state,
-                  initialData: ChatToSpeechState.idle,
+              StreamBuilder<ChatToSpeechConnectionState>(
+                  stream: widget.viewModel.state,
+                  initialData: ChatToSpeechConnectionState.idle,
                   builder: (context, snapshot) {
-                    if (snapshot.data == ChatToSpeechState.loading) {
+                    if (snapshot.data == ChatToSpeechConnectionState.loading) {
                       return const Center(child: ProgressRing());
                     } else {
                       List<Widget> buttons = [
                         Expanded(
                           child: Button(
-                            child: Text(snapshot.data == ChatToSpeechState.idle
+                            child: Text(snapshot.data ==
+                                    ChatToSpeechConnectionState.idle
                                 ? "Connect"
                                 : "Update configuration"),
                             onPressed: () {
-                              if (viewModel.channelController.text.isEmpty) {
+                              if (widget
+                                  .viewModel.channelController.text.isEmpty) {
                                 showDialog(
                                     context: context,
                                     builder: (context) => ContentDialog(
@@ -115,43 +149,47 @@ class ChatToSpeech extends StatelessWidget {
                                         ));
                                 return;
                               }
-                              viewModel.setEnabled(true);
+                              widget.viewModel.setEnabled(true);
                             },
                           ),
                         )
                       ];
 
-                      if (snapshot.data == ChatToSpeechState.connected) {
+                      if (snapshot.data ==
+                          ChatToSpeechConnectionState.connected) {
                         buttons.add(const SizedBox(width: 8));
-                        buttons.add(IconButton(
-                          icon: const Icon(FluentIcons.plug_disconnected),
-                          onPressed: () {
-                            showDialog(
-                                context: context,
-                                builder: (context) => ContentDialog(
-                                      title: const Text(
-                                          'Disconnect from channel?'),
-                                      content: Text(
-                                          'Are you sure you want to disconnect from ${viewModel.channelController.text}?'),
-                                      actions: [
-                                        Button(
-                                            child:
-                                                const Text('Yes, disconnect'),
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                              viewModel.setEnabled(false);
-                                            }),
-                                        Button(
-                                            child: const Text('No'),
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            }),
-                                      ],
-                                    ));
-                          },
+                        buttons.add(Tooltip(
+                          message: "Disconnect from channel",
+                          child: IconButton(
+                            icon: const Icon(FluentIcons.plug_disconnected),
+                            onPressed: () {
+                              showDialog(
+                                  context: context,
+                                  builder: (context) => ContentDialog(
+                                        title: const Text(
+                                            'Disconnect from channel?'),
+                                        content: const Text(
+                                            'Are you sure you want to disconnect from the channel?'),
+                                        actions: [
+                                          Button(
+                                              child:
+                                                  const Text('Yes, disconnect'),
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                                widget.viewModel
+                                                    .setEnabled(false);
+                                              }),
+                                          Button(
+                                              child: const Text('No'),
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              }),
+                                        ],
+                                      ));
+                            },
+                          ),
                         ));
                       }
-
                       return Row(
                         children: buttons,
                       );
@@ -186,7 +224,14 @@ class LanguageCheckbox extends StatelessWidget {
                   enabled: value ?? false,
                 );
               },
-              content: Text(language.displayName));
+              content: Wrap(
+                direction: Axis.horizontal,
+                spacing: 6,
+                children: [
+                  Flag.fromCode(language.flagCode, height: 21, width: 21),
+                  Text(language.displayName),
+                ],
+              ));
         });
   }
 }

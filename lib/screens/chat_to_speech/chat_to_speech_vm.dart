@@ -1,11 +1,12 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../../modules/chat_to_speech/chat_to_speech_handler.dart';
 import '../../modules/chat_to_speech/models/chat_to_speech_configuration.dart';
 import '../../modules/chat_to_speech/enums/language.dart';
 
-enum ChatToSpeechState {
+enum ChatToSpeechConnectionState {
   idle,
   connected,
   loading,
@@ -14,19 +15,22 @@ enum ChatToSpeechState {
 class ChatToSpeechViewModel {
   final ChatToSpeechHandler _handler = ChatToSpeechHandler();
 
-  final _state = BehaviorSubject<ChatToSpeechState>();
+  final _state = BehaviorSubject<ChatToSpeechConnectionState>();
   final _readUsername = BehaviorSubject<bool>();
   final _ignoreExclamationMark = BehaviorSubject<bool>();
   final _languages = BehaviorSubject<List<Language>>();
+  final _error = PublishSubject<String>();
 
-  Stream<ChatToSpeechState> get state => _state.stream;
+  Stream<ChatToSpeechConnectionState> get state => _state.stream;
   Stream<bool> get readUsername => _readUsername.stream;
   Stream<bool> get ignoreExclamationMark => _ignoreExclamationMark.stream;
   Stream<bool> language(Language language) =>
       _languages.map((languages) => languages.contains(language));
+  Stream<String> get error => _error.stream;
 
   TextEditingController channelController;
   bool _enabled = false;
+  BuildContext? globalContext;
 
   ChatToSpeechViewModel._(this.channelController);
 
@@ -67,14 +71,14 @@ class ChatToSpeechViewModel {
     final targetChannels = [channelController.text];
 
     if (!_enabled) {
-      _state.add(ChatToSpeechState.idle);
+      _state.add(ChatToSpeechConnectionState.idle);
       return;
     }
 
     if (connectedChannels.containsAll(targetChannels)) {
-      _state.add(ChatToSpeechState.connected);
+      _state.add(ChatToSpeechConnectionState.connected);
     } else {
-      _state.add(ChatToSpeechState.loading);
+      _state.add(ChatToSpeechConnectionState.loading);
     }
   }
 
@@ -101,15 +105,16 @@ class ChatToSpeechViewModel {
 
     if (enabled) {
       // Show the loading state even when not needed to give user the impression of action feedback.
-      _state.add(ChatToSpeechState.loading);
+      _state.add(ChatToSpeechConnectionState.loading);
       Future.delayed(const Duration(milliseconds: 100), () {
         _updateState();
       });
 
       Future.delayed(const Duration(seconds: 5), () {
         // JOIN timeout.
-        if (_state.value == ChatToSpeechState.loading) {
-          _state.add(ChatToSpeechState.idle);
+        if (_state.value == ChatToSpeechConnectionState.loading) {
+          _state.add(ChatToSpeechConnectionState.idle);
+          _error.add("Unable to join channel");
         }
       });
     } else {

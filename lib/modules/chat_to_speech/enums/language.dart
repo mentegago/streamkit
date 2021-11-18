@@ -1,3 +1,5 @@
+import 'package:flag/flag_enum.dart';
+
 enum Language { english, indonesian, japanese }
 
 extension LanguageExtension on Language {
@@ -31,6 +33,17 @@ extension LanguageExtension on Language {
         return 'Indonesian';
       case Language.japanese:
         return 'Japanese';
+    }
+  }
+
+  FlagsCode get flagCode {
+    switch (this) {
+      case Language.english:
+        return FlagsCode.US;
+      case Language.indonesian:
+        return FlagsCode.ID;
+      case Language.japanese:
+        return FlagsCode.JP;
     }
   }
 }

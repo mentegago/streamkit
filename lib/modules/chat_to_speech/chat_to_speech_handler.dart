@@ -52,9 +52,7 @@ class ChatToSpeechHandler {
   void _listenTwitchMessages() {
     _twitch.messageStream.listen((message) {
       _addMessageToQueue(ChatToSpeechMessage(
-        name: message.username,
-        message: message.emotelessMessage,
-      ));
+          name: message.username, message: message.emotelessMessage));
     });
   }
 
@@ -92,8 +90,10 @@ class ChatToSpeechHandler {
     _isSpeaking = true;
     final message = _messageQueue.removeFirst();
     final language = message.language ?? _getLanguage(text: message.message);
+    final filteredName =
+        message.name.replaceAll(RegExp("[^A-Za-z]"), "").toLowerCase();
     final text = (_configuration?.readUsername ?? true)
-        ? message.name + ", " + message.message
+        ? filteredName + ", " + message.message
         : message.message;
 
     _speak(text: text, language: language);
