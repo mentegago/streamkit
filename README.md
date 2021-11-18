@@ -1,16 +1,15 @@
-# streamkit
+# 🧈 Mentega StreamKit 🧈
+**This app is still in very early stage. Please use [Mentega TTS](https://github.com/mentegago/mentega-tts/releases/latest) instead for TTS.**
 
-A new Flutter project.
+![Screenshot](screenshots/streamkit.jpg)
 
-## Getting Started
+## Features
+- Multilingual Twitch Text-to-Speech (Based on [Mentega TTS](https://github.com/mentegago/mentega-tts))
 
-This project is a starting point for a Flutter application.
+## Coming Soon
+- Beat Saber to OBS scene control (Based on [Mentega Beat Saber to OBS](https://github.com/mentegago/mentega-bs2obs))
 
-A few resources to get you started if this is your first Flutter project:
+## Building
+This app is written with [Flutter on Desktop](https://flutter.dev/multi-platform/desktop). You'll need **Flutter** SDK to be installed as well as everything [required to build a Flutter Windows app](https://docs.flutter.dev/desktop#additional-windows-requirements). 
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+This app has not been tested to run on macOS or Linux, however, the libraries used in this project are all crossplatform, so I don't think there should be any issue building for oher platforms.
