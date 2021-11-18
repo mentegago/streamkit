@@ -52,8 +52,9 @@ class ChatToSpeechHandler {
   void _listenTwitchMessages() {
     _twitch.messageStream.listen((message) {
       _addMessageToQueue(ChatToSpeechMessage(
-          name: message.userState.displayName,
-          message: message.emotelessMessage));
+        name: message.username,
+        message: message.emotelessMessage,
+      ));
     });
   }
 
