@@ -36,8 +36,6 @@ class Twitch {
     wsChannel.stream.listen(
       (event) {
         event.toString().split('\r\n').forEach((line) {
-          print(line);
-
           final genericRegex = RegExp(
             "(?<tags>.*):(?<username>[^!]+)![^ ]* (?<type>[^ ]+) #(?<channel>[^ ]+)( :){0,1}(?<message>.*)",
             unicode: true,

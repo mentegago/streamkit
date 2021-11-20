@@ -51,8 +51,14 @@ class ChatToSpeechHandler {
 
   void _listenTwitchMessages() {
     _twitch.messageStream.listen((message) {
-      _addMessageToQueue(ChatToSpeechMessage(
-          name: message.username, message: message.emotelessMessage));
+      final text = _pachify(
+        _warafy(message.emotelessMessage),
+        username: message.username,
+      );
+
+      _addMessageToQueue(
+        ChatToSpeechMessage(name: message.username, message: text),
+      );
     });
   }
 
@@ -119,6 +125,10 @@ class ChatToSpeechHandler {
 
   // Get language from Franc JavaScript library.
   Language _getLanguage({required String text}) {
+    if (text.contains("panci panci panci")) {
+      return Language.indonesian;
+    }
+
     String francText = text;
 
     while (francText.length < 30 && francText.isNotEmpty) {
@@ -139,5 +149,33 @@ class ChatToSpeechHandler {
         ((_configuration?.languages ?? []).isNotEmpty
             ? (_configuration?.languages ?? []).first
             : Language.indonesian);
+  }
+
+  String _pachify(String text, {String username = ""}) {
+    final usernameList = [
+      'ngeq',
+      'amikarei',
+      'bagusnl',
+      'ozhy27',
+      'kalamuspls',
+      'seiki_ryuuichi',
+      'cepp18_',
+      'mentegagoreng',
+      'sodiumtaro'
+    ];
+
+    String pachiReplacement = 'パチパチパチ';
+    if (usernameList.contains(username.toLowerCase())) {
+      pachiReplacement = 'panci panci panci';
+    }
+
+    return text.replaceAll(RegExp(r'(8|８){3,}'), pachiReplacement);
+  }
+
+  String _warafy(String text) {
+    return text.replaceAll(
+      RegExp(r'(( |^|\n|\r)(w|ｗ){2,}( |$|\n|\r))'),
+      'わらわら',
+    );
   }
 }
