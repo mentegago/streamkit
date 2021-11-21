@@ -1,24 +1,46 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
+import 'package:rxdart/rxdart.dart';
 
 import 'package:web_socket_channel/io.dart';
 
-import 'models/twitch-message.dart';
-import 'models/user_state.dart';
+import '../../modules/chat_to_speech/models/twitch-message.dart';
+import '../../modules/chat_to_speech/models/user_state.dart';
+
+enum TwitchState { active, inactive, loading }
+enum TwitchError { timeout }
 
 class Twitch {
-  final _nick = "justinfan24";
-  Set<String> _channels;
+  final String _nick;
+  final String? _token;
+
+  Set<String> _channels = {};
+  Set<String> _targetChannels;
+
   IOWebSocketChannel? _wsChannel;
 
-  final _messageController = StreamController<TwitchMessage>();
-  final _joinController = StreamController<String>();
+  final _messageSubject = PublishSubject<TwitchMessage>();
+  final _joinSubject = PublishSubject<String>();
+  final _partSubject = PublishSubject<String>();
+  final _state = BehaviorSubject<TwitchState>();
+  final _error = PublishSubject<TwitchError>();
 
-  Stream<TwitchMessage> get messageStream => _messageController.stream;
-  Stream<String> get joinStream => _joinController.stream;
+  Stream<TwitchMessage> get messageStream => _messageSubject.stream;
+  Stream<String> get joinStream => _joinSubject.stream;
+  Stream<String> get partStream => _partSubject.stream;
+
+  Stream<TwitchState> get state => _state.stream;
+  Stream<TwitchError> get error => _error.stream;
 
   Set<String> get channels => _channels;
 
-  Twitch({Set<String> channels = const <String>{}}) : _channels = channels {
+  Twitch(
+      {String username = "justinfan24",
+      String? token,
+      Set<String> channels = const <String>{}})
+      : _nick = username,
+        _token = token,
+        _targetChannels = channels {
     _connect();
   }
 
@@ -29,9 +51,7 @@ class Twitch {
     wsChannel.sink.add("CAP REQ :twitch.tv/tags");
 
     // Connect to currently set channels.
-    final currentChannels = _channels;
-    _channels = <String>{};
-    setChannels(currentChannels.toList());
+    setChannels(_targetChannels.toList());
 
     wsChannel.stream.listen(
       (event) {
@@ -82,6 +102,10 @@ class Twitch {
   }
 
   void _handlePrivateMessage(RegExpMatch match) {
+    if (_state.value != TwitchState.active) {
+      return; // Ignore any message unless module is active.
+    }
+
     final tags = match.namedGroup('tags') ?? "";
     final username = match.namedGroup('username') ?? "";
     final channel = match.namedGroup('channel') ?? "";
@@ -99,7 +123,7 @@ class Twitch {
                 previousValue.replaceAll(element, ''))
         .replaceAll(RegExp(" +"), " "); // remove multiple spaces
 
-    _messageController.add(
+    _messageSubject.add(
       TwitchMessage(message,
           username: username,
           userState: userState,
@@ -115,7 +139,9 @@ class Twitch {
 
     if (user == _nick && channel != null) {
       _channels.add(channel);
-      _joinController.sink.add(channel);
+      _joinSubject.add(channel);
+
+      _updateModuleState();
     }
   }
 
@@ -125,6 +151,9 @@ class Twitch {
 
     if (user == _nick && channel != null) {
       _channels.remove(channel);
+      _partSubject.add(channel);
+
+      _updateModuleState();
     }
   }
 
@@ -140,11 +169,35 @@ class Twitch {
     channels
         .where((channel) => !currentChannels.contains(channel))
         .forEach((channel) => _wsChannel?.sink.add("JOIN #$channel"));
+
+    _targetChannels = channels.toSet();
+    _updateModuleState();
   }
 
   void leaveAllChannels() {
     for (var element in _channels) {
       _wsChannel?.sink.add("PART #$element");
     }
+
+    _targetChannels = <String>{};
+  }
+
+  void _updateModuleState() {
+    if (_targetChannels.isEmpty) {
+      return _state.add(TwitchState.inactive);
+    }
+
+    if (setEquals(_targetChannels, _channels)) {
+      return _state.add(TwitchState.active);
+    }
+
+    Future.delayed(const Duration(seconds: 5)).then((_) {
+      if (_state.value == TwitchState.loading) {
+        _error.add(TwitchError.timeout);
+        setChannels([]);
+      }
+    });
+
+    return _state.add(TwitchState.loading);
   }
 }

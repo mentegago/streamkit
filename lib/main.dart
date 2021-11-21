@@ -1,7 +1,7 @@
-import 'dart:ui';
-
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:streamkit/modules/stream_kit_module.dart';
 import 'package:streamkit/modules/chat_to_speech/enums/language.dart';
+import 'package:streamkit/screens/home/home_vm.dart';
 import 'package:system_theme/system_theme.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 
@@ -9,7 +9,7 @@ import 'screens/home/home.dart';
 import 'screens/chat_to_speech/chat_to_speech.dart';
 import 'screens/chat_to_speech/chat_to_speech_vm.dart';
 
-import 'modules/chat_to_speech/chat_to_speech_handler.dart';
+import 'modules/chat_to_speech/chat_to_speech_module.dart';
 import 'modules/chat_to_speech/models/chat_to_speech_configuration.dart';
 
 void main() {
@@ -34,16 +34,32 @@ class MyApp extends StatefulWidget {
 
 class MyAppState extends State<MyApp> {
   int index = 0;
-  final ChatToSpeechViewModel _chatToSpeechViewModel = ChatToSpeechViewModel(
-    ChatToSpeechConfiguration(
-        channels: [],
-        readUsername: true,
-        ignoreExclamationMark: true,
-        languages: [Language.indonesian, Language.english, Language.japanese],
-        enabled: false),
-  );
+  final ChatToSpeechViewModel _chatToSpeechViewModel;
+  final ChatToSpeechModule _chatToSpeechModule;
 
-  final ChatToSpeechHandler _chatToSpeechHandler = ChatToSpeechHandler();
+  MyAppState._(
+      {required ChatToSpeechModule chatToSpeechModule,
+      required ChatToSpeechViewModel chatToSpeechViewModel})
+      : _chatToSpeechModule = chatToSpeechModule,
+        _chatToSpeechViewModel = chatToSpeechViewModel;
+
+  factory MyAppState() {
+    final chatToSpeechModule = ChatToSpeechModule();
+    final chatToSpeechViewModel = ChatToSpeechViewModel(
+      configuration: ChatToSpeechConfiguration(
+          channels: [],
+          readUsername: true,
+          ignoreExclamationMark: true,
+          languages: [Language.indonesian, Language.english, Language.japanese],
+          enabled: false),
+      module: chatToSpeechModule,
+    );
+
+    return MyAppState._(
+      chatToSpeechModule: chatToSpeechModule,
+      chatToSpeechViewModel: chatToSpeechViewModel,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +108,15 @@ class MyAppState extends State<MyApp> {
           ),
         ),
         content: NavigationBody(children: [
-          const Home(),
+          Home(
+            viewModel:
+                HomeViewModel(chatToSpeechState: _chatToSpeechModule.state),
+            onSelectModule: (index) {
+              setState(() {
+                this.index = index;
+              });
+            },
+          ),
           ChatToSpeech(viewModel: _chatToSpeechViewModel),
         ], index: index),
         pane: NavigationPane(

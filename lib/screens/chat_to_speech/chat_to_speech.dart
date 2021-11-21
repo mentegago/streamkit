@@ -22,6 +22,8 @@ class _ChatToSpeechState extends State<ChatToSpeech> {
   @override
   void dispose() {
     _errorSubscription?.cancel();
+    widget.viewModel.dispose();
+
     super.dispose();
   }
 

@@ -3,10 +3,11 @@ import 'package:flutter/services.dart';
 
 import 'package:flutter_js/flutter_js.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:streamkit/modules/stream_kit_module.dart';
 
 import 'models/chat_to_speech_configuration.dart';
 import 'enums/language.dart';
-import 'twitch.dart';
+import '../../utils/twitch/twitch.dart';
 
 class ChatToSpeechMessage {
   final String name;
@@ -17,7 +18,7 @@ class ChatToSpeechMessage {
       {required this.name, required this.message, this.language});
 }
 
-class ChatToSpeechHandler {
+class ChatToSpeechModule extends StreamKitModule {
   final maxQueueLength = 5;
 
   final _runtime = getJavascriptRuntime();
@@ -29,8 +30,19 @@ class ChatToSpeechHandler {
 
   Set<String> get channels => _twitch.channels;
   Stream<String> get joinStream => _twitch.joinStream;
+  Stream<ModuleState> get state => _twitch.state.map((event) {
+        switch (event) {
+          case TwitchState.active:
+            return ModuleState.active;
+          case TwitchState.inactive:
+            return ModuleState.inactive;
+          case TwitchState.loading:
+            return ModuleState.loading;
+        }
+      });
+  Stream<TwitchError> get error => _twitch.error;
 
-  ChatToSpeechHandler() {
+  ChatToSpeechModule() {
     // Load Franc
     rootBundle.loadString('assets/franc-min.js').then((script) {
       _runtime.evaluate(script);
