@@ -1,4 +1,4 @@
-import '../../enums/language.dart';
+import 'package:streamkit/modules/enums/language.dart';
 
 class ChatToSpeechConfiguration {
   final List<String> channels;

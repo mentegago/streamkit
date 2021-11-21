@@ -1,13 +1,12 @@
 import 'dart:collection';
 
 import 'package:just_audio/just_audio.dart';
+import 'package:streamkit/modules/chat_to_speech/models/chat_to_speech_configuration.dart';
+import 'package:streamkit/modules/enums/language.dart';
 import 'package:streamkit/modules/stream_kit_module.dart';
 import 'package:streamkit/utils/language.dart';
 import 'package:streamkit/utils/string.dart';
-
-import 'models/chat_to_speech_configuration.dart';
-import '../enums/language.dart';
-import '../../utils/twitch.dart';
+import 'package:streamkit/utils/twitch.dart';
 
 class ChatToSpeechMessage {
   final String name;
