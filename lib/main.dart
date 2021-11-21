@@ -104,7 +104,7 @@ class MyAppState extends State<MyApp> {
             ),
             PaneItem(
               icon: const Icon(FluentIcons.speech),
-              title: const Text("Chat to Speech"),
+              title: const Text("Chat Reader"),
             ),
           ],
           selected: index,

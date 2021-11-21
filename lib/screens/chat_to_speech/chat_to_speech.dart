@@ -42,7 +42,7 @@ class _ChatToSpeechState extends State<ChatToSpeech> {
     });
 
     return ScaffoldPage(
-        header: const PageHeader(title: Text("Twitch Chat to Speech")),
+        header: const PageHeader(title: Text("Twitch Chat Reader")),
         content: Container(
           margin: const EdgeInsets.fromLTRB(24, 0, 24, 0),
           child: Column(
@@ -53,8 +53,7 @@ class _ChatToSpeechState extends State<ChatToSpeech> {
                 inputFormatters: [ChannelTextFormatter()],
                 header: "Channel name",
                 controller: widget.viewModel.channelController,
-                placeholder:
-                    "The name of the channel you want the TTS to read on",
+                placeholder: "The channel where you want the chat to be read.",
               ),
               const SizedBox(height: 24),
               Wrap(
@@ -62,7 +61,7 @@ class _ChatToSpeechState extends State<ChatToSpeech> {
                 spacing: 32,
                 children: [
                   InfoLabel(
-                    label: "Conditions",
+                    label: "Configurations",
                     child: Wrap(
                       direction: Axis.vertical,
                       spacing: 8,
@@ -84,14 +83,14 @@ class _ChatToSpeechState extends State<ChatToSpeech> {
                             stream: widget.viewModel.ignoreExclamationMark,
                             builder: (context, snapshot) {
                               return Checkbox(
-                                  checked: snapshot.data,
-                                  onChanged: (bool? value) {
-                                    widget.viewModel
-                                        .updateIgnoreExclamationMark(
-                                            value ?? false);
-                                  },
-                                  content: const Text(
-                                      "Ignore messages starting with \"!\""));
+                                checked: snapshot.data,
+                                onChanged: (bool? value) {
+                                  widget.viewModel.updateIgnoreExclamationMark(
+                                      value ?? false);
+                                },
+                                content: const Text(
+                                    "Ignore messages starting with \"!\""),
+                              );
                             })
                       ],
                     ),
