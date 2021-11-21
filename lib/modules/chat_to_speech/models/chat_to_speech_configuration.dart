@@ -1,10 +1,10 @@
-import '../enums/language.dart';
+import '../../enums/language.dart';
 
 class ChatToSpeechConfiguration {
   final List<String> channels;
   final bool readUsername;
   final bool ignoreExclamationMark;
-  final List<Language> languages;
+  final Set<Language> languages;
   final bool enabled;
 
   ChatToSpeechConfiguration({

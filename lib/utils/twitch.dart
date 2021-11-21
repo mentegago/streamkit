@@ -4,8 +4,8 @@ import 'package:rxdart/rxdart.dart';
 
 import 'package:web_socket_channel/io.dart';
 
-import '../../modules/chat_to_speech/models/twitch-message.dart';
-import '../../modules/chat_to_speech/models/user_state.dart';
+import '../modules/chat_to_speech/models/twitch-message.dart';
+import '../modules/chat_to_speech/models/user_state.dart';
 
 enum TwitchState { active, inactive, loading }
 enum TwitchError { timeout }
@@ -179,7 +179,7 @@ class Twitch {
       _wsChannel?.sink.add("PART #$element");
     }
 
-    _targetChannels = <String>{};
+    _targetChannels = {};
   }
 
   void _updateModuleState() {

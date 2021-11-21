@@ -1,6 +1,6 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:streamkit/modules/stream_kit_module.dart';
-import 'package:streamkit/modules/chat_to_speech/enums/language.dart';
+import 'package:streamkit/modules/enums/language.dart';
 import 'package:streamkit/screens/home/home_vm.dart';
 import 'package:system_theme/system_theme.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
@@ -47,11 +47,11 @@ class MyAppState extends State<MyApp> {
     final chatToSpeechModule = ChatToSpeechModule();
     final chatToSpeechViewModel = ChatToSpeechViewModel(
       configuration: ChatToSpeechConfiguration(
-          channels: [],
+          channels: ["mentegagoreng"],
           readUsername: true,
           ignoreExclamationMark: true,
-          languages: [Language.indonesian, Language.english, Language.japanese],
-          enabled: false),
+          languages: {Language.indonesian, Language.english, Language.japanese},
+          enabled: true),
       module: chatToSpeechModule,
     );
 

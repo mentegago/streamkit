@@ -1,13 +1,13 @@
 import 'dart:collection';
-import 'package:flutter/services.dart';
 
-import 'package:flutter_js/flutter_js.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:streamkit/modules/stream_kit_module.dart';
+import 'package:streamkit/utils/language.dart';
+import 'package:streamkit/utils/string.dart';
 
 import 'models/chat_to_speech_configuration.dart';
-import 'enums/language.dart';
-import '../../utils/twitch/twitch.dart';
+import '../enums/language.dart';
+import '../../utils/twitch.dart';
 
 class ChatToSpeechMessage {
   final String name;
@@ -20,8 +20,6 @@ class ChatToSpeechMessage {
 
 class ChatToSpeechModule extends StreamKitModule {
   final maxQueueLength = 5;
-
-  final _runtime = getJavascriptRuntime();
   final _twitch = Twitch();
   final _messageQueue = Queue<ChatToSpeechMessage>();
 
@@ -43,11 +41,6 @@ class ChatToSpeechModule extends StreamKitModule {
   Stream<TwitchError> get error => _twitch.error;
 
   ChatToSpeechModule() {
-    // Load Franc
-    rootBundle.loadString('assets/franc-min.js').then((script) {
-      _runtime.evaluate(script);
-    });
-
     _listenTwitchMessages();
   }
 
@@ -63,8 +56,8 @@ class ChatToSpeechModule extends StreamKitModule {
 
   void _listenTwitchMessages() {
     _twitch.messageStream.listen((message) {
-      final text = _pachify(
-        _warafy(message.emotelessMessage),
+      final text = StringUtil.pachify(
+        StringUtil.warafy(message.emotelessMessage),
         username: message.username,
       );
 
@@ -107,7 +100,10 @@ class ChatToSpeechModule extends StreamKitModule {
 
     _isSpeaking = true;
     final message = _messageQueue.removeFirst();
-    final language = message.language ?? _getLanguage(text: message.message);
+    final language = message.language ??
+        LanguageUtil.getLanguage(
+            text: message.message,
+            whitelistedLanguages: _configuration?.languages ?? {});
     final filteredName =
         message.name.replaceAll(RegExp("[^A-Za-z]"), "").toLowerCase();
     final text = (_configuration?.readUsername ?? true)
@@ -133,61 +129,5 @@ class ChatToSpeechModule extends StreamKitModule {
     if (!_isSpeaking) {
       _readQueue();
     }
-  }
-
-  // Get language from Franc JavaScript library.
-  Language _getLanguage({required String text}) {
-    if (text.contains("panci panci panci")) {
-      return Language.indonesian;
-    }
-
-    String francText = text;
-
-    while (francText.length < 30 && francText.isNotEmpty) {
-      francText += " " + text;
-    }
-
-    String languages = (_configuration?.languages ?? [])
-        .map((lang) => "'" + lang.franc + "'")
-        .join(", ");
-
-    final textLanguage = _runtime
-        .evaluate("franc('" +
-            francText.replaceAll('\'', '\\\'') +
-            "', { whitelist: [$languages] })")
-        .stringResult;
-
-    return LanguageParser.fromFranc(textLanguage) ??
-        ((_configuration?.languages ?? []).isNotEmpty
-            ? (_configuration?.languages ?? []).first
-            : Language.indonesian);
-  }
-
-  String _pachify(String text, {String username = ""}) {
-    final usernameList = [
-      'ngeq',
-      'amikarei',
-      'bagusnl',
-      'ozhy27',
-      'kalamuspls',
-      'seiki_ryuuichi',
-      'cepp18_',
-      'mentegagoreng',
-      'sodiumtaro'
-    ];
-
-    String pachiReplacement = 'パチパチパチ';
-    if (usernameList.contains(username.toLowerCase())) {
-      pachiReplacement = 'panci panci panci';
-    }
-
-    return text.replaceAll(RegExp(r'(8|８){3,}'), pachiReplacement);
-  }
-
-  String _warafy(String text) {
-    return text.replaceAll(
-      RegExp(r'(( |^|\n|\r)(w|ｗ){2,}( |$|\n|\r))'),
-      'わらわら',
-    );
   }
 }

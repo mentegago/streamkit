@@ -35,7 +35,7 @@ class Home extends StatelessWidget {
                         return ModuleStatusBox(
                           icon: FluentIcons.speech,
                           title: "Chat Reader",
-                          status: snapshot.data == ModuleState.active,
+                          state: snapshot.data ?? ModuleState.inactive,
                           onSelectModule: () {
                             _onSelectModule?.call(1);
                           },
@@ -52,14 +52,14 @@ class Home extends StatelessWidget {
 class ModuleStatusBox extends StatelessWidget {
   final IconData icon;
   final String title;
-  final bool status;
+  final ModuleState state;
   final Function? onSelectModule;
 
   const ModuleStatusBox({
     Key? key,
     required this.icon,
     required this.title,
-    required this.status,
+    required this.state,
     this.onSelectModule,
   }) : super(key: key);
 
@@ -76,7 +76,7 @@ class ModuleStatusBox extends StatelessWidget {
             Icon(icon, size: 42),
             const SizedBox(height: 12),
             Text(title),
-            ModuleStatusInfo(status: status),
+            ModuleStatusInfo(state: state),
           ],
         ),
       ),
@@ -85,9 +85,9 @@ class ModuleStatusBox extends StatelessWidget {
 }
 
 class ModuleStatusInfo extends StatelessWidget {
-  final bool _status;
-  const ModuleStatusInfo({Key? key, required bool status})
-      : _status = status,
+  final ModuleState _state;
+  const ModuleStatusInfo({Key? key, required ModuleState state})
+      : _state = state,
         super(key: key);
 
   @override
@@ -97,10 +97,28 @@ class ModuleStatusInfo extends StatelessWidget {
       margin: const EdgeInsets.only(top: 2),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        color: _status ? Colors.green : Colors.red,
+        color: () {
+          switch (_state) {
+            case ModuleState.active:
+              return Colors.green;
+            case ModuleState.inactive:
+              return Colors.red;
+            case ModuleState.loading:
+              return Colors.black;
+          }
+        }(),
       ),
       child: Text(
-        _status ? "Active" : "Inactive",
+        () {
+          switch (_state) {
+            case ModuleState.active:
+              return "Active";
+            case ModuleState.inactive:
+              return "Inactive";
+            case ModuleState.loading:
+              return "Loading";
+          }
+        }(),
         style: const TextStyle(
           color: Colors.white,
         ),

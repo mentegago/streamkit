@@ -2,12 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:streamkit/modules/stream_kit_module.dart';
-import 'package:streamkit/utils/twitch/twitch.dart';
+import 'package:streamkit/utils/twitch.dart';
 import 'package:streamkit/screens/stream_kit_view_model.dart';
 
 import '../../modules/chat_to_speech/chat_to_speech_module.dart';
 import '../../modules/chat_to_speech/models/chat_to_speech_configuration.dart';
-import '../../modules/chat_to_speech/enums/language.dart';
+import '../../modules/enums/language.dart';
 
 enum ChatToSpeechConnectionState {
   idle,
@@ -21,7 +21,7 @@ class ChatToSpeechViewModel extends StreamKitViewModel {
 
   final _readUsername = BehaviorSubject<bool>();
   final _ignoreExclamationMark = BehaviorSubject<bool>();
-  final _languages = BehaviorSubject<List<Language>>();
+  final _languages = BehaviorSubject<Set<Language>>();
 
   Stream<ChatToSpeechConnectionState> get state => _module.state.map((event) {
         switch (event) {
@@ -62,6 +62,7 @@ class ChatToSpeechViewModel extends StreamKitViewModel {
     viewModel._readUsername.add(configuration.readUsername);
     viewModel._ignoreExclamationMark.add(configuration.ignoreExclamationMark);
     viewModel._languages.add(configuration.languages);
+    module.updateConfiguration(configuration);
 
     return viewModel;
   }
@@ -94,8 +95,7 @@ class ChatToSpeechViewModel extends StreamKitViewModel {
       languages.remove(language);
     }
 
-    _languages
-        .add(languages.toSet().toList()); // Make the language list unique.
+    _languages.add(languages.toSet()); // Make the language list unique.
   }
 
   void setEnabled(bool enabled) {

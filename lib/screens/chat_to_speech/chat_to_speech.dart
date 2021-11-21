@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flag/flag.dart';
 
 import 'chat_to_speech_vm.dart';
-import '../../modules/chat_to_speech/enums/language.dart';
+import '../../modules/enums/language.dart';
 
 class ChatToSpeech extends StatefulWidget {
   final ChatToSpeechViewModel viewModel;
