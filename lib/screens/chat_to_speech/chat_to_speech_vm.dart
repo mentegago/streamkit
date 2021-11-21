@@ -6,7 +6,7 @@ import 'package:streamkit/utils/twitch.dart';
 import 'package:streamkit/screens/stream_kit_view_model.dart';
 
 import '../../modules/chat_to_speech/chat_to_speech_module.dart';
-import '../../modules/chat_to_speech/models/chat_to_speech_configuration.dart';
+import '../../configurations/chat_to_speech_configuration.dart';
 import '../../modules/enums/language.dart';
 
 enum ChatToSpeechConnectionState {

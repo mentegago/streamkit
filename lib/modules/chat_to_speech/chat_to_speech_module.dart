@@ -1,7 +1,7 @@
 import 'dart:collection';
 
 import 'package:just_audio/just_audio.dart';
-import 'package:streamkit/modules/chat_to_speech/models/chat_to_speech_configuration.dart';
+import 'package:streamkit/configurations/chat_to_speech_configuration.dart';
 import 'package:streamkit/modules/enums/language.dart';
 import 'package:streamkit/modules/stream_kit_module.dart';
 import 'package:streamkit/utils/language.dart';
@@ -25,6 +25,8 @@ class ChatToSpeechModule extends StreamKitModule {
   ChatToSpeechConfiguration? _configuration;
   bool _isSpeaking = false;
 
+  Function(ChatToSpeechConfiguration configuration)? onConfigurationChanged;
+
   Set<String> get channels => _twitch.channels;
   Stream<String> get joinStream => _twitch.joinStream;
   Stream<ModuleState> get state => _twitch.state.map((event) {
@@ -39,7 +41,7 @@ class ChatToSpeechModule extends StreamKitModule {
       });
   Stream<TwitchError> get error => _twitch.error;
 
-  ChatToSpeechModule() {
+  ChatToSpeechModule({this.onConfigurationChanged}) {
     _listenTwitchMessages();
   }
 
@@ -51,6 +53,7 @@ class ChatToSpeechModule extends StreamKitModule {
     }
 
     _configuration = configuration;
+    onConfigurationChanged?.call(configuration);
   }
 
   void _listenTwitchMessages() {
