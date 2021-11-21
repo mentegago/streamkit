@@ -1,5 +1,5 @@
 # 🧈 Mentega StreamKit 🧈
-**This app is still in very early stage. Please use [Mentega TTS](https://github.com/mentegago/mentega-tts/releases/latest) instead for TTS.**
+**This app is still in very early stage. There will be a lot of bugs.**
 
 ![Screenshot](screenshots/streamkit.jpg)
 
