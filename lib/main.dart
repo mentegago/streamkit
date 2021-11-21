@@ -11,7 +11,9 @@ import 'screens/chat_to_speech/chat_to_speech_vm.dart';
 import 'modules/chat_to_speech/chat_to_speech_module.dart';
 import 'modules/chat_to_speech/models/chat_to_speech_configuration.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await SystemTheme.accentInstance.load();
   runApp(const MyApp());
 
   doWhenWindowReady(() {
@@ -46,11 +48,11 @@ class MyAppState extends State<MyApp> {
     final chatToSpeechModule = ChatToSpeechModule();
     final chatToSpeechViewModel = ChatToSpeechViewModel(
       configuration: ChatToSpeechConfiguration(
-          channels: ["mentegagoreng"],
+          channels: [],
           readUsername: true,
           ignoreExclamationMark: true,
           languages: {Language.indonesian, Language.english, Language.japanese},
-          enabled: true),
+          enabled: false),
       module: chatToSpeechModule,
     );
 

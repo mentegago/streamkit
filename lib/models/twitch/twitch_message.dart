@@ -1,4 +1,4 @@
-import 'package:streamkit/modules/chat_to_speech/models/user_state.dart';
+import 'package:streamkit/models/twitch/user_state.dart';
 
 class TwitchMessage {
   final String username;

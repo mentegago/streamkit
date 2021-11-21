@@ -76,13 +76,6 @@ class ChatToSpeechViewModel extends StreamKitViewModel {
         enabled: enabled,
       );
 
-  @override
-  void dispose() {
-    _readUsername.close();
-    _ignoreExclamationMark.close();
-    _languages.close();
-  }
-
   // Form update handling.
   void updateUsername(bool value) => _readUsername.add(value);
   void updateIgnoreExclamationMark(bool value) =>
