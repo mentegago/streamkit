@@ -1,6 +1,9 @@
 import 'dart:async';
+import 'dart:collection';
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:http/http.dart' as http;
 
 import 'package:web_socket_channel/io.dart';
 
@@ -16,6 +19,9 @@ class Twitch {
 
   Set<String> _channels = {};
   Set<String> _targetChannels;
+
+  Set<String> _globalBttvEmotes = {};
+  Map<String, Set<String>> _bttvEmotes = Map();
 
   IOWebSocketChannel? _wsChannel;
 
@@ -42,6 +48,7 @@ class Twitch {
         _token = token,
         _targetChannels = channels {
     _connect();
+    _fetchGlobalBttvEmotes();
   }
 
   void _connect() {
@@ -109,32 +116,43 @@ class Twitch {
     final tags = match.namedGroup('tags') ?? "";
     final username = match.namedGroup('username') ?? "";
     final channel = match.namedGroup('channel') ?? "";
-    final message = match.namedGroup('message') ?? "";
     final userState = UserState.fromString(tags);
 
-    final emotes = userState.emotes
+    String message = match.namedGroup('message') ?? "";
+
+    final twitchEmotes = userState.emotes
         .map((emote) => message.substring(emote.startIndex, emote.endIndex + 1))
         .toSet();
 
-    final emotelessMessage = emotes
+    final emotes = {
+      ..._globalBttvEmotes,
+      ..._bttvEmotes[channel] ?? {},
+      ...twitchEmotes,
+    };
+
+    message = emotes
         .fold(
-            message,
-            (String previousValue, element) =>
-                previousValue.replaceAll(element, ''))
+          message,
+          (String previousValue, element) =>
+              previousValue.replaceAll(element, ''),
+        )
         .replaceAll(RegExp(" +"), " "); // remove multiple spaces
 
-    final urllessMessage = emotelessMessage.replaceAll(
-        RegExp(
-            r"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)"),
-        "");
+    message = message.replaceAll(
+      RegExp(
+          r"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)"),
+      "",
+    );
 
     _messageSubject.add(
-      TwitchMessage(message,
-          username: username,
-          userState: userState,
-          channel: channel,
-          self: username == _nick,
-          emotelessMessage: urllessMessage),
+      TwitchMessage(
+        message,
+        username: username,
+        userState: userState,
+        channel: channel,
+        self: username == _nick,
+        emotelessMessage: message,
+      ),
     );
   }
 
@@ -162,6 +180,25 @@ class Twitch {
     }
   }
 
+  void _fetchBttvEmotes(String channel) async {
+    if (_bttvEmotes[channel] != null) return;
+    final url = Uri.parse(
+        "https://customapi.aidenwallis.co.uk/api/v1/emotes/$channel/bttv");
+    final response = await http.get(url);
+    if (response.statusCode != 200) return;
+
+    final emotes = response.body.split(' ');
+    _bttvEmotes[channel] = emotes.toSet();
+  }
+
+  void _fetchGlobalBttvEmotes() async {
+    final url = Uri.parse("https://api.betterttv.net/3/cached/emotes/global");
+    final response = await http.get(url);
+    final List<dynamic> json = jsonDecode(response.body);
+
+    _globalBttvEmotes = json.map((emote) => emote['code'] as String).toSet();
+  }
+
   void setChannels(List<String> channels) {
     final currentChannels = _channels;
 
@@ -176,6 +213,10 @@ class Twitch {
         .forEach((channel) => _wsChannel?.sink.add("JOIN #$channel"));
 
     _targetChannels = channels.toSet();
+    for (var channel in channels) {
+      _fetchBttvEmotes(channel);
+    }
+
     _updateModuleState();
   }
 
