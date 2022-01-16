@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flag/flag.dart';
-import 'package:streamkit/configurations/chat_to_speech_configuration.dart';
 
 import 'chat_to_speech_vm.dart';
 import '../../modules/enums/language.dart';
@@ -52,6 +51,7 @@ class _ChatToSpeechState extends State<ChatToSpeech> {
   @override
   void dispose() {
     _errorSubscription?.cancel();
+    _stateSubscription?.cancel();
     widget.viewModel.dispose();
 
     super.dispose();

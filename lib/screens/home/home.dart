@@ -2,16 +2,22 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:streamkit/modules/stream_kit_module.dart';
 import 'package:streamkit/screens/chat_to_speech/chat_to_speech_vm.dart';
 import 'package:streamkit/screens/home/home_vm.dart';
+import 'package:tuple/tuple.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class Home extends StatelessWidget {
-  final HomeViewModel _viewModel;
+class Home extends StatefulWidget {
+  final HomeViewModel viewModel;
   final Function(int)? _onSelectModule;
 
-  const Home({Key? key, required viewModel, Function(int)? onSelectModule})
-      : _viewModel = viewModel,
-        _onSelectModule = onSelectModule,
+  const Home({Key? key, required this.viewModel, Function(int)? onSelectModule})
+      : _onSelectModule = onSelectModule,
         super(key: key);
 
+  @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return ScaffoldPage(
@@ -22,22 +28,68 @@ class Home extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const Text("Below are the status of all StreamKit modules."),
-              const SizedBox(height: 12),
+              StreamBuilder<Tuple2<VersionState, String?>>(
+                  stream: widget.viewModel.isOutdated,
+                  builder: (context, snapshot) {
+                    final state = snapshot.data?.item1 ?? VersionState.loading;
+                    final latestVersion = snapshot.data?.item2 ?? "";
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 24),
+                      child: MouseRegion(
+                        cursor: SystemMouseCursors.click,
+                        child: GestureDetector(
+                          onTap: () {
+                            switch (state) {
+                              case VersionState.outdated:
+                                launch(widget.viewModel.downloadUrl);
+                                break;
+                              case VersionState.upToDate:
+                                launch(
+                                    "https://www.youtube.com/watch?v=mW61VTLhNjQ");
+                                break;
+                              default:
+                                break;
+                            }
+                          },
+                          child: InfoBar(
+                            severity: state == VersionState.outdated
+                                ? InfoBarSeverity.warning
+                                : state == VersionState.upToDate
+                                    ? InfoBarSeverity.success
+                                    : InfoBarSeverity.info,
+                            title: Text(state == VersionState.outdated
+                                ? "Outdated"
+                                : state == VersionState.upToDate
+                                    ? "Up to date"
+                                    : state == VersionState.error
+                                        ? "Error"
+                                        : "Loading"),
+                            content: Text(state == VersionState.outdated
+                                ? "Your StreamKit is outdated. Click here to download the latest version ($latestVersion)."
+                                : state == VersionState.upToDate
+                                    ? "Your StreamKit is up to date."
+                                    : state == VersionState.error
+                                        ? "Failed to get latest version of StreamKit."
+                                        : "Getting latest version of StreamKit..."),
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
               Wrap(
                 direction: Axis.horizontal,
                 spacing: 12,
                 runSpacing: 12,
                 children: [
                   StreamBuilder<ModuleState>(
-                      stream: _viewModel.chatToSpeechState,
+                      stream: widget.viewModel.chatToSpeechState,
                       builder: (context, snapshot) {
                         return ModuleStatusBox(
                           icon: FluentIcons.speech,
                           title: "Chat Reader",
                           state: snapshot.data ?? ModuleState.inactive,
                           onSelectModule: () {
-                            _onSelectModule?.call(1);
+                            widget._onSelectModule?.call(1);
                           },
                         );
                       }),

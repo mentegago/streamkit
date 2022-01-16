@@ -36,13 +36,16 @@ class MyApp extends StatefulWidget {
 
 class MyAppState extends State<MyApp> {
   int index = 0;
+  final HomeViewModel _homeViewModel;
   final ChatToSpeechViewModel _chatToSpeechViewModel;
   final ChatToSpeechModule _chatToSpeechModule;
 
-  MyAppState._(
-      {required ChatToSpeechModule chatToSpeechModule,
-      required ChatToSpeechViewModel chatToSpeechViewModel})
-      : _chatToSpeechModule = chatToSpeechModule,
+  MyAppState._({
+    required HomeViewModel homeViewModel,
+    required ChatToSpeechModule chatToSpeechModule,
+    required ChatToSpeechViewModel chatToSpeechViewModel,
+  })  : _homeViewModel = homeViewModel,
+        _chatToSpeechModule = chatToSpeechModule,
         _chatToSpeechViewModel = chatToSpeechViewModel;
 
   factory MyAppState() {
@@ -58,8 +61,11 @@ class MyAppState extends State<MyApp> {
       configuration: AppConfig.configurations.chatToSpeech,
       module: chatToSpeechModule,
     );
+    final homeViewModel =
+        HomeViewModel(chatToSpeechState: chatToSpeechModule.state);
 
     return MyAppState._(
+      homeViewModel: homeViewModel,
       chatToSpeechModule: chatToSpeechModule,
       chatToSpeechViewModel: chatToSpeechViewModel,
     );
@@ -113,8 +119,7 @@ class MyAppState extends State<MyApp> {
         ),
         content: NavigationBody(children: [
           Home(
-            viewModel:
-                HomeViewModel(chatToSpeechState: _chatToSpeechModule.state),
+            viewModel: _homeViewModel,
             onSelectModule: (index) {
               setState(() {
                 this.index = index;
