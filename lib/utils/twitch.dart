@@ -123,13 +123,18 @@ class Twitch {
                 previousValue.replaceAll(element, ''))
         .replaceAll(RegExp(" +"), " "); // remove multiple spaces
 
+    final urllessMessage = emotelessMessage.replaceAll(
+        RegExp(
+            r"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)"),
+        "");
+
     _messageSubject.add(
       TwitchMessage(message,
           username: username,
           userState: userState,
           channel: channel,
           self: username == _nick,
-          emotelessMessage: emotelessMessage),
+          emotelessMessage: urllessMessage),
     );
   }
 
