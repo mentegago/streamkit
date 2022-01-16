@@ -10,6 +10,7 @@
 #include <flutter_js/flutter_js_plugin.h>
 #include <libwinmedia/libwinmedia_plugin.h>
 #include <system_theme/system_theme_plugin.h>
+#include <url_launcher_windows/url_launcher_windows.h>
 
 void RegisterPlugins(flutter::PluginRegistry* registry) {
   BitsdojoWindowPluginRegisterWithRegistrar(
@@ -20,4 +21,6 @@ void RegisterPlugins(flutter::PluginRegistry* registry) {
       registry->GetRegistrarForPlugin("LibwinmediaPlugin"));
   SystemThemePluginRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("SystemThemePlugin"));
+  UrlLauncherWindowsRegisterWithRegistrar(
+      registry->GetRegistrarForPlugin("UrlLauncherWindows"));
 }
