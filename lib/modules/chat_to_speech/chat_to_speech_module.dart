@@ -58,13 +58,24 @@ class ChatToSpeechModule extends StreamKitModule {
 
   void _listenTwitchMessages() {
     _twitch.messageStream.listen((message) {
-      final text = StringUtil.pachify(
+      var text = StringUtil.pachify(
         StringUtil.warafy(message.emotelessMessage),
         username: message.username,
       );
 
+      final splitText = text.split(' ');
+      final forcedLanguage = splitText.length > 1
+          ? LanguageParser.fromForceCode(splitText.first)
+          : null;
+
+      if (forcedLanguage != null) {
+        splitText.removeAt(0);
+        text = splitText.join(' ');
+      }
+
       _addMessageToQueue(
-        ChatToSpeechMessage(name: message.username, message: text),
+        ChatToSpeechMessage(
+            name: message.username, message: text, language: forcedLanguage),
       );
     });
   }

@@ -36,6 +36,11 @@ class LanguageUtil {
     String languages =
         whitelistedLanguages.map((lang) => "'" + lang.franc + "'").join(", ");
 
+    if (whitelistedLanguages.contains(Language.japanese)) {
+      languages = languages +
+          ", 'cmn'"; // Use Mandarin to guide Franc into recognizing Japanese kanji. I'm so so sorry, but I guess no Mandarin support anytime soon...
+    }
+
     final textLanguage = _runtime
         .evaluate("franc('" +
             francText.replaceAll('\'', '\\\'') +

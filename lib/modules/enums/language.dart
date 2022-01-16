@@ -57,6 +57,9 @@ class LanguageParser {
         return Language.indonesian;
       case "jpn":
         return Language.japanese;
+      case "cmn":
+        return Language
+            .japanese; // Currently, we use Mandarin to guide Franc into recognizing Japanese kanji.
       default:
         return null;
     }
@@ -69,6 +72,19 @@ class LanguageParser {
       case "id-ID":
         return Language.indonesian;
       case "ja":
+        return Language.japanese;
+      default:
+        return null;
+    }
+  }
+
+  static Language? fromForceCode(String lang) {
+    switch (lang) {
+      case "EN":
+        return Language.english;
+      case "ID":
+        return Language.indonesian;
+      case "JP":
         return Language.japanese;
       default:
         return null;
