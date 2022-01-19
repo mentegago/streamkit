@@ -81,8 +81,7 @@ class ChatToSpeechModule extends StreamKitModule {
     });
   }
 
-  Future<Duration?> _speak(
-      {required String text, required Language language}) async {
+  void _speak({required String text, required Language language}) async {
     final url = Uri(
         scheme: "https",
         host: "translate.google.com",
@@ -96,6 +95,7 @@ class ChatToSpeechModule extends StreamKitModule {
 
     final player = AudioPlayer();
     await player.setUrl(url.toString());
+    await player.setVolume(_configuration?.volume ?? 1.0);
     await player.play();
 
     await player.playerStateStream.firstWhere((event) =>

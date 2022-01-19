@@ -17,6 +17,7 @@ ChatToSpeechConfiguration _$ChatToSpeechConfigurationFromJson(
           .map((e) => $enumDecode(_$LanguageEnumMap, e))
           .toSet(),
       enabled: json['enabled'] as bool,
+      volume: (json['volume'] as num?)?.toDouble(),
     );
 
 Map<String, dynamic> _$ChatToSpeechConfigurationToJson(
@@ -27,6 +28,7 @@ Map<String, dynamic> _$ChatToSpeechConfigurationToJson(
       'ignoreExclamationMark': instance.ignoreExclamationMark,
       'languages': instance.languages.map((e) => _$LanguageEnumMap[e]).toList(),
       'enabled': instance.enabled,
+      'volume': instance.volume,
     };
 
 const _$LanguageEnumMap = {

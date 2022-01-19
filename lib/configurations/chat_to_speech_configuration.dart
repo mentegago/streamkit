@@ -10,6 +10,7 @@ class ChatToSpeechConfiguration {
   final bool ignoreExclamationMark;
   final Set<Language> languages;
   final bool enabled;
+  final double? volume;
 
   factory ChatToSpeechConfiguration.fromJson(Map<String, dynamic> json) =>
       _$ChatToSpeechConfigurationFromJson(json);
@@ -21,5 +22,6 @@ class ChatToSpeechConfiguration {
     required this.ignoreExclamationMark,
     required this.languages,
     required this.enabled,
+    this.volume,
   });
 }

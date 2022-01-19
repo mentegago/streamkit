@@ -23,7 +23,8 @@ class Configurations {
               Language.japanese
             },
             readUsername: true,
-            enabled: false),
+            enabled: false,
+            volume: 1.0),
       );
 
   Configurations copyWith({

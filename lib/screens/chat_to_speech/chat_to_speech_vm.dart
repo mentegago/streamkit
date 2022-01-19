@@ -24,6 +24,7 @@ class ChatToSpeechViewModel extends StreamKitViewModel {
   final _ignoreExclamationMark = BehaviorSubject<bool>();
   final _languages = BehaviorSubject<Set<Language>>();
   final _isChanged = BehaviorSubject<bool>();
+  final _volume = BehaviorSubject<double>();
 
   ChatToSpeechConfiguration _currentConfiguration;
 
@@ -48,6 +49,7 @@ class ChatToSpeechViewModel extends StreamKitViewModel {
         }
       });
   Stream<bool> get isChanged => _isChanged.stream;
+  Stream<double> get volume => _volume.stream;
 
   void updateChangedState() {
     if (_currentConfiguration.readUsername != _readUsername.value) {
@@ -64,6 +66,11 @@ class ChatToSpeechViewModel extends StreamKitViewModel {
       return;
     }
     if (channelController.text != _currentConfiguration.channels.first) {
+      _isChanged.add(true);
+      return;
+    }
+    if (((_currentConfiguration.volume ?? 1.0) * 100).toInt() !=
+        (_volume.value * 100).toInt()) {
       _isChanged.add(true);
       return;
     }
@@ -96,6 +103,7 @@ class ChatToSpeechViewModel extends StreamKitViewModel {
     viewModel._readUsername.add(configuration.readUsername);
     viewModel._ignoreExclamationMark.add(configuration.ignoreExclamationMark);
     viewModel._languages.add({...configuration.languages});
+    viewModel._volume.add(configuration.volume ?? 1.0);
     module.updateConfiguration(configuration);
 
     return viewModel;
@@ -108,6 +116,7 @@ class ChatToSpeechViewModel extends StreamKitViewModel {
         ignoreExclamationMark: _ignoreExclamationMark.value,
         languages: _languages.value,
         enabled: enabled,
+        volume: _volume.value,
       );
 
   // Form update handling.
@@ -130,6 +139,11 @@ class ChatToSpeechViewModel extends StreamKitViewModel {
     }
 
     _languages.add(languages); // Make the language list unique.
+    updateChangedState();
+  }
+
+  void updateVolume(double volume) {
+    _volume.add(volume);
     updateChangedState();
   }
 

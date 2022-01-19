@@ -131,6 +131,22 @@ class _ChatToSpeechState extends State<ChatToSpeech> {
                       ],
                     ),
                   ),
+                  SizedBox(
+                    width: 200,
+                    child: InfoLabel(
+                      label: "Volume",
+                      child: StreamBuilder<double>(
+                        stream: widget.viewModel.volume,
+                        initialData: 1.0,
+                        builder: (context, snapshot) => Slider(
+                          max: 1.0,
+                          value: snapshot.data ?? 0,
+                          onChanged: (v) => widget.viewModel.updateVolume(v),
+                          label: '${((snapshot.data ?? 0) * 100).round()}%',
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 24),
