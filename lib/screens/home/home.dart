@@ -1,4 +1,5 @@
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:streamkit/app_config.dart';
 import 'package:streamkit/modules/stream_kit_module.dart';
 import 'package:streamkit/screens/home/home_vm.dart';
 import 'package:tuple/tuple.dart';
@@ -108,8 +109,26 @@ class _HomeState extends State<Home> {
                       if (snapshot.data == null) {
                         return const Text("");
                       } else {
-                        return Text(
-                          "🎈 ${snapshot.data}",
+                        return GestureDetector(
+                          onDoubleTap: () {
+                            final dialog = ContentDialog(
+                              title: const Text("Panci List"),
+                              content: Text(AppConfig.panciList.join(", ")),
+                              actions: [
+                                Button(
+                                    child: const Text("Ok"),
+                                    onPressed: () =>
+                                        Navigator.of(context).pop())
+                              ],
+                            );
+                            showDialog(
+                              context: context,
+                              builder: (context) => dialog,
+                            );
+                          },
+                          child: Text(
+                            "🎈 ${snapshot.data}",
+                          ),
                         );
                       }
                     }),

@@ -2,6 +2,7 @@ import 'dart:collection';
 import 'dart:convert';
 
 import 'package:just_audio/just_audio.dart';
+import 'package:streamkit/app_config.dart';
 import 'package:streamkit/configurations/chat_to_speech_configuration.dart';
 import 'package:streamkit/modules/enums/language.dart';
 import 'package:streamkit/modules/stream_kit_module.dart';
@@ -128,6 +129,11 @@ class ChatToSpeechModule extends StreamKitModule {
   }
 
   void _addMessageToQueue(ChatToSpeechMessage message) {
+    if (message.message == '!updatepachifylist' &&
+        message.name == 'mentegagoreng') {
+      AppConfig.loadPanciList();
+    }
+
     if ((_configuration?.ignoreExclamationMark ?? true) &&
         message.message.startsWith('!')) {
       return;

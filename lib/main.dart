@@ -12,6 +12,7 @@ import 'package:streamkit/modules/chat_to_speech/chat_to_speech_module.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  AppConfig.loadPanciList();
   await SystemTheme.accentInstance.load();
   await AppConfig.loadConfigurations();
 
