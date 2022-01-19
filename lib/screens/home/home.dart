@@ -194,7 +194,7 @@ class ModuleStatusInfo extends StatelessWidget {
             case ModuleState.inactive:
               return Colors.red;
             case ModuleState.loading:
-              return Colors.black;
+              return Colors.orange;
           }
         }(),
       ),
