@@ -19,8 +19,10 @@ enum VersionState {
 class HomeViewModel extends StreamKitViewModel {
   final Stream<ModuleState> chatToSpeechState;
   final _isOutdated = BehaviorSubject<Tuple2<VersionState, String?>>();
+  final _currentVersion = BehaviorSubject<String>();
 
   Stream<Tuple2<VersionState, String?>> get isOutdated => _isOutdated.stream;
+  Stream<String> get currentVersion => _currentVersion.stream;
 
   // TODO: These configs deserves to be in a better place :(
   final apiUrl =
@@ -58,5 +60,7 @@ class HomeViewModel extends StreamKitViewModel {
       _isOutdated
           .add(Tuple2<VersionState, String?>(VersionState.upToDate, tagName));
     }
+
+    _currentVersion.add(currentVersion.toString());
   }
 }

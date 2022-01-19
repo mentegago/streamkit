@@ -1,6 +1,5 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:streamkit/modules/stream_kit_module.dart';
-import 'package:streamkit/screens/chat_to_speech/chat_to_speech_vm.dart';
 import 'package:streamkit/screens/home/home_vm.dart';
 import 'package:tuple/tuple.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -24,76 +23,96 @@ class _HomeState extends State<Home> {
         header: const PageHeader(title: Text("StreamKit Status")),
         content: Container(
           margin: const EdgeInsets.fromLTRB(24, 0, 24, 0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisAlignment: MainAxisAlignment.start,
+          child: Stack(
             children: [
-              StreamBuilder<Tuple2<VersionState, String?>>(
-                  stream: widget.viewModel.isOutdated,
-                  builder: (context, snapshot) {
-                    final state = snapshot.data?.item1 ?? VersionState.loading;
-                    final latestVersion = snapshot.data?.item2 ?? "";
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 24),
-                      child: MouseRegion(
-                        cursor: SystemMouseCursors.click,
-                        child: GestureDetector(
-                          onTap: () {
-                            switch (state) {
-                              case VersionState.outdated:
-                                launch(widget.viewModel.downloadUrl);
-                                break;
-                              case VersionState.upToDate:
-                                launch(
-                                    "https://www.youtube.com/watch?v=mW61VTLhNjQ");
-                                break;
-                              default:
-                                break;
-                            }
-                          },
-                          child: InfoBar(
-                            severity: state == VersionState.outdated
-                                ? InfoBarSeverity.warning
-                                : state == VersionState.upToDate
-                                    ? InfoBarSeverity.success
-                                    : InfoBarSeverity.info,
-                            title: Text(state == VersionState.outdated
-                                ? "Outdated"
-                                : state == VersionState.upToDate
-                                    ? "Up to date"
-                                    : state == VersionState.error
-                                        ? "Error"
-                                        : "Loading"),
-                            content: Text(state == VersionState.outdated
-                                ? "Your StreamKit is outdated. Click here to download the latest version ($latestVersion)."
-                                : state == VersionState.upToDate
-                                    ? "Your StreamKit is up to date."
-                                    : state == VersionState.error
-                                        ? "Failed to get latest version of StreamKit."
-                                        : "Getting latest version of StreamKit..."),
-                          ),
-                        ),
-                      ),
-                    );
-                  }),
-              Wrap(
-                direction: Axis.horizontal,
-                spacing: 12,
-                runSpacing: 12,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  StreamBuilder<ModuleState>(
-                      stream: widget.viewModel.chatToSpeechState,
+                  StreamBuilder<Tuple2<VersionState, String?>>(
+                      stream: widget.viewModel.isOutdated,
                       builder: (context, snapshot) {
-                        return ModuleStatusBox(
-                          icon: FluentIcons.speech,
-                          title: "Chat Reader",
-                          state: snapshot.data ?? ModuleState.inactive,
-                          onSelectModule: () {
-                            widget._onSelectModule?.call(1);
-                          },
+                        final state =
+                            snapshot.data?.item1 ?? VersionState.loading;
+                        final latestVersion = snapshot.data?.item2 ?? "";
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 24),
+                          child: MouseRegion(
+                            cursor: SystemMouseCursors.click,
+                            child: GestureDetector(
+                              onTap: () {
+                                switch (state) {
+                                  case VersionState.outdated:
+                                    launch(widget.viewModel.downloadUrl);
+                                    break;
+                                  case VersionState.upToDate:
+                                    launch(
+                                        "https://www.youtube.com/watch?v=mW61VTLhNjQ");
+                                    break;
+                                  default:
+                                    break;
+                                }
+                              },
+                              child: InfoBar(
+                                severity: state == VersionState.outdated
+                                    ? InfoBarSeverity.warning
+                                    : state == VersionState.upToDate
+                                        ? InfoBarSeverity.success
+                                        : InfoBarSeverity.info,
+                                title: Text(state == VersionState.outdated
+                                    ? "Outdated"
+                                    : state == VersionState.upToDate
+                                        ? "Up to date"
+                                        : state == VersionState.error
+                                            ? "Error"
+                                            : "Loading"),
+                                content: Text(state == VersionState.outdated
+                                    ? "Your StreamKit is outdated. Click here to download the latest version ($latestVersion)."
+                                    : state == VersionState.upToDate
+                                        ? "Your StreamKit is up to date."
+                                        : state == VersionState.error
+                                            ? "Failed to get latest version of StreamKit."
+                                            : "Getting latest version of StreamKit..."),
+                              ),
+                            ),
+                          ),
                         );
                       }),
+                  Wrap(
+                    direction: Axis.horizontal,
+                    spacing: 12,
+                    runSpacing: 12,
+                    children: [
+                      StreamBuilder<ModuleState>(
+                          stream: widget.viewModel.chatToSpeechState,
+                          builder: (context, snapshot) {
+                            return ModuleStatusBox(
+                              icon: FluentIcons.speech,
+                              title: "Chat Reader",
+                              state: snapshot.data ?? ModuleState.inactive,
+                              onSelectModule: () {
+                                widget._onSelectModule?.call(1);
+                              },
+                            );
+                          }),
+                    ],
+                  ),
                 ],
+              ),
+              Positioned(
+                bottom: 0,
+                right: 0,
+                child: StreamBuilder(
+                    stream: widget.viewModel.currentVersion,
+                    builder: (context, snapshot) {
+                      if (snapshot.data == null) {
+                        return const Text("");
+                      } else {
+                        return Text(
+                          "🎈 ${snapshot.data}",
+                        );
+                      }
+                    }),
               )
             ],
           ),
