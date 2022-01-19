@@ -1,5 +1,6 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:streamkit/app_config.dart';
+import 'package:streamkit/screens/bs2obs/beatsaber_to_obs.dart';
 import 'package:streamkit/screens/home/home_vm.dart';
 import 'package:system_theme/system_theme.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
@@ -21,7 +22,7 @@ void main() async {
   doWhenWindowReady(() {
     final win = appWindow;
     win.minSize = const Size(750, 500);
-    win.size = const Size(1200, 700);
+    win.size = const Size(1100, 700);
     win.alignment = Alignment.center;
     win.title = "Mentega StreamKit";
     win.show();
@@ -118,17 +119,21 @@ class MyAppState extends State<MyApp> {
             ],
           ),
         ),
-        content: NavigationBody(children: [
-          Home(
-            viewModel: _homeViewModel,
-            onSelectModule: (index) {
-              setState(() {
-                this.index = index;
-              });
-            },
-          ),
-          ChatToSpeech(viewModel: _chatToSpeechViewModel),
-        ], index: index),
+        content: NavigationBody(
+          children: [
+            Home(
+              viewModel: _homeViewModel,
+              onSelectModule: (index) {
+                setState(() {
+                  this.index = index;
+                });
+              },
+            ),
+            ChatToSpeech(viewModel: _chatToSpeechViewModel),
+            BeatSaberToObs(),
+          ],
+          index: index,
+        ),
         pane: NavigationPane(
           displayMode: PaneDisplayMode.auto,
           items: [
@@ -139,6 +144,10 @@ class MyAppState extends State<MyApp> {
             PaneItem(
               icon: const Icon(FluentIcons.speech),
               title: const Text("Chat Reader"),
+            ),
+            PaneItem(
+              icon: const Icon(FluentIcons.streaming),
+              title: const Text("Beat Saber to OBS"),
             ),
           ],
           selected: index,

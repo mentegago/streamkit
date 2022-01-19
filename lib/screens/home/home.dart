@@ -85,17 +85,25 @@ class _HomeState extends State<Home> {
                     runSpacing: 12,
                     children: [
                       StreamBuilder<ModuleState>(
-                          stream: widget.viewModel.chatToSpeechState,
-                          builder: (context, snapshot) {
-                            return ModuleStatusBox(
-                              icon: FluentIcons.speech,
-                              title: "Chat Reader",
-                              state: snapshot.data ?? ModuleState.inactive,
-                              onSelectModule: () {
-                                widget._onSelectModule?.call(1);
-                              },
-                            );
-                          }),
+                        stream: widget.viewModel.chatToSpeechState,
+                        builder: (context, snapshot) {
+                          return ModuleStatusBox(
+                            icon: FluentIcons.speech,
+                            title: "Chat Reader",
+                            state: snapshot.data ?? ModuleState.inactive,
+                            onSelectModule: () {
+                              widget._onSelectModule?.call(1);
+                            },
+                          );
+                        },
+                      ),
+                      ModuleStatusBox(
+                        icon: FluentIcons.streaming,
+                        title: "Beat Saber 2 OBS",
+                        onSelectModule: () {
+                          widget._onSelectModule?.call(2);
+                        },
+                      )
                     ],
                   ),
                 ],
@@ -142,14 +150,14 @@ class _HomeState extends State<Home> {
 class ModuleStatusBox extends StatelessWidget {
   final IconData icon;
   final String title;
-  final ModuleState state;
+  final ModuleState? state;
   final Function? onSelectModule;
 
   const ModuleStatusBox({
     Key? key,
     required this.icon,
     required this.title,
-    required this.state,
+    this.state,
     this.onSelectModule,
   }) : super(key: key);
 
@@ -159,13 +167,17 @@ class ModuleStatusBox extends StatelessWidget {
       onPressed: () {
         onSelectModule?.call();
       },
-      child: Container(
-        padding: const EdgeInsets.fromLTRB(18, 18, 18, 8),
+      child: SizedBox(
+        height: 120,
+        width: 120,
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Icon(icon, size: 42),
             const SizedBox(height: 12),
             Text(title),
+            const SizedBox(height: 2),
             ModuleStatusInfo(state: state),
           ],
         ),
@@ -175,8 +187,8 @@ class ModuleStatusBox extends StatelessWidget {
 }
 
 class ModuleStatusInfo extends StatelessWidget {
-  final ModuleState _state;
-  const ModuleStatusInfo({Key? key, required ModuleState state})
+  final ModuleState? _state;
+  const ModuleStatusInfo({Key? key, ModuleState? state})
       : _state = state,
         super(key: key);
 
@@ -195,6 +207,8 @@ class ModuleStatusInfo extends StatelessWidget {
               return Colors.red;
             case ModuleState.loading:
               return Colors.orange;
+            case null:
+              return Colors.blue;
           }
         }(),
       ),
@@ -207,6 +221,8 @@ class ModuleStatusInfo extends StatelessWidget {
               return "Inactive";
             case ModuleState.loading:
               return "Loading";
+            case null:
+              return "Web";
           }
         }(),
         style: const TextStyle(
