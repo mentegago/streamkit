@@ -25,6 +25,7 @@ class ChatToSpeechViewModel extends StreamKitViewModel {
   final _languages = BehaviorSubject<Set<Language>>();
   final _isChanged = BehaviorSubject<bool>();
   final _volume = BehaviorSubject<double>();
+  final _readBsr = BehaviorSubject<bool>();
 
   ChatToSpeechConfiguration _currentConfiguration;
 
@@ -50,6 +51,7 @@ class ChatToSpeechViewModel extends StreamKitViewModel {
       });
   Stream<bool> get isChanged => _isChanged.stream;
   Stream<double> get volume => _volume.stream;
+  Stream<bool> get readBsr => _readBsr.stream;
 
   void updateChangedState() {
     if (_currentConfiguration.readUsername != _readUsername.value) {
@@ -74,6 +76,11 @@ class ChatToSpeechViewModel extends StreamKitViewModel {
       _isChanged.add(true);
       return;
     }
+    if (_currentConfiguration.readBsr != _readBsr.value) {
+      _isChanged.add(true);
+      return;
+    }
+
     _isChanged.add(false);
   }
 
@@ -104,6 +111,7 @@ class ChatToSpeechViewModel extends StreamKitViewModel {
     viewModel._ignoreExclamationMark.add(configuration.ignoreExclamationMark);
     viewModel._languages.add({...configuration.languages});
     viewModel._volume.add(configuration.volume ?? 1.0);
+    viewModel._readBsr.add(configuration.readBsr ?? true);
     module.updateConfiguration(configuration);
 
     return viewModel;
@@ -117,6 +125,7 @@ class ChatToSpeechViewModel extends StreamKitViewModel {
         languages: _languages.value,
         enabled: enabled,
         volume: _volume.value,
+        readBsr: _readBsr.value,
       );
 
   // Form update handling.
@@ -144,6 +153,11 @@ class ChatToSpeechViewModel extends StreamKitViewModel {
 
   void updateVolume(double volume) {
     _volume.add(volume);
+    updateChangedState();
+  }
+
+  void updateReadBsr(bool value) {
+    _readBsr.add(value);
     updateChangedState();
   }
 

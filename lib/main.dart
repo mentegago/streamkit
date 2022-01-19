@@ -20,7 +20,7 @@ void main() async {
 
   doWhenWindowReady(() {
     final win = appWindow;
-    win.minSize = const Size(500, 500);
+    win.minSize = const Size(750, 500);
     win.size = const Size(1200, 700);
     win.alignment = Alignment.center;
     win.title = "Mentega StreamKit";

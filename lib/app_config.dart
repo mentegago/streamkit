@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:streamkit/configurations/configurations.dart';
 
 class AppConfig {
+  static const String userAgent = 'MentegaStreamKit';
   static Configurations configurations = Configurations.defaultConfiguration();
   static Set<String> panciList = {};
   static String appPath = Platform.resolvedExecutable.lastIndexOf('\\') != -1

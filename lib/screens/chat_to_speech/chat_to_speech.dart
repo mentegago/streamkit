@@ -19,6 +19,7 @@ class ChatToSpeech extends StatefulWidget {
 class _ChatToSpeechState extends State<ChatToSpeech> {
   StreamSubscription<String>? _errorSubscription;
   StreamSubscription<ChatToSpeechConnectionState>? _stateSubscription;
+  final _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -61,8 +62,8 @@ class _ChatToSpeechState extends State<ChatToSpeech> {
   Widget build(BuildContext context) {
     return ScaffoldPage(
         header: const PageHeader(title: Text("Twitch Chat Reader")),
-        content: Container(
-          margin: const EdgeInsets.fromLTRB(24, 0, 24, 0),
+        content: SingleChildScrollView(
+          padding: const EdgeInsets.only(right: 24, left: 24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisAlignment: MainAxisAlignment.start,
@@ -77,6 +78,7 @@ class _ChatToSpeechState extends State<ChatToSpeech> {
               Wrap(
                 direction: Axis.horizontal,
                 spacing: 32,
+                runSpacing: 32,
                 children: [
                   InfoLabel(
                     label: "Configurations",
@@ -85,31 +87,52 @@ class _ChatToSpeechState extends State<ChatToSpeech> {
                       spacing: 8,
                       children: [
                         StreamBuilder<bool>(
-                            initialData: false,
-                            stream: widget.viewModel.readUsername,
-                            builder: (context, snapshot) {
-                              return Checkbox(
-                                  checked: snapshot.data,
-                                  onChanged: (bool? value) {
-                                    widget.viewModel
-                                        .updateUsername(value ?? false);
-                                  },
-                                  content: const Text("Read username"));
-                            }),
+                          initialData: false,
+                          stream: widget.viewModel.readUsername,
+                          builder: (context, snapshot) {
+                            return Checkbox(
+                                checked: snapshot.data,
+                                onChanged: (bool? value) {
+                                  widget.viewModel
+                                      .updateUsername(value ?? false);
+                                },
+                                content: const Text("Read username"));
+                          },
+                        ),
                         StreamBuilder<bool>(
-                            initialData: false,
-                            stream: widget.viewModel.ignoreExclamationMark,
+                          initialData: false,
+                          stream: widget.viewModel.ignoreExclamationMark,
+                          builder: (context, snapshot) {
+                            return Checkbox(
+                              checked: snapshot.data,
+                              onChanged: (bool? value) {
+                                widget.viewModel.updateIgnoreExclamationMark(
+                                    value ?? false);
+                              },
+                              content: const Text(
+                                "Ignore messages starting with \"!\"",
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 8),
+                        InfoLabel(
+                          label: "Beat Saber",
+                          child: StreamBuilder<bool>(
+                            initialData: true,
+                            stream: widget.viewModel.readBsr,
                             builder: (context, snapshot) {
                               return Checkbox(
                                 checked: snapshot.data,
                                 onChanged: (bool? value) {
-                                  widget.viewModel.updateIgnoreExclamationMark(
-                                      value ?? false);
+                                  widget.viewModel
+                                      .updateReadBsr(value ?? false);
                                 },
-                                content: const Text(
-                                    "Ignore messages starting with \"!\""),
+                                content: const Text("Read !bsr song name"),
                               );
-                            })
+                            },
+                          ),
+                        ),
                       ],
                     ),
                   ),

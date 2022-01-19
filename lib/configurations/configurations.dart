@@ -15,16 +15,14 @@ class Configurations {
 
   factory Configurations.defaultConfiguration() => Configurations(
         chatToSpeech: ChatToSpeechConfiguration(
-            channels: [],
-            ignoreExclamationMark: true,
-            languages: {
-              Language.english,
-              Language.indonesian,
-              Language.japanese
-            },
-            readUsername: true,
-            enabled: false,
-            volume: 1.0),
+          channels: [],
+          ignoreExclamationMark: true,
+          languages: {Language.english, Language.indonesian, Language.japanese},
+          readUsername: true,
+          enabled: false,
+          volume: 1.0,
+          readBsr: true,
+        ),
       );
 
   Configurations copyWith({

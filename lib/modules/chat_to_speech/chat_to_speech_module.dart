@@ -6,17 +6,29 @@ import 'package:streamkit/app_config.dart';
 import 'package:streamkit/configurations/chat_to_speech_configuration.dart';
 import 'package:streamkit/modules/enums/language.dart';
 import 'package:streamkit/modules/stream_kit_module.dart';
+import 'package:streamkit/screens/chat_to_speech/chat_to_speech.dart';
+import 'package:streamkit/utils/beatsaver.dart';
 import 'package:streamkit/utils/language.dart';
 import 'package:streamkit/utils/string.dart';
 import 'package:streamkit/utils/twitch.dart';
+
+enum ChatToSpeechMessageType {
+  message,
+  bsr,
+}
 
 class ChatToSpeechMessage {
   final String name;
   final String message;
   final Language? language;
+  final ChatToSpeechMessageType type;
 
-  ChatToSpeechMessage(
-      {required this.name, required this.message, this.language});
+  ChatToSpeechMessage({
+    required this.name,
+    required this.message,
+    this.language,
+    this.type = ChatToSpeechMessageType.message,
+  });
 }
 
 class ChatToSpeechModule extends StreamKitModule {
@@ -79,6 +91,22 @@ class ChatToSpeechModule extends StreamKitModule {
         ChatToSpeechMessage(
             name: message.username, message: text, language: forcedLanguage),
       );
+
+      // Check for !bsr code
+      final readBsr = _configuration?.readBsr ?? true;
+      final messageSplit = text.toLowerCase().split(' ');
+
+      if (messageSplit[0] == '!bsr' && messageSplit.length == 2 && readBsr) {
+        BeatSaverUtil.getSongName(bsrCode: messageSplit[1]).then((songName) {
+          _addMessageToQueue(ChatToSpeechMessage(
+            name: message.username,
+            message: songName,
+            language: Language.english,
+            type: ChatToSpeechMessageType.bsr,
+          ));
+        }).catchError((error) {});
+        return;
+      }
     });
   }
 
@@ -115,17 +143,23 @@ class ChatToSpeechModule extends StreamKitModule {
 
     _isSpeaking = true;
     final message = _messageQueue.removeFirst();
-    final language = message.language ??
-        LanguageUtil.getLanguage(
-            text: message.message,
-            whitelistedLanguages: _configuration?.languages ?? {});
-    final filteredName =
-        message.name.replaceAll(RegExp("[^A-Za-z]"), "").toLowerCase();
-    final text = (_configuration?.readUsername ?? true)
-        ? filteredName + ", " + message.message
-        : message.message;
 
-    _speak(text: text, language: language);
+    if (message.type == ChatToSpeechMessageType.message) {
+      final language = message.language ??
+          LanguageUtil.getLanguage(
+              text: message.message,
+              whitelistedLanguages: _configuration?.languages ?? {});
+      final filteredName =
+          message.name.replaceAll(RegExp("[^A-Za-z]"), "").toLowerCase();
+      final text = (_configuration?.readUsername ?? true)
+          ? filteredName + ", " + message.message
+          : message.message;
+
+      _speak(text: text, language: language);
+    } else if (message.type == ChatToSpeechMessageType.bsr) {
+      final text = "${message.name} requested ${message.message}";
+      _speak(text: text, language: message.language ?? Language.english);
+    }
   }
 
   void _addMessageToQueue(ChatToSpeechMessage message) {

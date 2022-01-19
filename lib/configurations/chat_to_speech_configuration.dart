@@ -11,6 +11,7 @@ class ChatToSpeechConfiguration {
   final Set<Language> languages;
   final bool enabled;
   final double? volume;
+  final bool? readBsr;
 
   factory ChatToSpeechConfiguration.fromJson(Map<String, dynamic> json) =>
       _$ChatToSpeechConfigurationFromJson(json);
@@ -23,5 +24,6 @@ class ChatToSpeechConfiguration {
     required this.languages,
     required this.enabled,
     this.volume,
+    this.readBsr,
   });
 }

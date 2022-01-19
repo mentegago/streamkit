@@ -18,6 +18,7 @@ ChatToSpeechConfiguration _$ChatToSpeechConfigurationFromJson(
           .toSet(),
       enabled: json['enabled'] as bool,
       volume: (json['volume'] as num?)?.toDouble(),
+      readBsr: json['readBsr'] as bool?,
     );
 
 Map<String, dynamic> _$ChatToSpeechConfigurationToJson(
@@ -29,6 +30,7 @@ Map<String, dynamic> _$ChatToSpeechConfigurationToJson(
       'languages': instance.languages.map((e) => _$LanguageEnumMap[e]).toList(),
       'enabled': instance.enabled,
       'volume': instance.volume,
+      'readBsr': instance.readBsr,
     };
 
 const _$LanguageEnumMap = {
