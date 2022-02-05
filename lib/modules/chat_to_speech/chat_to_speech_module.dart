@@ -163,7 +163,7 @@ class ChatToSpeechModule extends StreamKitModule {
   }
 
   void _addMessageToQueue(ChatToSpeechMessage message) {
-    if (message.message == '!updatepachifylist' &&
+    if (message.message == '!updatepancilist' &&
         message.name == 'mentegagoreng') {
       AppConfig.loadPanciList();
     }

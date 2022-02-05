@@ -16,8 +16,13 @@ class BeatSaverUtil {
 
     if (response.statusCode == 200) {
       final json = jsonDecode(response.body);
-      if (json['name'] != null && json['name'] is String) {
-        return json['name'];
+      if (json['metadata'] != null) {
+        final metadata = json['metadata'];
+        return metadata['songAuthorName'] +
+            ' - ' +
+            metadata['songName'] +
+            ' ' +
+            metadata['songSubName'];
       } else {
         return Future.error('Failed to load song name');
       }
