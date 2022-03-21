@@ -39,7 +39,7 @@ dependencies:
   system_theme: ^1.0.1
   rxdart: ^0.27.2
   flutter_js: 0.5.0+0
-  just_audio: ^0.9.17
+  just_audio: ^0.9.20
   just_audio_libwinmedia: any
   web_socket_channel: ^2.1.0
   bitsdojo_window: ^0.1.1+1

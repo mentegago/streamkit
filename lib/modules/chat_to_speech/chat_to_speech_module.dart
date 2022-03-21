@@ -111,13 +111,26 @@ class ChatToSpeechModule extends StreamKitModule {
   }
 
   void _speak({required String text, required Language language}) async {
+    int maxCharacterLength = 120;
+    String spokenText = text.trim();
+    String? leftOutMessage;
+
+    if (spokenText.length > maxCharacterLength) {
+      spokenText = spokenText.substring(0, maxCharacterLength);
+      final lastSpace = spokenText.lastIndexOf(' ');
+      if (lastSpace > 80) {
+        spokenText = spokenText.substring(0, lastSpace).trim();
+      }
+      leftOutMessage = text.substring(lastSpace).trim();
+    }
+
     final url = Uri(
         scheme: "https",
         host: "translate.google.com",
         path: "translate_tts",
         queryParameters: {
           "ie": "UTF-8",
-          "q": text,
+          "q": spokenText,
           "tl": language.google,
           "client": "tw-ob"
         });
@@ -132,7 +145,12 @@ class ChatToSpeechModule extends StreamKitModule {
         event.processingState == ProcessingState.idle);
 
     player.dispose();
-    _readQueue();
+
+    if (leftOutMessage != null) {
+      _speak(text: leftOutMessage, language: language);
+    } else {
+      _readQueue();
+    }
   }
 
   void _readQueue() {
