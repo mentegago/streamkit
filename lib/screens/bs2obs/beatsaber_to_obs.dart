@@ -38,7 +38,7 @@ class BeatSaberToObs extends StatelessWidget {
             ),
             const SizedBox(height: 32),
             const Text(
-                "*In the future, this module will be directly integrated to StreamKit."),
+                "*This module is planned to be directly integrated into StreamKit."),
           ],
         ),
       ),

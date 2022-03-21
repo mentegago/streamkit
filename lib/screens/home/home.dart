@@ -21,7 +21,7 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return ScaffoldPage(
-        header: const PageHeader(title: Text("StreamKit Status")),
+        header: const PageHeader(title: Text("Mentega StreamKit")),
         content: Container(
           margin: const EdgeInsets.fromLTRB(24, 0, 24, 0),
           child: Stack(
@@ -44,6 +44,7 @@ class _HomeState extends State<Home> {
                               onTap: () {
                                 switch (state) {
                                   case VersionState.outdated:
+                                  case VersionState.beta:
                                     launch(widget.viewModel.downloadUrl);
                                     break;
                                   case VersionState.upToDate:
@@ -55,7 +56,8 @@ class _HomeState extends State<Home> {
                                 }
                               },
                               child: InfoBar(
-                                severity: state == VersionState.outdated
+                                severity: state == VersionState.outdated ||
+                                        state == VersionState.beta
                                     ? InfoBarSeverity.warning
                                     : state == VersionState.upToDate
                                         ? InfoBarSeverity.success
@@ -64,16 +66,20 @@ class _HomeState extends State<Home> {
                                     ? "Outdated"
                                     : state == VersionState.upToDate
                                         ? "Up to date"
-                                        : state == VersionState.error
-                                            ? "Error"
-                                            : "Loading"),
+                                        : state == VersionState.beta
+                                            ? ""
+                                            : state == VersionState.error
+                                                ? "Error"
+                                                : "Loading"),
                                 content: Text(state == VersionState.outdated
                                     ? "Your StreamKit is outdated. Click here to download the latest version ($latestVersion)."
                                     : state == VersionState.upToDate
                                         ? "Your StreamKit is up to date."
-                                        : state == VersionState.error
-                                            ? "Failed to get latest version of StreamKit."
-                                            : "Getting latest version of StreamKit..."),
+                                        : state == VersionState.beta
+                                            ? "You're running unreleased version of StreamKit. Some features may not work properly."
+                                            : state == VersionState.error
+                                                ? "Failed to get latest version of StreamKit."
+                                                : "Getting latest version of StreamKit..."),
                               ),
                             ),
                           ),
@@ -107,6 +113,19 @@ class _HomeState extends State<Home> {
                     ],
                   ),
                 ],
+              ),
+              Positioned(
+                bottom: 0,
+                left: 0,
+                child: GestureDetector(
+                  onTap: () {
+                    launch("https://github.com/mentegago/streamkit");
+                  },
+                  child: const MouseRegion(
+                    child: Text("👨‍💻 GitHub"),
+                    cursor: SystemMouseCursors.click,
+                  ),
+                ),
               ),
               Positioned(
                 bottom: 0,

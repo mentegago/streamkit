@@ -14,6 +14,7 @@ enum VersionState {
   error,
   outdated,
   upToDate,
+  beta,
 }
 
 class HomeViewModel extends StreamKitViewModel {
@@ -56,9 +57,12 @@ class HomeViewModel extends StreamKitViewModel {
     if (latestVersion > currentVersion) {
       _isOutdated
           .add(Tuple2<VersionState, String?>(VersionState.outdated, tagName));
-    } else {
+    } else if (latestVersion == currentVersion) {
       _isOutdated
           .add(Tuple2<VersionState, String?>(VersionState.upToDate, tagName));
+    } else {
+      _isOutdated
+          .add(Tuple2<VersionState, String?>(VersionState.beta, tagName));
     }
 
     _currentVersion.add(currentVersion.toString());
