@@ -1,12 +1,10 @@
 import 'dart:collection';
-import 'dart:convert';
 
 import 'package:just_audio/just_audio.dart';
 import 'package:streamkit/app_config.dart';
 import 'package:streamkit/configurations/chat_to_speech_configuration.dart';
 import 'package:streamkit/modules/enums/language.dart';
 import 'package:streamkit/modules/stream_kit_module.dart';
-import 'package:streamkit/screens/chat_to_speech/chat_to_speech.dart';
 import 'package:streamkit/utils/beatsaver.dart';
 import 'package:streamkit/utils/language.dart';
 import 'package:streamkit/utils/string.dart';
@@ -33,6 +31,7 @@ class ChatToSpeechMessage {
 
 class ChatToSpeechModule extends StreamKitModule {
   final maxQueueLength = 5;
+  final maxCharacterLength = 120;
   final _twitch = Twitch();
   final _messageQueue = Queue<ChatToSpeechMessage>();
 
@@ -110,8 +109,11 @@ class ChatToSpeechModule extends StreamKitModule {
     });
   }
 
-  void _speak({required String text, required Language language}) async {
-    int maxCharacterLength = 120;
+  void _speak({
+    required String text,
+    required Language language,
+    double speed = 1.0,
+  }) async {
     String spokenText = text.trim();
     String? leftOutMessage;
 
@@ -138,6 +140,7 @@ class ChatToSpeechModule extends StreamKitModule {
     final player = AudioPlayer();
     await player.setUrl(url.toString());
     await player.setVolume(_configuration?.volume ?? 1.0);
+    await player.setSpeed(speed);
     await player.play();
 
     await player.playerStateStream.firstWhere((event) =>
@@ -146,11 +149,11 @@ class ChatToSpeechModule extends StreamKitModule {
 
     player.dispose();
 
-    if (leftOutMessage != null) {
-      _speak(text: leftOutMessage, language: language);
-    } else {
-      _readQueue();
-    }
+    // if (leftOutMessage != null) {
+    //   _speak(text: leftOutMessage, language: language);
+    // } else {
+    _readQueue();
+    // }
   }
 
   void _readQueue() {
