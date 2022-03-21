@@ -14,11 +14,17 @@ class BeatSaberToObs extends StatelessWidget {
             const Text(
                 "Beat Saber to OBS is a web service that bridges BSDataPuller mod and OBS. It allows you to change your OBS scene based on whether you're in game or menu."),
             const SizedBox(height: 8),
-            MouseRegion(
-              cursor: SystemMouseCursors.click,
-              child: Text(
-                  "Click here for detailed instruction on how to setup Beat Saber to OBS.",
-                  style: TextStyle(color: Colors.blue.lighter)),
+            GestureDetector(
+              onTap: () {
+                launch(
+                    "https://github.com/mentegago/mentega-bs2obs/blob/master/README.md");
+              },
+              child: MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: Text(
+                    "Click here for detailed instruction on how to setup Beat Saber to OBS.",
+                    style: TextStyle(color: Colors.blue.lighter)),
+              ),
             ),
             const SizedBox(height: 18),
             Button(
