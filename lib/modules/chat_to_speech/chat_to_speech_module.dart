@@ -170,10 +170,17 @@ class ChatToSpeechModule extends StreamKitModule {
           LanguageUtil.getLanguage(
               text: message.message,
               whitelistedLanguages: _configuration?.languages ?? {});
+      final fixedUsername = AppConfig.nameFixConfig.getName(
+          originalName: message.name.toLowerCase(), language: language);
       final filteredName =
           message.name.replaceAll(RegExp("[^A-Za-z]"), "").toLowerCase();
+      final spokenName =
+          (fixedUsername.toLowerCase() != message.name.toLowerCase())
+              ? fixedUsername
+              : filteredName;
+
       final text = (_configuration?.readUsername ?? true)
-          ? filteredName + ", " + message.message
+          ? spokenName + ", " + message.message
           : message.message;
 
       _speak(text: text, language: language);
@@ -187,6 +194,11 @@ class ChatToSpeechModule extends StreamKitModule {
     if (message.message == '!updatepancilist' &&
         message.name == 'mentegagoreng') {
       AppConfig.loadPanciList();
+    }
+
+    if (message.message == '!updatenamefixlist' &&
+        message.name == 'mentegagoreng') {
+      AppConfig.loadNameFixList();
     }
 
     if ((_configuration?.ignoreExclamationMark ?? true) &&
