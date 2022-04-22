@@ -1,253 +1,154 @@
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:streamkit/app_config.dart';
-import 'package:streamkit/modules/stream_kit_module.dart';
-import 'package:streamkit/screens/home/home_vm.dart';
-import 'package:tuple/tuple.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:provider/provider.dart';
 
-class Home extends StatefulWidget {
-  final HomeViewModel viewModel;
-  final Function(int)? _onSelectModule;
+import 'package:streamkit_tts/screens/home/widgets/config_groups/bs_config_group.dart';
+import 'package:streamkit_tts/screens/home/widgets/config_groups/languages_config_group.dart';
+import 'package:streamkit_tts/screens/home/widgets/config_groups/tts_config_group.dart';
+import 'package:streamkit_tts/screens/home/widgets/footer/toggle_chat_reader_button.dart';
+import 'package:streamkit_tts/screens/home/widgets/twitch_channel_box.dart';
+import 'package:streamkit_tts/screens/home/widgets/footer/volume_control.dart';
+import 'package:streamkit_tts/services/chat_to_speech_service.dart';
+import 'package:streamkit_tts/services/twitch_chat_service.dart';
+import 'package:streamkit_tts/services/version_check_service.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
-  const Home({Key? key, required this.viewModel, Function(int)? onSelectModule})
-      : _onSelectModule = onSelectModule,
-        super(key: key);
+class Home extends HookWidget {
+  const Home({Key? key}) : super(key: key);
 
-  @override
-  State<Home> createState() => _HomeState();
-}
-
-class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
+    final scrollController = useScrollController();
+
+    useEffect(() => _errorStateEffect(context));
+    useEffect(() => _versionCheckEffect(context));
+
     return ScaffoldPage(
-        header: const PageHeader(title: Text("Mentega StreamKit")),
-        content: Container(
-          margin: const EdgeInsets.fromLTRB(24, 0, 24, 0),
-          child: Stack(
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  StreamBuilder<Tuple2<VersionState, String?>>(
-                      stream: widget.viewModel.isOutdated,
-                      builder: (context, snapshot) {
-                        final state =
-                            snapshot.data?.item1 ?? VersionState.loading;
-                        final latestVersion = snapshot.data?.item2 ?? "";
-                        return Container(
-                          margin: const EdgeInsets.only(bottom: 24),
-                          child: MouseRegion(
-                            cursor: SystemMouseCursors.click,
-                            child: GestureDetector(
-                              onTap: () {
-                                switch (state) {
-                                  case VersionState.outdated:
-                                  case VersionState.beta:
-                                    launch(widget.viewModel.downloadUrl);
-                                    break;
-                                  case VersionState.upToDate:
-                                    launch(
-                                        "https://www.youtube.com/watch?v=mW61VTLhNjQ");
-                                    break;
-                                  default:
-                                    break;
-                                }
-                              },
-                              child: InfoBar(
-                                severity: state == VersionState.outdated ||
-                                        state == VersionState.beta
-                                    ? InfoBarSeverity.warning
-                                    : state == VersionState.upToDate
-                                        ? InfoBarSeverity.success
-                                        : InfoBarSeverity.info,
-                                title: Text(state == VersionState.outdated
-                                    ? "Outdated"
-                                    : state == VersionState.upToDate
-                                        ? "Up to date"
-                                        : state == VersionState.beta
-                                            ? ""
-                                            : state == VersionState.error
-                                                ? "Error"
-                                                : "Loading"),
-                                content: Text(state == VersionState.outdated
-                                    ? "Your StreamKit is outdated. Click here to download the latest version ($latestVersion)."
-                                    : state == VersionState.upToDate
-                                        ? "Your StreamKit is up to date."
-                                        : state == VersionState.beta
-                                            ? "You're running unreleased version of StreamKit. Some features may not work properly."
-                                            : state == VersionState.error
-                                                ? "Failed to get latest version of StreamKit."
-                                                : "Getting latest version of StreamKit..."),
-                              ),
-                            ),
-                          ),
-                        );
-                      }),
-                  Wrap(
-                    direction: Axis.horizontal,
-                    spacing: 12,
-                    runSpacing: 12,
-                    children: [
-                      StreamBuilder<ModuleState>(
-                        stream: widget.viewModel.chatToSpeechState,
-                        builder: (context, snapshot) {
-                          return ModuleStatusBox(
-                            icon: FluentIcons.speech,
-                            title: "Chat Reader",
-                            state: snapshot.data ?? ModuleState.inactive,
-                            onSelectModule: () {
-                              widget._onSelectModule?.call(1);
-                            },
-                          );
-                        },
-                      ),
-                      ModuleStatusBox(
-                        icon: FluentIcons.streaming,
-                        title: "Beat Saber 2 OBS",
-                        onSelectModule: () {
-                          widget._onSelectModule?.call(2);
-                        },
-                      )
-                    ],
-                  ),
-                ],
-              ),
-              Positioned(
-                bottom: 0,
-                left: 0,
-                child: GestureDetector(
-                  onTap: () {
-                    launch("https://github.com/mentegago/streamkit");
-                  },
-                  child: const MouseRegion(
-                    child: Text("👨‍💻 GitHub"),
-                    cursor: SystemMouseCursors.click,
-                  ),
+      header: const PageHeader(title: Text("StreamKit Chat Reader")),
+      content: Container(
+        alignment: Alignment.topLeft,
+        margin: const EdgeInsets.symmetric(
+          horizontal: 18.0,
+          vertical: 0.0,
+        ),
+        child: SingleChildScrollView(
+          controller: scrollController,
+          child: Scrollbar(
+            controller: scrollController,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const TwitchChannelBox(),
+                const SizedBox(height: 32.0),
+                Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.start,
+                  alignment: WrapAlignment.start,
+                  spacing: 48.0,
+                  runSpacing: 32.0,
+                  children: const [
+                    TtsConfigGroup(),
+                    LanguagesConfigGroup(),
+                    BeatSaberConfigGroup(),
+                  ],
                 ),
-              ),
-              Positioned(
-                bottom: 0,
-                right: 0,
-                child: StreamBuilder(
-                    stream: widget.viewModel.currentVersion,
-                    builder: (context, snapshot) {
-                      if (snapshot.data == null) {
-                        return const Text("");
-                      } else {
-                        return GestureDetector(
-                          onDoubleTap: () {
-                            final dialog = ContentDialog(
-                              title: const Text("Panci List"),
-                              content: Text(AppConfig.panciList.join(", ")),
-                              actions: [
-                                Button(
-                                    child: const Text("Ok"),
-                                    onPressed: () =>
-                                        Navigator.of(context).pop())
-                              ],
-                            );
-                            showDialog(
-                              context: context,
-                              builder: (context) => dialog,
-                            );
-                          },
-                          child: Text(
-                            "🎈 ${snapshot.data}",
-                          ),
-                        );
-                      }
-                    }),
-              )
-            ],
+              ],
+            ),
           ),
-        ));
-  }
-}
-
-class ModuleStatusBox extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final ModuleState? state;
-  final Function? onSelectModule;
-
-  const ModuleStatusBox({
-    Key? key,
-    required this.icon,
-    required this.title,
-    this.state,
-    this.onSelectModule,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Button(
-      onPressed: () {
-        onSelectModule?.call();
-      },
-      child: SizedBox(
-        height: 120,
-        width: 120,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Icon(icon, size: 42),
-            const SizedBox(height: 12),
-            Text(title),
-            const SizedBox(height: 2),
-            ModuleStatusInfo(state: state),
+        ),
+      ),
+      bottomBar: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 18.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: const [
+            VolumeControl(),
+            ToggleChatReaderButton(),
           ],
         ),
       ),
     );
   }
-}
 
-class ModuleStatusInfo extends StatelessWidget {
-  final ModuleState? _state;
-  const ModuleStatusInfo({Key? key, ModuleState? state})
-      : _state = state,
-        super(key: key);
+  Function()? _errorStateEffect(BuildContext context) {
+    final errorStream = context.read<ChatToSpeechService>().errorStream;
+    final subscription = errorStream.listen((error) {
+      switch (error) {
+        case TwitchError.timeout:
+          showDialog(
+            context: context,
+            builder: (context) => ContentDialog(
+              title: const Text("Timeout"),
+              content: const Text(
+                  "Fail to connect to channel. Please make sure the username is correct."),
+              actions: [
+                Button(
+                  child: const Text("Ok"),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            ),
+          );
+      }
+    });
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
-      margin: const EdgeInsets.only(top: 2),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: () {
-          switch (_state) {
-            case ModuleState.active:
-              return Colors.green;
-            case ModuleState.inactive:
-              return Colors.red;
-            case ModuleState.loading:
-              return Colors.orange;
-            case null:
-              return Colors.blue;
-          }
-        }(),
-      ),
-      child: Text(
-        () {
-          switch (_state) {
-            case ModuleState.active:
-              return "Active";
-            case ModuleState.inactive:
-              return "Inactive";
-            case ModuleState.loading:
-              return "Loading";
-            case null:
-              return "Web";
-          }
-        }(),
-        style: const TextStyle(
-          color: Colors.white,
-        ),
-      ),
-    );
+    return subscription.cancel;
+  }
+
+  Function()? _versionCheckEffect(BuildContext context) {
+    final versionCheckService = context.read<VersionCheckService>();
+
+    versionCheckService.addListener(() {
+      final status = versionCheckService.status;
+      String? updateMessage;
+      String? updateTitle;
+
+      switch (status.state) {
+        case VersionState.loading:
+        case VersionState.error:
+        case VersionState.upToDate:
+          break;
+        case VersionState.outdated:
+          updateTitle = "Out of date";
+          updateMessage =
+              "StreamKit is out of date. Please update to the latest version (${status.latestVersion}).";
+          break;
+        case VersionState.beta:
+          updateTitle = "Warning";
+          updateMessage =
+              "You are running unreleased version of StreamKit. Some features may not work properly.";
+          break;
+      }
+
+      if (updateTitle != null && updateMessage != null) {
+        showDialog(
+          context: context,
+          builder: (context) => ContentDialog(
+            title: Text(updateTitle ?? ""),
+            content: Text(updateMessage ?? ""),
+            actions: [
+              Button(
+                child: const Text("Later"),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+              FilledButton(
+                child: const Text("Download latest stable"),
+                onPressed: () {
+                  launchUrlString(versionCheckService.downloadUrl);
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
+      }
+    });
+
+    return () {
+      versionCheckService.removeListener(() {});
+    };
   }
 }

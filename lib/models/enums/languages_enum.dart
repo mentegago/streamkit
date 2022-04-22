@@ -14,17 +14,6 @@ extension LanguageExtension on Language {
     }
   }
 
-  String get franc {
-    switch (this) {
-      case Language.english:
-        return 'eng';
-      case Language.indonesian:
-        return 'ind';
-      case Language.japanese:
-        return 'jpn';
-    }
-  }
-
   String get displayName {
     switch (this) {
       case Language.english:
@@ -33,6 +22,19 @@ extension LanguageExtension on Language {
         return 'Indonesian';
       case Language.japanese:
         return 'Japanese';
+    }
+  }
+
+  // Messages that starts with this code (case sensitive), followed by space, will be recognized as its language.
+  // Example: "ID hello world" will be recognized as Indonesian despite "hello world" being an English sentence.
+  String get forceCode {
+    switch (this) {
+      case Language.english:
+        return 'EN';
+      case Language.indonesian:
+        return 'ID';
+      case Language.japanese:
+        return 'JP';
     }
   }
 
@@ -49,22 +51,6 @@ extension LanguageExtension on Language {
 }
 
 class LanguageParser {
-  static Language? fromFranc(String lang) {
-    switch (lang) {
-      case "eng":
-        return Language.english;
-      case "ind":
-        return Language.indonesian;
-      case "jpn":
-        return Language.japanese;
-      case "cmn":
-        return Language
-            .japanese; // Currently, we use Mandarin to guide Franc into recognizing Japanese kanji.
-      default:
-        return null;
-    }
-  }
-
   static Language? fromGoogle(String lang) {
     switch (lang) {
       case "en-US":

@@ -1,4 +1,4 @@
-package com.example.streamkit
+package com.example.streamkit_tts
 
 import io.flutter.embedding.android.FlutterActivity
 

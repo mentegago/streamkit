@@ -4,9 +4,7 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   bitsdojo_window_windows
-  flutter_js
   libwinmedia
-  system_theme
   url_launcher_windows
 )
 

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:collection';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:rxdart/rxdart.dart';
@@ -13,7 +12,11 @@ import '../models/twitch/user_state.dart';
 enum TwitchState { active, inactive, loading }
 enum TwitchError { timeout }
 
-class Twitch {
+// This script is taken from prior rewrite of StreamKit.
+// May need to revisit this in the future.
+// I'm treating this util as blackbox for now.
+
+class TwitchChatService {
   final String _nick;
   final String? _token;
 
@@ -40,11 +43,11 @@ class Twitch {
 
   Set<String> get channels => _channels;
 
-  Twitch(
-      {String username = "justinfan24",
-      String? token,
-      Set<String> channels = const <String>{}})
-      : _nick = username,
+  TwitchChatService({
+    String username = "justinfan24",
+    String? token,
+    Set<String> channels = const <String>{},
+  })  : _nick = username,
         _token = token,
         _targetChannels = channels {
     _connect();
@@ -58,7 +61,7 @@ class Twitch {
     wsChannel.sink.add("CAP REQ :twitch.tv/tags");
 
     // Connect to currently set channels.
-    setChannels(_targetChannels.toList());
+    setChannels(_targetChannels);
 
     wsChannel.stream.listen(
       (event) {
@@ -120,6 +123,12 @@ class Twitch {
 
     String message = match.namedGroup('message') ?? "";
 
+    message = message.replaceAll(
+      RegExp(
+          r"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)"),
+      "",
+    );
+
     final twitchEmotes = userState.emotes
         .map((emote) => message.substring(emote.startIndex, emote.endIndex + 1))
         .toSet();
@@ -130,19 +139,13 @@ class Twitch {
       ...twitchEmotes,
     };
 
-    message = emotes
+    String emotelessMessage = emotes
         .fold(
           message,
           (String previousValue, element) =>
               previousValue.replaceAll(element, ''),
         )
         .replaceAll(RegExp(" +"), " "); // remove multiple spaces
-
-    message = message.replaceAll(
-      RegExp(
-          r"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)"),
-      "",
-    );
 
     _messageSubject.add(
       TwitchMessage(
@@ -151,7 +154,7 @@ class Twitch {
         userState: userState,
         channel: channel,
         self: username == _nick,
-        emotelessMessage: message,
+        emotelessMessage: emotelessMessage,
       ),
     );
   }
@@ -199,7 +202,7 @@ class Twitch {
     _globalBttvEmotes = json.map((emote) => emote['code'] as String).toSet();
   }
 
-  void setChannels(List<String> channels) {
+  void setChannels(Set<String> channels) {
     final currentChannels = _channels;
 
     // Leave current channels.
@@ -240,7 +243,7 @@ class Twitch {
     Future.delayed(const Duration(seconds: 5)).then((_) {
       if (_state.value == TwitchState.loading) {
         _error.add(TwitchError.timeout);
-        setChannels([]);
+        setChannels({});
       }
     });
 

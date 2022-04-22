@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:streamkit/modules/enums/language.dart';
+import 'package:streamkit_tts/models/enums/languages_enum.dart';
 
 NameFixConfig nameFixConfigFromJson(String str) =>
     NameFixConfig.fromJson(json.decode(str));

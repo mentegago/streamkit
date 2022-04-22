@@ -1,6 +1,6 @@
 {
-    "name": "streamkit",
-    "short_name": "streamkit",
+    "name": "streamkit_tts",
+    "short_name": "streamkit_tts",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

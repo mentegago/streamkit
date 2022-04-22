@@ -1,163 +1,128 @@
-import 'package:fluent_ui/fluent_ui.dart';
-import 'package:streamkit/app_config.dart';
-import 'package:streamkit/screens/bs2obs/beatsaber_to_obs.dart';
-import 'package:streamkit/screens/home/home_vm.dart';
-import 'package:system_theme/system_theme.dart';
+import 'dart:io';
+
 import 'package:bitsdojo_window/bitsdojo_window.dart';
-
-import 'package:streamkit/screens/home/home.dart';
-import 'package:streamkit/screens/chat_to_speech/chat_to_speech.dart';
-import 'package:streamkit/screens/chat_to_speech/chat_to_speech_vm.dart';
-
-import 'package:streamkit/modules/chat_to_speech/chat_to_speech_module.dart';
+import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:provider/provider.dart';
+import 'package:streamkit_tts/models/chat_to_speech_config_model.dart';
+import 'package:streamkit_tts/models/config_model.dart';
+import 'package:streamkit_tts/models/enums/languages_enum.dart';
+import 'package:streamkit_tts/screens/home/home.dart';
+import 'package:streamkit_tts/services/chat_to_speech_service.dart';
+import 'package:streamkit_tts/services/version_check_service.dart';
+import 'package:streamkit_tts/utils/external_config_util.dart';
+import 'package:streamkit_tts/utils/language_detection_util.dart';
+import 'package:streamkit_tts/utils/misc_tts_util.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
+import 'package:version/version.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  AppConfig.loadPanciList();
-  AppConfig.loadNameFixList();
-  await SystemTheme.accentInstance.load();
-  await AppConfig.loadConfigurations();
+  final externalConfigUtil = ExternalConfig();
 
-  runApp(const MyApp());
+  final config = await loadConfigurations(appPath: externalConfigUtil.appPath);
+  final chatToSpeechService = ChatToSpeechService(
+    config: config,
+    languageDetectionUtil: LanguageDetection(),
+    externalConfigUtil: externalConfigUtil,
+    miscTtsUtil: MiscTts(),
+  );
+  final versionCheckService = VersionCheckService();
+
+  config.addListener(() {
+    final file = File('${externalConfigUtil.appPath}/config.json');
+    file.writeAsStringSync(config.chatToSpeechConfiguration.toJson());
+  });
+
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => config),
+        ChangeNotifierProvider(create: (_) => chatToSpeechService),
+        ChangeNotifierProvider(create: (_) => versionCheckService),
+      ],
+      child: const MyApp(),
+    ),
+  );
 
   doWhenWindowReady(() {
-    final win = appWindow;
-    win.minSize = const Size(750, 500);
-    win.size = const Size(1100, 700);
-    win.alignment = Alignment.center;
-    win.title = "Mentega StreamKit";
-    win.show();
+    const initialSize = Size(800, 550);
+    appWindow.minSize = initialSize;
+    appWindow.size = initialSize;
+    appWindow.alignment = Alignment.center;
+    appWindow.show();
   });
 }
 
-class MyApp extends StatefulWidget {
-  const MyApp({Key? key}) : super(key: key);
+Future<Config> loadConfigurations({required String appPath}) async {
+  final file = File('$appPath/config.json');
 
-  @override
-  State<StatefulWidget> createState() => MyAppState();
+  if (file.existsSync()) {
+    final config = ChatToSpeechConfiguration.fromJson(file.readAsStringSync());
+    return Config(chatToSpeechConfiguration: config);
+  }
+
+  return Config(
+    chatToSpeechConfiguration: ChatToSpeechConfiguration(
+      channels: {},
+      enabled: false,
+      ignoreExclamationMark: true,
+      languages: Language.values.toSet(),
+      readBsr: true,
+      readUsername: true,
+      volume: 100.0,
+      ignoreEmotes: true,
+    ),
+  );
 }
 
-class MyAppState extends State<MyApp> {
-  int index = 0;
-  final HomeViewModel _homeViewModel;
-  final ChatToSpeechViewModel _chatToSpeechViewModel;
-  final ChatToSpeechModule _chatToSpeechModule;
+class MyApp extends HookWidget {
+  const MyApp({Key? key}) : super(key: key);
 
-  MyAppState._({
-    required HomeViewModel homeViewModel,
-    required ChatToSpeechModule chatToSpeechModule,
-    required ChatToSpeechViewModel chatToSpeechViewModel,
-  })  : _homeViewModel = homeViewModel,
-        _chatToSpeechModule = chatToSpeechModule,
-        _chatToSpeechViewModel = chatToSpeechViewModel;
-
-  factory MyAppState() {
-    final configurations = AppConfig.configurations;
-    final chatToSpeechModule = ChatToSpeechModule(
-      onConfigurationChanged: (configuration) {
-        AppConfig.saveConfigurations(
-          configurations.copyWith(chatToSpeech: configuration),
-        );
-      },
-    );
-    final chatToSpeechViewModel = ChatToSpeechViewModel(
-      configuration: AppConfig.configurations.chatToSpeech,
-      module: chatToSpeechModule,
-    );
-    final homeViewModel =
-        HomeViewModel(chatToSpeechState: chatToSpeechModule.state);
-
-    return MyAppState._(
-      homeViewModel: homeViewModel,
-      chatToSpeechModule: chatToSpeechModule,
-      chatToSpeechViewModel: chatToSpeechViewModel,
+  // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
+    return FluentApp(
+      title: "StreamKit Chat Reader",
+      theme: ThemeData(
+        brightness: Brightness.dark,
+        accentColor: const Color.fromARGB(255, 100, 65, 165).toAccentColor(),
+      ),
+      home: NavigationView(
+        appBar: streamKitAppBar(),
+        content: NavigationBody(
+          index: 0,
+          children: const [Home()],
+        ),
+      ),
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final themeData = ThemeData(
-      brightness: Brightness.dark,
-      accentColor: SystemTheme.accentInstance.accent.toAccentColor(),
-    );
-
-    return FluentApp(
-      title: "Mentega StreamKit",
-      themeMode: ThemeMode.dark,
-      theme: themeData,
-      home: NavigationView(
-        appBar: NavigationAppBar(
-          height: 36,
-          automaticallyImplyLeading: false,
-          title: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(
-                child: MoveWindow(
-                  child: Container(
-                    margin: const EdgeInsets.only(left: 12),
-                    child: Row(
-                      children: [
-                        Container(
-                            child: const Text("🧈",
-                                style: TextStyle(fontSize: 24)),
-                            margin: const EdgeInsets.only(bottom: 8, right: 8)),
-                        const Text("Mentega StreamKit"),
-                      ],
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                    ),
-                  ),
-                ),
-              ),
-              MinimizeWindowButton(
-                  colors: WindowButtonColors(iconNormal: Colors.white)),
-              MaximizeWindowButton(
-                  colors: WindowButtonColors(iconNormal: Colors.white)),
-              CloseWindowButton(
-                  colors: WindowButtonColors(
-                      iconNormal: Colors.white, mouseOver: Colors.red))
-            ],
+  NavigationAppBar streamKitAppBar() {
+    return NavigationAppBar(
+      title: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            child: MoveWindow(
+              child: Container(),
+            ),
           ),
-        ),
-        content: NavigationBody(
-          children: [
-            Home(
-              viewModel: _homeViewModel,
-              onSelectModule: (index) {
-                setState(() {
-                  this.index = index;
-                });
-              },
-            ),
-            ChatToSpeech(viewModel: _chatToSpeechViewModel),
-            BeatSaberToObs(),
-          ],
-          index: index,
-        ),
-        pane: NavigationPane(
-          displayMode: PaneDisplayMode.auto,
-          items: [
-            PaneItem(
-              icon: const Icon(FluentIcons.home),
-              title: const Text("Home"),
-            ),
-            PaneItem(
-              icon: const Icon(FluentIcons.speech),
-              title: const Text("Chat Reader"),
-            ),
-            PaneItem(
-              icon: const Icon(FluentIcons.streaming),
-              title: const Text("Beat Saber to OBS"),
-            ),
-          ],
-          selected: index,
-          onChanged: (newIndex) {
-            setState(() {
-              index = newIndex;
-            });
-          },
-        ),
+          MinimizeWindowButton(
+              colors: WindowButtonColors(iconNormal: Colors.white)),
+          MaximizeWindowButton(
+              colors: WindowButtonColors(iconNormal: Colors.white)),
+          CloseWindowButton(
+              colors: WindowButtonColors(
+                  iconNormal: Colors.white, mouseOver: Colors.red))
+        ],
+      ),
+      automaticallyImplyLeading: false,
+      height: 36.0,
+      leading: const Padding(
+        child: Text("🧈", style: TextStyle(fontSize: 24)),
+        padding: EdgeInsets.only(bottom: 4.0),
       ),
     );
   }

@@ -1,4 +1,4 @@
-import 'package:streamkit/models/twitch/user_state.dart';
+import 'package:streamkit_tts/models/twitch/user_state.dart';
 
 class TwitchMessage {
   final String username;
@@ -8,10 +8,12 @@ class TwitchMessage {
   final UserState userState;
   final bool self;
 
-  TwitchMessage(this.message,
-      {required this.username,
-      required this.userState,
-      required this.channel,
-      required this.self,
-      required this.emotelessMessage});
+  TwitchMessage(
+    this.message, {
+    required this.username,
+    required this.userState,
+    required this.channel,
+    required this.self,
+    required this.emotelessMessage,
+  });
 }
