@@ -3,7 +3,9 @@
 
 ![Screenshot](screenshots/streamkit.jpg)
 
-StreamKit Chat Reader is a free Twitch chat reader (text-to-speech) app that supports Indonesian, English, and Japanese simultaneously. StreamKit is designed for my streaming use cases ([https://twitch.tv/mentegagoreng](https://twitch.tv/mentegagoreng)), therefore some of the features will be tailored towards my needs, such as Beat Saber specific reading.
+StreamKit Chat Reader is a free Twitch chat reader (text-to-speech) app that supports Indonesian, English, and Japanese simultaneously. StreamKit automatically detects the language of each chat message and read with the appropriate TTS.
+
+StreamKit is designed for my streaming use cases ([https://twitch.tv/mentegagoreng](https://twitch.tv/mentegagoreng)), therefore some of the features will be tailored towards my needs, such as Beat Saber specific reading.
 
 Feel free to suggest feature or report bug at the [Issues](https://github.com/mentegago/streamkit/issues) page or if you're a developer too and want to improve StreamKit, [submit a pull request](https://github.com/mentegago/streamkit/pulls).
 
