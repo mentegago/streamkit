@@ -1,14 +1,14 @@
-# 🧈 Mentega StreamKit 🧈
-**This app is still in very early stage. There will be a lot of bugs.**
+# 🧈 StreamKit Chat Reader 🧈
+**This app is still in early stage.**
 
 ![Screenshot](screenshots/streamkit.jpg)
 
-## Features
-- Twitch chat text-to-speech with multilingual (Indonesian, English, and Japanese) support. StreamKit automatically detects the language of each message and use the appropriate TTS voice for the language.
-- Shortcut to [Beat Saber to OBS](https://github.com/mentegago/mentega-bs2obs).
+StreamKit Chat Reader is a free Twitch chat reader (text-to-speech) app that supports Indonesian, English, and Japanese simultaneously. StreamKit is designed for my streaming use cases ([https://twitch.tv/mentegagoreng](https://twitch.tv/mentegagoreng)), therefore some of the features will be tailored towards my needs, such as Beat Saber specific reading.
 
-## Language detection
-The language detection algorithm is using n-gram based language detection algorithm. The models are trained from actual Twitch streamer's chat, which allows it to detect commonly used abbreviations and slangs. I kind of made a mistake and accidentally removed all the whitespaces when creating the n-gram models, but it seems to work regardless, so, there's that. Might fix it later, but that would mean I need to train it again.
+Feel free to suggest feature or report bug at the [Issues](https://github.com/mentegago/streamkit/issues) page or if you're a developer too and want to improve StreamKit, [submit a pull request](https://github.com/mentegago/streamkit/pulls).
+
+## Usage
+Download the latest version at [the release page](https://github.com/mentegago/streamkit/releases/latest). Download the zip file (**be aware to download "StreamKit" archive, not the "Source Code" archive!**), extract, and run `streamkit_tts.exe`. Follow the instruction in the app.
 
 ## Building
 This app is written with [Flutter on Desktop](https://flutter.dev/multi-platform/desktop). You'll need **Flutter** SDK to be installed as well as everything [required to build a Flutter Windows app](https://docs.flutter.dev/desktop#additional-windows-requirements). 

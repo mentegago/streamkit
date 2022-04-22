@@ -13,9 +13,6 @@ import 'package:streamkit_tts/services/version_check_service.dart';
 import 'package:streamkit_tts/utils/external_config_util.dart';
 import 'package:streamkit_tts/utils/language_detection_util.dart';
 import 'package:streamkit_tts/utils/misc_tts_util.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:url_launcher/url_launcher_string.dart';
-import 'package:version/version.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -85,6 +82,7 @@ class MyApp extends HookWidget {
   Widget build(BuildContext context) {
     return FluentApp(
       title: "StreamKit Chat Reader",
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         brightness: Brightness.dark,
         accentColor: const Color.fromARGB(255, 100, 65, 165).toAccentColor(),
