@@ -1,5 +1,6 @@
 import 'dart:collection';
 import 'dart:io';
+import 'dart:math';
 import 'package:collection/collection.dart';
 import 'package:http/http.dart' as http;
 
@@ -223,6 +224,9 @@ class ChatToSpeechService extends ChangeNotifier {
     final audioFile = _messageAudioQueue.removeFirst();
     if (_player.playerState.playing) await _player.stop();
     await _player.setAudioSource(AudioSource.uri(audioFile.uri));
+    final duration = _player.duration?.inSeconds ?? 0;
+    final audioSpeed = duration <= 5 ? 1.0 : min(duration / 5.0, 1.8);
+    await _player.setSpeed(audioSpeed);
     await _player.play();
 
     await _player.processingStateStream.firstWhere((element) =>
