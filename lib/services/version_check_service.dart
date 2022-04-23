@@ -31,14 +31,18 @@ class VersionCheckService extends ChangeNotifier {
       "https://github.com/mentegago/streamkit/releases/latest";
 
   late VersionStatus _status;
+  String? _currentVersion;
+
   VersionStatus get status => _status;
+  String? get currentVersion => _currentVersion;
 
   VersionCheckService() {
     _checkLatestVersion();
   }
 
-  void _updateState(VersionStatus status) {
+  void _updateState(VersionStatus status, {String? currentVersion}) {
     _status = status;
+    _currentVersion = currentVersion;
     notifyListeners();
   }
 
@@ -61,20 +65,27 @@ class VersionCheckService extends ChangeNotifier {
     final latestVersion = Version.parse(tagName);
 
     if (latestVersion > currentVersion) {
-      _updateState(VersionStatus(
-        state: VersionState.outdated,
-        latestVersion: tagName,
-      ));
+      _updateState(
+        VersionStatus(
+          state: VersionState.outdated,
+          latestVersion: tagName,
+        ),
+        currentVersion: packageInfo.version,
+      );
     } else if (latestVersion == currentVersion) {
-      _updateState(VersionStatus(
-        state: VersionState.upToDate,
-        latestVersion: tagName,
-      ));
+      _updateState(
+          VersionStatus(
+            state: VersionState.upToDate,
+            latestVersion: tagName,
+          ),
+          currentVersion: packageInfo.version);
     } else {
-      _updateState(VersionStatus(
-        state: VersionState.beta,
-        latestVersion: tagName,
-      ));
+      _updateState(
+          VersionStatus(
+            state: VersionState.beta,
+            latestVersion: tagName,
+          ),
+          currentVersion: packageInfo.version);
     }
   }
 }

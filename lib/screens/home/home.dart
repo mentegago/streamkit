@@ -119,9 +119,9 @@ class Home extends HookWidget {
               "StreamKit is out of date. Please update to the latest version (${status.latestVersion}).";
           break;
         case VersionState.beta:
-          updateTitle = "Warning";
+          updateTitle = "Prerelease Version";
           updateMessage =
-              "You are running unreleased version of StreamKit. Some features may not work properly.";
+              "You are running prerelease version of StreamKit. Some features may not work properly.";
           break;
       }
 

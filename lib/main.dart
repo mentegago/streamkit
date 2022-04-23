@@ -14,6 +14,7 @@ import 'package:streamkit_tts/utils/beat_saver_util.dart';
 import 'package:streamkit_tts/utils/external_config_util.dart';
 import 'package:streamkit_tts/utils/language_detection_util.dart';
 import 'package:streamkit_tts/utils/misc_tts_util.dart';
+import 'package:version/version.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -106,7 +107,7 @@ class MyApp extends HookWidget {
         children: [
           Expanded(
             child: MoveWindow(
-              child: Container(),
+              child: const StreamKitTitleBar(),
             ),
           ),
           MinimizeWindowButton(
@@ -123,6 +124,54 @@ class MyApp extends HookWidget {
       leading: const Padding(
         child: Text("🧈", style: TextStyle(fontSize: 24)),
         padding: EdgeInsets.only(bottom: 4.0),
+      ),
+    );
+  }
+}
+
+class StreamKitTitleBar extends HookWidget {
+  const StreamKitTitleBar({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final visible = useState(false);
+    final versionCheckService = context.watch<VersionCheckService>();
+
+    final version = versionCheckService.currentVersion;
+    final versionInfo = versionCheckService.status.state == VersionState.beta
+        ? "prerelease"
+        : versionCheckService.status.state == VersionState.outdated
+            ? "outdated"
+            : "";
+
+    String titleBarText = "StreamKit";
+
+    if (version != null) {
+      final versionParsed = Version.parse(version);
+      titleBarText += " ${versionParsed.major}.${versionParsed.minor}";
+      if (versionParsed.patch != 0) {
+        titleBarText += ".${versionParsed.patch}";
+      }
+    }
+
+    if (versionInfo.isNotEmpty) {
+      titleBarText += " ($versionInfo)";
+    }
+
+    return MouseRegion(
+      onEnter: (event) {
+        visible.value = true;
+      },
+      onExit: (event) {
+        visible.value = false;
+      },
+      child: AnimatedOpacity(
+        opacity: visible.value ? 0.5 : 0.0,
+        duration: const Duration(milliseconds: 100),
+        child: Container(
+          child: Text(titleBarText),
+          alignment: Alignment.center,
+        ),
       ),
     );
   }
