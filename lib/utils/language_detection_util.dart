@@ -51,7 +51,8 @@ class LanguageDetection {
   }
 
   bool _isJapanese(String text) {
-    return text.contains(RegExp(r'[一-龯ぁ-んァ-ン]'));
+    return text.contains(RegExp(r'[一-龯ぁ-んァ-ン]')) ||
+        text.contains("teeeeeccchhhh");
   }
 
   int _languageScore(List<String> profile, Map<String, dynamic> language) {

@@ -10,6 +10,7 @@ import 'package:streamkit_tts/models/enums/languages_enum.dart';
 import 'package:streamkit_tts/screens/home/home.dart';
 import 'package:streamkit_tts/services/chat_to_speech_service.dart';
 import 'package:streamkit_tts/services/version_check_service.dart';
+import 'package:streamkit_tts/utils/beat_saver_util.dart';
 import 'package:streamkit_tts/utils/external_config_util.dart';
 import 'package:streamkit_tts/utils/language_detection_util.dart';
 import 'package:streamkit_tts/utils/misc_tts_util.dart';
@@ -24,6 +25,7 @@ void main() async {
     languageDetectionUtil: LanguageDetection(),
     externalConfigUtil: externalConfigUtil,
     miscTtsUtil: MiscTts(),
+    beatSaverUtil: BeatSaverUtil(),
   );
   final versionCheckService = VersionCheckService();
 
@@ -88,7 +90,7 @@ class MyApp extends HookWidget {
         accentColor: const Color.fromARGB(255, 100, 65, 165).toAccentColor(),
       ),
       home: NavigationView(
-        appBar: streamKitAppBar(),
+        appBar: streamKitAppBar(context),
         content: NavigationBody(
           index: 0,
           children: const [Home()],
@@ -97,7 +99,7 @@ class MyApp extends HookWidget {
     );
   }
 
-  NavigationAppBar streamKitAppBar() {
+  NavigationAppBar streamKitAppBar(BuildContext context) {
     return NavigationAppBar(
       title: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,

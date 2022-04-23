@@ -10,6 +10,7 @@ import 'package:streamkit_tts/models/config_model.dart';
 import 'package:streamkit_tts/models/enums/languages_enum.dart';
 import 'package:streamkit_tts/models/twitch/twitch_message.dart';
 import 'package:streamkit_tts/services/twitch_chat_service.dart';
+import 'package:streamkit_tts/utils/beat_saver_util.dart';
 import 'package:streamkit_tts/utils/external_config_util.dart';
 import 'package:streamkit_tts/utils/language_detection_util.dart';
 import 'package:streamkit_tts/utils/misc_tts_util.dart';
@@ -28,9 +29,11 @@ class ChatToSpeechMessage {
 class ChatToSpeechService extends ChangeNotifier {
   final _player = AudioPlayer();
 
+  // Utils
   final LanguageDetection _languageDetectionUtil;
   final ExternalConfig _externalConfigUtil;
   final MiscTts _miscTtsUtil;
+  final BeatSaverUtil _beatSaverUtil;
 
   late String _streamKitDir;
 
@@ -54,10 +57,12 @@ class ChatToSpeechService extends ChangeNotifier {
     required LanguageDetection languageDetectionUtil,
     required ExternalConfig externalConfigUtil,
     required MiscTts miscTtsUtil,
+    required BeatSaverUtil beatSaverUtil,
   })  : _config = config,
         _languageDetectionUtil = languageDetectionUtil,
         _externalConfigUtil = externalConfigUtil,
-        _miscTtsUtil = miscTtsUtil {
+        _miscTtsUtil = miscTtsUtil,
+        _beatSaverUtil = beatSaverUtil {
     _config.addListener(_configChanged);
     _twitch.state.listen((event) {
       state = event;
@@ -126,23 +131,11 @@ class ChatToSpeechService extends ChangeNotifier {
     String spokenText = messageText.toLowerCase();
 
     if (_config.chatToSpeechConfiguration.readUsername) {
-      spokenText = "${message.username} $spokenText";
+      spokenText = "${message.username}, $spokenText";
     }
 
     // Username fixing.
-    for (var name in _externalConfigUtil.nameFixConfig.names) {
-      final replacedName = () {
-        switch (language) {
-          case Language.english:
-            return name.en;
-          case Language.indonesian:
-            return name.id;
-          case Language.japanese:
-            return name.jp;
-        }
-      }();
-      spokenText = spokenText.replaceAll(name.original, replacedName);
-    }
+    spokenText = _fixNames(language, spokenText);
 
     if (spokenText.length > _maxCharacterLength) {
       spokenText = spokenText.substring(0, _maxCharacterLength);
@@ -156,15 +149,54 @@ class ChatToSpeechService extends ChangeNotifier {
     );
   }
 
-  void _handleCommand(TwitchMessage message) {
-    if (message.username.toLowerCase() != "mentegagoreng") return;
-    if (message.message == "!updatepancilist") {
-      _externalConfigUtil.loadPanciList();
-      return;
+  String _fixNames(Language language, String spokenText) {
+    for (var name in _externalConfigUtil.nameFixConfig.names) {
+      final replacedName = () {
+        switch (language) {
+          case Language.english:
+            return name.en;
+          case Language.indonesian:
+            return name.id;
+          case Language.japanese:
+            return name.jp;
+        }
+      }();
+      spokenText = spokenText.replaceAll(name.original, replacedName);
+    }
+    return spokenText;
+  }
+
+  _handleCommand(TwitchMessage message) {
+    if (message.username == "mentegagoreng") {
+      // StreamKit admin commands.
+      if (message.message == "!updatepancilist") {
+        _externalConfigUtil.loadPanciList();
+        return;
+      }
+
+      if (message.message == "!updatenamefixlist") {
+        _externalConfigUtil.loadNameFixList();
+        return;
+      }
     }
 
-    if (message.message == "!updatenamefixlist") {
-      _externalConfigUtil.loadNameFixList();
+    final commandSplit = message.message.toLowerCase().split(' ');
+
+    if (_config.chatToSpeechConfiguration.readBsr &&
+        commandSplit.length == 2 &&
+        commandSplit[0] == "!bsr") {
+      final bsrCode = commandSplit[1];
+      _beatSaverUtil.getSongName(bsrCode: bsrCode).then((songName) {
+        _addMessageToQueue(
+          ChatToSpeechMessage(
+            message: _fixNames(
+              Language.english,
+              "${message.username} requested $songName",
+            ),
+            language: Language.english,
+          ),
+        );
+      });
       return;
     }
   }

@@ -1,6 +1,7 @@
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:provider/provider.dart';
+import 'package:streamkit_tts/screens/home/widgets/chat_reader_status_info.dart';
 
 import 'package:streamkit_tts/screens/home/widgets/config_groups/bs_config_group.dart';
 import 'package:streamkit_tts/screens/home/widgets/config_groups/languages_config_group.dart';
@@ -24,7 +25,10 @@ class Home extends HookWidget {
     useEffect(() => _versionCheckEffect(context));
 
     return ScaffoldPage(
-      header: const PageHeader(title: Text("StreamKit Chat Reader")),
+      header: const PageHeader(
+        title: Text("StreamKit Chat Reader"),
+        commandBar: ChatReaderStatus(),
+      ),
       content: Container(
         alignment: Alignment.topLeft,
         margin: const EdgeInsets.symmetric(
