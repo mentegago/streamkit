@@ -10,22 +10,34 @@ class BeatSaberConfigGroup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final config = context.watch<Config>();
     return ConfigGroup(
       title: "Beat Saber Specific",
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 8.0),
-          Checkbox(
-            checked: config.chatToSpeechConfiguration.readBsr,
-            onChanged: (isChecked) {
-              config.setBsrSpecificConfig(readBsr: isChecked ?? false);
-            },
-            content: const Text("Read !bsr song name"),
-          ),
+        children: const [
+          SizedBox(height: 8.0),
+          _ReadBsrCheckbox(),
         ],
       ),
+    );
+  }
+}
+
+class _ReadBsrCheckbox extends StatelessWidget {
+  const _ReadBsrCheckbox({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final config = context.read<Config>();
+    final readBsr = context
+        .select((Config config) => config.chatToSpeechConfiguration.readBsr);
+
+    return Checkbox(
+      checked: readBsr,
+      onChanged: (isChecked) {
+        config.setBsrSpecificConfig(readBsr: isChecked ?? false);
+      },
+      content: const Text("Read !bsr song name"),
     );
   }
 }

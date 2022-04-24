@@ -11,7 +11,8 @@ class ChatReaderStatus extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final chatToSpeechState = context.watch<ChatToSpeechService>().state;
+    final chatToSpeechState =
+        context.select((ChatToSpeechService service) => service.state);
     final color = chatToSpeechState == TwitchState.active
         ? const Color.fromARGB(255, 0, 255, 0)
         : Colors.red.normal;

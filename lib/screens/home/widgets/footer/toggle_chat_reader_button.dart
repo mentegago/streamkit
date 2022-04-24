@@ -11,8 +11,12 @@ class ToggleChatReaderButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final config = context.watch<Config>();
-    final service = context.watch<ChatToSpeechService>();
+    final config = context.read<Config>();
+
+    final enabled = context
+        .select((Config config) => config.chatToSpeechConfiguration.enabled);
+    final state =
+        context.select((ChatToSpeechService service) => service.state);
 
     final onPressed = (() {
       if (config.chatToSpeechConfiguration.channels.isEmpty) {
@@ -46,15 +50,13 @@ class ToggleChatReaderButton extends StatelessWidget {
       ),
     );
 
-    if (config.chatToSpeechConfiguration.enabled &&
-        service.state == TwitchState.active) {
+    if (enabled && state == TwitchState.active) {
       return Button(
         child: const Text("Stop Chat Reader"),
         onPressed: onPressed,
         style: buttonStyle,
       );
-    } else if (!config.chatToSpeechConfiguration.enabled ||
-        service.state == TwitchState.inactive) {
+    } else if (!enabled || state == TwitchState.inactive) {
       return FilledButton(
         child: const Text("Start Chat Reader"),
         onPressed: onPressed,

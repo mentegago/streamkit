@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -17,10 +15,11 @@ class TwitchChannelBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeData = FluentTheme.of(context);
-    final config = context.watch<Config>();
+    final channels = context
+        .select((Config config) => config.chatToSpeechConfiguration.channels);
 
     final List<Widget> channelInfoWidgets = (() {
-      if (config.chatToSpeechConfiguration.channels.isEmpty) {
+      if (channels.isEmpty) {
         return [
           const Expanded(
             child: Text("No channel selected."),
@@ -32,12 +31,13 @@ class TwitchChannelBox extends StatelessWidget {
           const SizedBox(width: 4.0),
           Expanded(
             child: Text(
-              config.chatToSpeechConfiguration.channels.join(", "),
+              channels.join(", "),
             ),
           ),
         ];
       }
     })();
+
     return FluentTheme(
       data: ThemeData(brightness: Brightness.dark),
       child: Card(
@@ -76,9 +76,8 @@ class TwitchChannelBox extends StatelessWidget {
                   }
                   showTwitchChannelSelection(context);
                 },
-                child: Text(config.chatToSpeechConfiguration.channels.isEmpty
-                    ? "Select channel"
-                    : "Change channel"),
+                child: Text(
+                    channels.isEmpty ? "Select channel" : "Change channel"),
               ),
             ],
           ),

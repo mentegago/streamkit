@@ -18,19 +18,8 @@ class LanguagesConfigGroup extends StatelessWidget {
       Language.japanese,
     ];
 
-    final config = context.watch<Config>();
-    final activeLanguages = config.chatToSpeechConfiguration.languages;
-
     final languageWidgets = languages.map(
-      (e) => Checkbox(
-        checked: activeLanguages.contains(e),
-        onChanged: (isChecked) =>
-            config.setLanguage(e, enabled: isChecked ?? false),
-        content: TextWithFlag(
-          flagCode: e.flagCode,
-          text: e.displayName,
-        ),
-      ),
+      (e) => _LanguageCheckbox(language: e),
     );
 
     return ConfigGroup(
@@ -43,6 +32,32 @@ class LanguagesConfigGroup extends StatelessWidget {
           const SizedBox(height: 8.0),
           ...languageWidgets,
         ],
+      ),
+    );
+  }
+}
+
+class _LanguageCheckbox extends StatelessWidget {
+  const _LanguageCheckbox({
+    Key? key,
+    required this.language,
+  }) : super(key: key);
+
+  final Language language;
+
+  @override
+  Widget build(BuildContext context) {
+    final config = context.read<Config>();
+    final isChecked = context.select((Config config) =>
+        config.chatToSpeechConfiguration.languages.contains(language));
+
+    return Checkbox(
+      checked: isChecked,
+      onChanged: (isChecked) =>
+          config.setLanguage(language, enabled: isChecked ?? false),
+      content: TextWithFlag(
+        flagCode: language.flagCode,
+        text: language.displayName,
       ),
     );
   }

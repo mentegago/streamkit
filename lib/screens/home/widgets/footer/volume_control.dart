@@ -9,7 +9,9 @@ class VolumeControl extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final config = context.watch<Config>();
+    final config = context.read<Config>();
+    final volume = context
+        .select((Config config) => config.chatToSpeechConfiguration.volume);
 
     return Row(
       children: [
@@ -19,7 +21,7 @@ class VolumeControl extends StatelessWidget {
           onChanged: (double value) {
             config.setVolume(value);
           },
-          value: config.chatToSpeechConfiguration.volume,
+          value: volume,
           max: 100,
           min: 0,
         ),
