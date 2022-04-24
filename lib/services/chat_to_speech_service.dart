@@ -142,7 +142,7 @@ class ChatToSpeechService extends ChangeNotifier {
       spokenText = spokenText.substring(0, _maxCharacterLength);
     }
 
-    spokenText = spokenText.replaceAll(r"[:*><();^~`\[\]]", "");
+    spokenText = spokenText.replaceAll(RegExp(r"[:*><();^~`\[\]]"), "");
 
     _addMessageToQueue(
       ChatToSpeechMessage(
