@@ -1,7 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:streamkit_tts/models/config_model.dart';
 import 'package:streamkit_tts/models/enums/languages_enum.dart';
-import 'package:streamkit_tts/screens/home/config_group.dart';
+import 'package:streamkit_tts/screens/home/widgets/config_group.dart';
 import 'package:provider/provider.dart';
 import 'package:streamkit_tts/screens/home/widgets/text_with_flag.dart';
 
@@ -35,6 +35,8 @@ class LanguagesConfigGroup extends StatelessWidget {
 
     return ConfigGroup(
       title: "Languages",
+      tooltip:
+          "The language of each chat message will be automatically detected between these languages",
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

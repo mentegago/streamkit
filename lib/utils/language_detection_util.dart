@@ -84,7 +84,7 @@ class LanguageDetection {
   }
 
   Map<String, int> _getNgrams(String text, {required int n}) {
-    final filteredText = text
+    String filteredText = text
         .replaceAll(RegExp(r'(\.|\,)(\s+|$)'), " ")
         .replaceAll(RegExp(r'\-'), " ")
         .replaceAll(RegExp(r'\s+'), "_")
@@ -93,6 +93,8 @@ class LanguageDetection {
         .replaceAll(RegExp(r'_$'), "")
         .replaceAll(RegExp(r'^_'), "")
         .toLowerCase();
+
+    filteredText = "_${filteredText}_";
 
     Map<String, int> tokens = {};
     for (var i = 0; i < filteredText.length - (n + 1); i++) {
