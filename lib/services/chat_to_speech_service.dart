@@ -132,7 +132,7 @@ class ChatToSpeechService extends ChangeNotifier {
     String spokenText = messageText.toLowerCase();
 
     if (_config.chatToSpeechConfiguration.readUsername) {
-      spokenText = "${message.username}, $spokenText";
+      spokenText = "${message.username.replaceAll("_", " ")}, $spokenText";
     }
 
     // Username fixing.
@@ -192,7 +192,7 @@ class ChatToSpeechService extends ChangeNotifier {
           ChatToSpeechMessage(
             message: _fixNames(
               Language.english,
-              "${message.username} requested $songName",
+              "${message.username.replaceAll("_", " ")} requested $songName",
             ),
             language: Language.english,
           ),
@@ -225,7 +225,7 @@ class ChatToSpeechService extends ChangeNotifier {
     if (_player.playerState.playing) await _player.stop();
     await _player.setAudioSource(AudioSource.uri(audioFile.uri));
     final duration = _player.duration?.inSeconds ?? 0;
-    final audioSpeed = duration <= 5 ? 1.0 : min(duration / 5.0, 1.8);
+    final audioSpeed = duration <= 10 ? 1.0 : min(duration / 10.0, 2.0);
     await _player.setSpeed(audioSpeed);
     await _player.play();
 

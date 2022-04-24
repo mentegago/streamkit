@@ -16,36 +16,13 @@ class ChatReaderStatus extends HookWidget {
         ? const Color.fromARGB(255, 0, 255, 0)
         : Colors.red.normal;
 
-    final activeAnimationController = useAnimationController(
-      duration: const Duration(milliseconds: 500),
-      initialValue: 0,
-      lowerBound: 0.3,
-      upperBound: 1,
-    )..repeat(
-        reverse: true,
-      );
-
-    final inactiveAnimationController = useAnimationController(
-      duration: const Duration(milliseconds: 500),
-      initialValue: 1,
-      lowerBound: 1,
-      upperBound: 1,
-    )..repeat(
-        reverse: true,
-      );
-
-    return FadeTransition(
-      opacity: chatToSpeechState == TwitchState.active
-          ? activeAnimationController
-          : inactiveAnimationController,
-      child: Container(
-        decoration: BoxDecoration(
-          color: color,
-          shape: BoxShape.circle,
-        ),
-        width: 18,
-        height: 18,
+    return Container(
+      decoration: BoxDecoration(
+        color: color,
+        shape: BoxShape.circle,
       ),
+      width: 18,
+      height: 18,
     );
   }
 }
