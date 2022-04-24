@@ -142,6 +142,8 @@ class ChatToSpeechService extends ChangeNotifier {
       spokenText = spokenText.substring(0, _maxCharacterLength);
     }
 
+    spokenText = spokenText.replaceAll(r"[:*><();^~`\[\]]", "");
+
     _addMessageToQueue(
       ChatToSpeechMessage(
         message: spokenText,
@@ -225,7 +227,7 @@ class ChatToSpeechService extends ChangeNotifier {
     if (_player.playerState.playing) await _player.stop();
     await _player.setAudioSource(AudioSource.uri(audioFile.uri));
     final duration = _player.duration?.inSeconds ?? 0;
-    final audioSpeed = duration <= 10 ? 1.0 : min(duration / 10.0, 2.0);
+    final audioSpeed = duration <= 8 ? 1.0 : min(duration / 8.0, 2.0);
     await _player.setSpeed(audioSpeed);
     await _player.play();
 
