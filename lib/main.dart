@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:bitsdojo_window/bitsdojo_window.dart';
@@ -16,6 +17,7 @@ import 'package:streamkit_tts/utils/language_detection_util.dart';
 import 'package:streamkit_tts/utils/misc_tts_util.dart';
 import 'package:version/version.dart';
 
+Timer? _saveConfigTimer;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final externalConfigUtil = ExternalConfig();
@@ -31,7 +33,13 @@ void main() async {
   final versionCheckService = VersionCheckService();
 
   config.addListener(() {
-    saveConfigurations(config, appPath: externalConfigUtil.appPath);
+    _saveConfigTimer?.cancel();
+
+    // Debounce for two seconds before saving configuration.
+    _saveConfigTimer = Timer(
+      const Duration(seconds: 2),
+      () => saveConfigurations(config, appPath: externalConfigUtil.appPath),
+    );
   });
 
   runApp(
