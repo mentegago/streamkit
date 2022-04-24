@@ -1,7 +1,14 @@
 # 🧈 StreamKit Chat Reader 🧈
+<p>
+    <a title="Made with Fluent Design" href="https://github.com/bdlukaa/fluent_ui">
+        <img src="https://img.shields.io/badge/fluent-design-blue?style=flat-square&color=7A7574&labelColor=0078D7">
+    </a>
+</p>
+
 **This app is still in early stage.**
 
 ![Screenshot](screenshots/streamkit_screenshot.jpg)
+
 
 StreamKit Chat Reader is a free Twitch chat reader (text-to-speech) app that supports Indonesian, English, and Japanese simultaneously. StreamKit automatically detects the language of each chat message and read with the appropriate TTS.
 
