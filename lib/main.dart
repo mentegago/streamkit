@@ -31,8 +31,7 @@ void main() async {
   final versionCheckService = VersionCheckService();
 
   config.addListener(() {
-    final file = File('${externalConfigUtil.appPath}/config.json');
-    file.writeAsStringSync(config.chatToSpeechConfiguration.toJson());
+    saveConfigurations(config, appPath: externalConfigUtil.appPath);
   });
 
   runApp(
@@ -55,13 +54,32 @@ void main() async {
   });
 }
 
+void saveConfigurations(Config config, {required String appPath}) {
+  final file = File('$appPath\\config.json');
+  file.writeAsStringSync(config.chatToSpeechConfiguration.toJson());
+}
+
 Future<Config> loadConfigurations({required String appPath}) async {
-  final file = File('$appPath/config.json');
+  final file = File('$appPath\\config.json');
 
   if (file.existsSync()) {
     final config = ChatToSpeechConfiguration.fromJson(file.readAsStringSync());
     return Config(chatToSpeechConfiguration: config);
   }
+
+  try {
+    final oldConfigFile = File('$appPath\\streamkit_configurations.json');
+    if (oldConfigFile.existsSync()) {
+      final config = ChatToSpeechConfiguration.fromOldJson(
+          oldConfigFile.readAsStringSync());
+      saveConfigurations(Config(chatToSpeechConfiguration: config),
+          appPath: appPath);
+
+      oldConfigFile.deleteSync();
+
+      return Config(chatToSpeechConfiguration: config);
+    }
+  } catch (e) {}
 
   return Config(
     chatToSpeechConfiguration: ChatToSpeechConfiguration(

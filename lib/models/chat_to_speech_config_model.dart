@@ -82,6 +82,36 @@ class ChatToSpeechConfiguration {
   factory ChatToSpeechConfiguration.fromJson(String source) =>
       ChatToSpeechConfiguration.fromMap(json.decode(source));
 
+  factory ChatToSpeechConfiguration.fromOldJson(String source) {
+    final json = jsonDecode(source);
+    final config = json["chatToSpeech"];
+    final languages = Set<String>.from(
+            config?["languages"] ?? ["indonesian", "english", "japanese"])
+        .map((e) {
+      switch (e) {
+        case "indonesian":
+          return Language.indonesian;
+        case "japanese":
+          return Language.japanese;
+        case "english":
+        default:
+          return Language.english;
+      }
+    }).toSet();
+    final volume = (config?["volume"]?.toDouble() ?? 0.0) * 100.0;
+
+    return ChatToSpeechConfiguration(
+      channels: Set<String>.from(config?["channels"] ?? []),
+      readUsername: config?["readUsername"] ?? true,
+      ignoreExclamationMark: config?["ignoreExclamationMark"] ?? true,
+      ignoreEmotes: true,
+      languages: languages,
+      enabled: config?["enabled"] ?? false,
+      volume: volume,
+      readBsr: config?["readBsr"] ?? true,
+    );
+  }
+
   @override
   String toString() {
     return 'ChatToSpeechConfiguration(channels: $channels, readUsername: $readUsername, ignoreExclamationMark: $ignoreExclamationMark, ignoreEmotes: $ignoreEmotes, languages: $languages, enabled: $enabled, volume: $volume, readBsr: $readBsr)';
