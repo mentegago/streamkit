@@ -75,7 +75,9 @@ class ChatToSpeechService extends ChangeNotifier {
     _twitch.messageStream.listen(_messageReceived);
 
     getTemporaryDirectory().then((dir) {
-      _streamKitDir = "${dir.path}\\StreamKitTmpAudio";
+      _streamKitDir = Platform.isWindows
+          ? "${dir.path}\\StreamKitTmpAudio"
+          : "${dir.path}/StreamKitTmpAudio";
       _cleanUpAndPrepareStreamKitDir();
     });
 

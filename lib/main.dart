@@ -63,12 +63,16 @@ void main() async {
 }
 
 void saveConfigurations(Config config, {required String appPath}) {
-  final file = File('$appPath\\config.json');
+  final file = Platform.isWindows
+      ? File('$appPath\\config.json')
+      : File('$appPath/config.json');
   file.writeAsStringSync(config.chatToSpeechConfiguration.toJson());
 }
 
 Future<Config> loadConfigurations({required String appPath}) async {
-  final file = File('$appPath\\config.json');
+  final file = Platform.isWindows
+      ? File('$appPath\\config.json')
+      : File('$appPath/config.json');
 
   if (file.existsSync()) {
     final config = ChatToSpeechConfiguration.fromJson(file.readAsStringSync());
@@ -76,7 +80,9 @@ Future<Config> loadConfigurations({required String appPath}) async {
   }
 
   try {
-    final oldConfigFile = File('$appPath\\streamkit_configurations.json');
+    final oldConfigFile = Platform.isWindows
+        ? File('$appPath\\streamkit_configurations.json')
+        : File('$appPath/streamkit_configurations.json');
     if (oldConfigFile.existsSync()) {
       final config = ChatToSpeechConfiguration.fromOldJson(
           oldConfigFile.readAsStringSync());
@@ -127,6 +133,8 @@ class MyApp extends HookWidget {
   }
 
   NavigationAppBar streamKitAppBar(BuildContext context) {
+    final isMacOS = Platform.isMacOS;
+
     return NavigationAppBar(
       title: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -147,10 +155,12 @@ class MyApp extends HookWidget {
       ),
       automaticallyImplyLeading: false,
       height: 36.0,
-      leading: const Padding(
-        child: Text("🧈", style: TextStyle(fontSize: 24)),
-        padding: EdgeInsets.only(bottom: 4.0),
-      ),
+      leading: !isMacOS
+          ? const Padding(
+              child: Text("🧈", style: TextStyle(fontSize: 24)),
+              padding: EdgeInsets.only(bottom: 4.0),
+            )
+          : null,
     );
   }
 }
