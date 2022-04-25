@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:streamkit_tts/models/chat_to_speech_config_model.dart';
 import 'package:streamkit_tts/models/config_model.dart';
@@ -22,7 +23,11 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final externalConfigUtil = ExternalConfig();
 
-  final config = await loadConfigurations(appPath: externalConfigUtil.appPath);
+  final appPath = Platform.isWindows
+      ? externalConfigUtil.appPath
+      : (await getApplicationDocumentsDirectory()).path;
+
+  final config = await loadConfigurations(appPath: appPath);
   final chatToSpeechService = ChatToSpeechService(
     config: config,
     languageDetectionUtil: LanguageDetection(),
@@ -38,7 +43,7 @@ void main() async {
     // Debounce for two seconds before saving configuration.
     _saveConfigTimer = Timer(
       const Duration(seconds: 2),
-      () => saveConfigurations(config, appPath: externalConfigUtil.appPath),
+      () => saveConfigurations(config, appPath: appPath),
     );
   });
 
