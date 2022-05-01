@@ -88,6 +88,9 @@ class TwitchChatService {
               case 'PRIVMSG':
                 _handlePrivateMessage(match);
                 break;
+              case 'USERNOTICE':
+                _handlePrivateMessage(match);
+                break;
               default:
                 break;
             }
