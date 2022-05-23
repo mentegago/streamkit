@@ -1,6 +1,6 @@
 import 'package:flag/flag_enum.dart';
 
-enum Language { english, indonesian, japanese }
+enum Language { english, indonesian, japanese, french }
 
 extension LanguageExtension on Language {
   String get google {
@@ -11,6 +11,8 @@ extension LanguageExtension on Language {
         return 'id-ID';
       case Language.japanese:
         return 'ja';
+      case Language.french:
+        return 'fr';
     }
   }
 
@@ -22,6 +24,8 @@ extension LanguageExtension on Language {
         return 'Indonesian';
       case Language.japanese:
         return 'Japanese';
+      case Language.french:
+        return 'French';
     }
   }
 
@@ -35,6 +39,8 @@ extension LanguageExtension on Language {
         return 'ID';
       case Language.japanese:
         return 'JP';
+      case Language.french:
+        return 'FR';
     }
   }
 
@@ -46,6 +52,8 @@ extension LanguageExtension on Language {
         return FlagsCode.ID;
       case Language.japanese:
         return FlagsCode.JP;
+      case Language.french:
+        return FlagsCode.FR;
     }
   }
 }
@@ -59,6 +67,8 @@ class LanguageParser {
         return Language.indonesian;
       case "ja":
         return Language.japanese;
+      case "fr":
+        return Language.french;
       default:
         return null;
     }
@@ -72,6 +82,8 @@ class LanguageParser {
         return Language.indonesian;
       case "JP":
         return Language.japanese;
+      case "FR":
+        return Language.french;
       default:
         return null;
     }

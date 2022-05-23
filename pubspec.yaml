@@ -81,6 +81,7 @@ flutter:
     - assets/images/twitch_icon.svg
     - assets/en_ngram_model.json
     - assets/id_ngram_model.json
+    - assets/fr_ngram_model.json
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

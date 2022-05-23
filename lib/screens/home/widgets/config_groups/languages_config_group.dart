@@ -16,6 +16,7 @@ class LanguagesConfigGroup extends StatelessWidget {
       Language.indonesian,
       Language.english,
       Language.japanese,
+      Language.french,
     ];
 
     final languageWidgets = languages.map(

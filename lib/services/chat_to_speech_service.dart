@@ -162,9 +162,12 @@ class ChatToSpeechService extends ChangeNotifier {
             return name.id;
           case Language.japanese:
             return name.jp;
+          case Language.french:
+            return name.fr;
         }
       }();
-      spokenText = spokenText.replaceAll(name.original, replacedName);
+      spokenText =
+          spokenText.replaceAll(name.original, replacedName ?? name.original);
     }
     return spokenText;
   }

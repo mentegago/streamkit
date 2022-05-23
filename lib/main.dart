@@ -94,7 +94,7 @@ Future<Config> loadConfigurations({required String appPath}) async {
       channels: {},
       enabled: false,
       ignoreExclamationMark: true,
-      languages: Language.values.toSet(),
+      languages: {Language.english, Language.indonesian, Language.japanese},
       readBsr: true,
       readUsername: true,
       volume: 100.0,
