@@ -106,8 +106,8 @@ class ChatToSpeechService extends ChangeNotifier {
     }
 
     String messageText = _config.chatToSpeechConfiguration.ignoreEmotes
-        ? message.emotelessMessage
-        : message.message;
+        ? message.emotelessMessage.trim()
+        : message.message.trim();
 
     if (messageText.isEmpty) {
       return;
