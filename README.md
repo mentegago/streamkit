@@ -25,3 +25,8 @@ Download the latest version at [the release page](https://github.com/mentegago/s
 This app is written with [Flutter on Desktop](https://flutter.dev/multi-platform/desktop). You'll need **Flutter** SDK to be installed as well as everything [required to build a Flutter Windows app](https://docs.flutter.dev/desktop#additional-windows-requirements). 
 
 This app has not been tested to run on macOS or Linux, however, the libraries used in this project are all crossplatform, so I don't think there should be any issue building for other platforms.
+
+## Credits
+App icon is butter emoji from Twemoji.
+Copyright 2020 Twitter, Inc and other contributors
+Graphics licensed under CC-BY 4.0: https://creativecommons.org/licenses/by/4.0/
