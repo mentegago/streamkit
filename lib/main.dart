@@ -35,9 +35,9 @@ void main() async {
   config.addListener(() {
     _saveConfigTimer?.cancel();
 
-    // Debounce for two seconds before saving configuration.
+    // Debounce for one seconds before saving configuration.
     _saveConfigTimer = Timer(
-      const Duration(seconds: 2),
+      const Duration(seconds: 1),
       () => saveConfigurations(config, appPath: externalConfigUtil.appPath),
     );
   });
