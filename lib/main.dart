@@ -95,7 +95,7 @@ Future<Config> loadConfigurations({required String appPath}) async {
       enabled: false,
       ignoreExclamationMark: true,
       languages: {Language.english, Language.indonesian, Language.japanese},
-      readBsr: true,
+      readBsr: false,
       readUsername: true,
       volume: 100.0,
       ignoreEmotes: true,
