@@ -35,9 +35,9 @@ void main() async {
   config.addListener(() {
     _saveConfigTimer?.cancel();
 
-    // Debounce for two seconds before saving configuration.
+    // Debounce for one seconds before saving configuration.
     _saveConfigTimer = Timer(
-      const Duration(seconds: 2),
+      const Duration(seconds: 1),
       () => saveConfigurations(config, appPath: externalConfigUtil.appPath),
     );
   });
@@ -94,11 +94,12 @@ Future<Config> loadConfigurations({required String appPath}) async {
       channels: {},
       enabled: false,
       ignoreExclamationMark: true,
-      languages: Language.values.toSet(),
-      readBsr: true,
+      languages: {Language.english, Language.indonesian, Language.japanese},
+      readBsr: false,
       readUsername: true,
       volume: 100.0,
       ignoreEmotes: true,
+      readBsrSafely: false,
     ),
   );
 }

@@ -7,6 +7,7 @@ import 'package:tuple/tuple.dart';
 class LanguageDetection {
   static Map<String, dynamic> enModel = {};
   static Map<String, dynamic> idModel = {};
+  static Map<String, dynamic> frModel = {};
 
   LanguageDetection() {
     _loadLanguageModels();
@@ -17,9 +18,12 @@ class LanguageDetection {
         await rootBundle.loadString("assets/en_ngram_model.json");
     final String idJsonString =
         await rootBundle.loadString("assets/id_ngram_model.json");
+    final String frJsonString =
+        await rootBundle.loadString("assets/fr_ngram_model.json");
 
     enModel = json.decode(enJsonString);
     idModel = json.decode(idJsonString);
+    frModel = json.decode(frJsonString);
   }
 
   Language getLanguage(
@@ -35,14 +39,26 @@ class LanguageDetection {
 
     final enScore = Tuple2(
       Language.english,
-      _languageScore(textProfile, enModel),
-    );
-    final idScore = Tuple2(
-      Language.indonesian,
-      _languageScore(textProfile, idModel),
+      whitelistedLanguages.contains(Language.english)
+          ? _languageScore(textProfile, enModel)
+          : double.maxFinite,
     );
 
-    final scores = [enScore, idScore]
+    final idScore = Tuple2(
+      Language.indonesian,
+      whitelistedLanguages.contains(Language.indonesian)
+          ? _languageScore(textProfile, idModel)
+          : double.maxFinite,
+    );
+
+    final frScore = Tuple2(
+      Language.french,
+      whitelistedLanguages.contains(Language.french)
+          ? _languageScore(textProfile, frModel)
+          : double.maxFinite,
+    );
+
+    final scores = [enScore, idScore, frScore]
         .where((element) => whitelistedLanguages.contains(element.item1))
         .toList()
       ..sort((a, b) => a.item2.compareTo(b.item2));
@@ -88,13 +104,16 @@ class LanguageDetection {
         .replaceAll(RegExp(r'(\.|\,)(\s+|$)'), " ")
         .replaceAll(RegExp(r'\-'), " ")
         .replaceAll(RegExp(r'\s+'), "_")
-        .replaceAll(RegExp(r"""[^a-zA-Z\'_]"""), "")
+        .replaceAll(
+            RegExp(
+                r"""[^a-zA-Z\'_àâäæáãåāèéêëęėēîïīįíìôōøõóòöœùûüūúÿçćčńñÀÂÄÆÁÃÅĀÈÉÊËĘĖĒÎÏĪĮÍÌÔŌØÕÓÒÖŒÙÛÜŪÚŸÇĆČŃÑ]"""),
+            "")
         .replaceAll(RegExp(r'_+'), "_")
         .replaceAll(RegExp(r'_$'), "")
         .replaceAll(RegExp(r'^_'), "")
         .toLowerCase();
 
-    filteredText = "_${filteredText}_";
+    filteredText = "${'_' * (n - 1)}$filteredText${'_' * (n - 1)}";
 
     Map<String, int> tokens = {};
     for (var i = 0; i < filteredText.length - (n + 1); i++) {

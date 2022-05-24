@@ -17,6 +17,7 @@ class BeatSaberConfigGroup extends StatelessWidget {
         children: const [
           SizedBox(height: 8.0),
           _ReadBsrCheckbox(),
+          _ReadBsrSafelyCheckbox(),
         ],
       ),
     );
@@ -37,7 +38,30 @@ class _ReadBsrCheckbox extends StatelessWidget {
       onChanged: (isChecked) {
         config.setBsrSpecificConfig(readBsr: isChecked ?? false);
       },
-      content: const Text("Read !bsr song name"),
+      content: const Text("Read !bsr requests"),
     );
+  }
+}
+
+class _ReadBsrSafelyCheckbox extends StatelessWidget {
+  const _ReadBsrSafelyCheckbox({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final config = context.read<Config>();
+    final readBsr = context
+        .select((Config config) => config.chatToSpeechConfiguration.readBsr);
+    final readBsrSafely = context.select(
+        (Config config) => config.chatToSpeechConfiguration.readBsrSafely);
+
+    return readBsr
+        ? Checkbox(
+            checked: readBsrSafely,
+            onChanged: (isChecked) {
+              config.setBsrSpecificConfig(readBsrSafely: isChecked ?? false);
+            },
+            content: const Text("Don't read song name"),
+          )
+        : const SizedBox();
   }
 }

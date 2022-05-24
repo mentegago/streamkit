@@ -37,11 +37,13 @@ class NameFixConfig {
 
     switch (language) {
       case Language.english:
-        return name.en;
+        return name.en ?? originalName;
       case Language.indonesian:
-        return name.id;
+        return name.id ?? originalName;
       case Language.japanese:
-        return name.jp;
+        return name.jp ?? originalName;
+      case Language.french:
+        return name.fr ?? originalName;
     }
   }
 
@@ -53,21 +55,24 @@ class NameFixConfig {
 class Name {
   Name({
     required this.original,
-    required this.jp,
-    required this.id,
-    required this.en,
+    this.jp,
+    this.id,
+    this.en,
+    this.fr,
   });
 
   String original;
-  String jp;
-  String id;
-  String en;
+  String? jp;
+  String? id;
+  String? en;
+  String? fr;
 
   factory Name.fromJson(Map<String, dynamic> json) => Name(
         original: json["original"],
         jp: json["jp"],
         id: json["id"],
         en: json["en"],
+        fr: json["fr"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -75,5 +80,6 @@ class Name {
         "jp": jp,
         "id": id,
         "en": en,
+        "fr": fr,
       };
 }

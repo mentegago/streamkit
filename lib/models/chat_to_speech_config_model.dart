@@ -13,6 +13,7 @@ class ChatToSpeechConfiguration {
   final bool enabled;
   final double volume;
   final bool readBsr;
+  final bool readBsrSafely;
 
   ChatToSpeechConfiguration({
     required this.channels,
@@ -23,6 +24,7 @@ class ChatToSpeechConfiguration {
     required this.enabled,
     required this.volume,
     required this.readBsr,
+    required this.readBsrSafely,
   });
 
   ChatToSpeechConfiguration copyWith({
@@ -34,6 +36,7 @@ class ChatToSpeechConfiguration {
     bool? enabled,
     double? volume,
     bool? readBsr,
+    bool? readBsrSafely,
   }) {
     return ChatToSpeechConfiguration(
       channels: channels ?? this.channels,
@@ -45,6 +48,7 @@ class ChatToSpeechConfiguration {
       enabled: enabled ?? this.enabled,
       volume: volume ?? this.volume,
       readBsr: readBsr ?? this.readBsr,
+      readBsrSafely: readBsrSafely ?? this.readBsrSafely,
     );
   }
 
@@ -59,6 +63,7 @@ class ChatToSpeechConfiguration {
     result.addAll({'enabled': enabled});
     result.addAll({'volume': volume});
     result.addAll({'readBsr': readBsr});
+    result.addAll({'readBsrSafely': readBsrSafely});
 
     return result;
   }
@@ -74,6 +79,7 @@ class ChatToSpeechConfiguration {
       enabled: map['enabled'] ?? false,
       volume: map['volume']?.toDouble() ?? 0.0,
       readBsr: map['readBsr'] ?? false,
+      readBsrSafely: map['readBsrSafely'] ?? false,
     );
   }
 
@@ -109,6 +115,7 @@ class ChatToSpeechConfiguration {
       enabled: config?["enabled"] ?? false,
       volume: volume,
       readBsr: config?["readBsr"] ?? true,
+      readBsrSafely: false,
     );
   }
 
@@ -129,7 +136,8 @@ class ChatToSpeechConfiguration {
         setEquals(other.languages, languages) &&
         other.enabled == enabled &&
         other.volume == volume &&
-        other.readBsr == readBsr;
+        other.readBsr == readBsr &&
+        other.readBsrSafely == readBsrSafely;
   }
 
   @override

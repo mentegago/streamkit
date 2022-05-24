@@ -106,8 +106,8 @@ class ChatToSpeechService extends ChangeNotifier {
     }
 
     String messageText = _config.chatToSpeechConfiguration.ignoreEmotes
-        ? message.emotelessMessage
-        : message.message;
+        ? message.emotelessMessage.trim()
+        : message.message.trim();
 
     if (messageText.isEmpty) {
       return;
@@ -162,9 +162,12 @@ class ChatToSpeechService extends ChangeNotifier {
             return name.id;
           case Language.japanese:
             return name.jp;
+          case Language.french:
+            return name.fr;
         }
       }();
-      spokenText = spokenText.replaceAll(name.original, replacedName);
+      spokenText =
+          spokenText.replaceAll(name.original, replacedName ?? name.original);
     }
     return spokenText;
   }
@@ -190,11 +193,14 @@ class ChatToSpeechService extends ChangeNotifier {
         commandSplit[0] == "!bsr") {
       final bsrCode = commandSplit[1];
       _beatSaverUtil.getSongName(bsrCode: bsrCode).then((songName) {
+        final filteredSongName = _config.chatToSpeechConfiguration.readBsrSafely
+            ? "a song"
+            : songName;
         _addMessageToQueue(
           ChatToSpeechMessage(
             message: _fixNames(
               Language.english,
-              "${message.username.replaceAll("_", " ")} requested $songName",
+              "${message.username.replaceAll("_", " ")} requested $filteredSongName",
             ),
             language: Language.english,
           ),
