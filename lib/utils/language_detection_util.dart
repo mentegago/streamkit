@@ -113,7 +113,7 @@ class LanguageDetection {
         .replaceAll(RegExp(r'^_'), "")
         .toLowerCase();
 
-    filteredText = "_${filteredText}_";
+    filteredText = "${'_' * (n - 1)}$filteredText${'_' * (n - 1)}";
 
     Map<String, int> tokens = {};
     for (var i = 0; i < filteredText.length - (n + 1); i++) {
