@@ -193,11 +193,14 @@ class ChatToSpeechService extends ChangeNotifier {
         commandSplit[0] == "!bsr") {
       final bsrCode = commandSplit[1];
       _beatSaverUtil.getSongName(bsrCode: bsrCode).then((songName) {
+        final filteredSongName = _config.chatToSpeechConfiguration.readBsrSafely
+            ? "a song"
+            : songName;
         _addMessageToQueue(
           ChatToSpeechMessage(
             message: _fixNames(
               Language.english,
-              "${message.username.replaceAll("_", " ")} requested $songName",
+              "${message.username.replaceAll("_", " ")} requested $filteredSongName",
             ),
             language: Language.english,
           ),

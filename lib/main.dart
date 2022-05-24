@@ -99,6 +99,7 @@ Future<Config> loadConfigurations({required String appPath}) async {
       readUsername: true,
       volume: 100.0,
       ignoreEmotes: true,
+      readBsrSafely: false,
     ),
   );
 }

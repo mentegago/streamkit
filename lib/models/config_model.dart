@@ -47,10 +47,12 @@ class Config extends ChangeNotifier {
 
   void setBsrSpecificConfig({
     bool? readBsr,
+    bool? readBsrSafely,
   }) {
     setChatToSpeechConfiguration(
       chatToSpeechConfiguration.copyWith(
         readBsr: readBsr ?? chatToSpeechConfiguration.readBsr,
+        readBsrSafely: readBsrSafely ?? chatToSpeechConfiguration.readBsrSafely,
       ),
     );
   }
