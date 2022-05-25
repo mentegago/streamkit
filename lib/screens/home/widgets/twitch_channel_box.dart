@@ -154,11 +154,12 @@ class TwitchChannelSelectionDialog extends HookWidget {
         FilledButton(
           child: const Text("Set channel"),
           onPressed: () {
-            if (usernameController.text.isEmpty) {
+            final username = usernameController.text.trim();
+            if (username.isEmpty) {
               showUsernameEmptyError.value = true;
               return;
             }
-            config.setChannelUsernames({usernameController.text});
+            config.setChannelUsernames({username});
             Navigator.pop(context);
           },
         ),

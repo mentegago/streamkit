@@ -10,6 +10,7 @@ import '../models/twitch/twitch_message.dart';
 import '../models/twitch/user_state.dart';
 
 enum TwitchState { active, inactive, loading }
+
 enum TwitchError { timeout }
 
 // This script is taken from prior rewrite of StreamKit.
@@ -205,8 +206,10 @@ class TwitchChatService {
     _globalBttvEmotes = json.map((emote) => emote['code'] as String).toSet();
   }
 
-  void setChannels(Set<String> channels) {
+  void setChannels(Set<String> targetChannels) {
     final currentChannels = _channels;
+    final channels =
+        targetChannels.map((channel) => channel.trim().toLowerCase()).toSet();
 
     // Leave current channels.
     currentChannels
