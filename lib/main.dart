@@ -21,8 +21,12 @@ Timer? _saveConfigTimer;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final externalConfigUtil = ExternalConfig();
+  await externalConfigUtil.loadConfigPath();
 
-  final config = await loadConfigurations(appPath: externalConfigUtil.appPath);
+  final config = await loadConfigurations(
+    configPath: externalConfigUtil.configPath,
+    appPath: externalConfigUtil.appPath,
+  );
   final chatToSpeechService = ChatToSpeechService(
     config: config,
     languageDetectionUtil: LanguageDetection(),
@@ -38,7 +42,8 @@ void main() async {
     // Debounce for one seconds before saving configuration.
     _saveConfigTimer = Timer(
       const Duration(seconds: 1),
-      () => saveConfigurations(config, appPath: externalConfigUtil.appPath),
+      () =>
+          saveConfigurations(config, configPath: externalConfigUtil.configPath),
     );
   });
 
@@ -62,13 +67,14 @@ void main() async {
   });
 }
 
-void saveConfigurations(Config config, {required String appPath}) {
-  final file = File('$appPath\\config.json');
+void saveConfigurations(Config config, {required String configPath}) {
+  final file = File('$configPath\\config.json');
   file.writeAsStringSync(config.chatToSpeechConfiguration.toJson());
 }
 
-Future<Config> loadConfigurations({required String appPath}) async {
-  final file = File('$appPath\\config.json');
+Future<Config> loadConfigurations(
+    {required String configPath, required String appPath}) async {
+  final file = File('$configPath\\config.json');
 
   if (file.existsSync()) {
     final config = ChatToSpeechConfiguration.fromJson(file.readAsStringSync());
@@ -81,7 +87,7 @@ Future<Config> loadConfigurations({required String appPath}) async {
       final config = ChatToSpeechConfiguration.fromOldJson(
           oldConfigFile.readAsStringSync());
       saveConfigurations(Config(chatToSpeechConfiguration: config),
-          appPath: appPath);
+          configPath: configPath);
 
       oldConfigFile.deleteSync();
 
