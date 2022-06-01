@@ -2,6 +2,7 @@ import 'dart:collection';
 import 'dart:io';
 import 'dart:math';
 import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter/cupertino.dart';
@@ -20,15 +21,25 @@ import 'package:uuid/uuid.dart';
 class ChatToSpeechMessage {
   final String message;
   final Language language;
+  final bool
+      disallowDequeue; // When queue exceeds maxMessageQueueLength, allow this message to be removed from queue.
+  final bool
+      disallowSpeedUp; // Disallow this message to be played faster than 1x.
+  File? audio;
+  Duration? audioDuration;
 
   ChatToSpeechMessage({
     required this.message,
     required this.language,
+    this.disallowDequeue = false,
+    this.disallowSpeedUp = false,
   });
 }
 
 class ChatToSpeechService extends ChangeNotifier {
   final _player = AudioPlayer();
+  final _durationCheckPlayer =
+      AudioPlayer(); // Used to check duration of audio.
 
   // Utils
   final LanguageDetection _languageDetectionUtil;
@@ -38,13 +49,16 @@ class ChatToSpeechService extends ChangeNotifier {
 
   late String _streamKitDir;
 
-  final _maxMessageQueueLength = 5;
+  final _maxMessageQueueLength = 15;
   final _maxCharacterLength =
       120; // Important due to Google Translate API limit.
+  final _maxMessageQueueTotalDurationMilliseconds = 20000;
+  final _maxMessageDurationMilliseconds = 8000;
+  final double _maxMessageSpeedUpFactor = 5;
+  final double _minMessageSpeedUpFactor = 1;
 
   final _twitch = TwitchChatService();
   final _messageQueue = Queue<ChatToSpeechMessage>();
-  final _messageAudioQueue = Queue<File>();
 
   final Config _config;
 
@@ -87,10 +101,9 @@ class ChatToSpeechService extends ChangeNotifier {
       _twitch.setChannels(_config.chatToSpeechConfiguration.channels);
     } else {
       _twitch.leaveAllChannels();
-      _messageQueue.clear();
-      while (_messageAudioQueue.isNotEmpty) {
-        final audioFile = _messageAudioQueue.removeFirst();
-        audioFile.delete();
+      while (_messageQueue.isNotEmpty) {
+        final message = _messageQueue.removeFirst();
+        _cleanMessage(message);
       }
     }
 
@@ -211,46 +224,76 @@ class ChatToSpeechService extends ChangeNotifier {
   }
 
   void _addMessageToQueue(ChatToSpeechMessage message) {
+    while (_messageQueue.length > _maxMessageQueueLength) {
+      final message =
+          _messageQueue.firstWhereOrNull((element) => !element.disallowDequeue);
+      if (message == null) break;
+
+      _messageQueue.remove(message);
+      _cleanMessage(message);
+    }
     _messageQueue.add(message);
     _performMessageQueueDownload();
   }
 
-  void _addAudioFileToQueue(File file) {
-    while (_messageAudioQueue.length >= _maxMessageQueueLength) {
-      final removedFile = _messageAudioQueue.removeFirst();
-      removedFile.delete();
-    }
-
-    _messageAudioQueue.add(file);
-    _performMessageAudioQueueSpeak();
+  void _cleanMessage(ChatToSpeechMessage message) {
+    message.audio?.delete();
   }
 
   void _performMessageAudioQueueSpeak() async {
-    if (_isSpeaking || _messageAudioQueue.isEmpty) return;
-    _isSpeaking = true;
+    if (_isSpeaking) return;
 
-    final audioFile = _messageAudioQueue.removeFirst();
+    final message =
+        _messageQueue.firstWhereOrNull((element) => element.audio != null);
+    final audioFile = message?.audio;
+
+    if (message == null || audioFile == null) return;
+
+    final queueAudioDuration = _messageQueue
+        .where((element) => element.audioDuration != null)
+        .fold<int>(
+            0,
+            (previousValue, element) =>
+                previousValue +
+                min(element.audioDuration?.inMilliseconds ?? 0,
+                    _maxMessageDurationMilliseconds));
+    _isSpeaking = true;
+    _messageQueue.remove(message);
+
     if (_player.playerState.playing) await _player.stop();
     await _player.setAudioSource(AudioSource.uri(audioFile.uri));
-    final duration = _player.duration?.inSeconds ?? 0;
-    final audioSpeed = duration <= 8 ? 1.0 : min(duration / 8.0, 2.0);
-    await _player.setSpeed(audioSpeed);
+    final duration = _player.duration?.inMilliseconds ?? 0;
+    // final audioSpeed = duration <= 8 ? 1.0 : min(duration / 8.0, 2.0);
+    final audioSpeed = message.disallowSpeedUp
+        ? 1.0
+        : max(duration / _maxMessageDurationMilliseconds,
+            queueAudioDuration / _maxMessageQueueTotalDurationMilliseconds);
+    await _player.setSpeed(max(
+      min(
+        audioSpeed,
+        _maxMessageSpeedUpFactor,
+      ),
+      _minMessageSpeedUpFactor,
+    ));
     await _player.play();
 
     await _player.processingStateStream.firstWhere((element) =>
         element ==
         ProcessingState.completed); // Wait until audio playback is complete.
 
-    audioFile.delete();
+    _cleanMessage(message);
     _isSpeaking = false;
     _performMessageAudioQueueSpeak();
   }
 
   void _performMessageQueueDownload() async {
-    if (_isDownloading || _messageQueue.isEmpty) return;
+    if (_isDownloading) return;
+    final message =
+        _messageQueue.firstWhereOrNull((element) => element.audio == null);
+
+    if (message == null) return;
 
     _isDownloading = true;
-    final message = _messageQueue.removeFirst();
     final language = message.language;
     final spokenText = message.message;
 
@@ -268,10 +311,18 @@ class ChatToSpeechService extends ChangeNotifier {
 
     final file = await _downloadFile(url, "${const Uuid().v4()}.mp3");
     if (file != null) {
-      _addAudioFileToQueue(file);
+      message.audio = file;
+      await _durationCheckPlayer.stop();
+      await _durationCheckPlayer.setAudioSource(AudioSource.uri(file.uri));
+      if ((_durationCheckPlayer.duration?.inSeconds ?? 0) < 60) {
+        message.audioDuration = _durationCheckPlayer.duration;
+      }
+    } else {
+      _messageQueue.remove(message);
     }
 
     _isDownloading = false;
+    _performMessageAudioQueueSpeak();
     _performMessageQueueDownload();
   }
 
