@@ -4,11 +4,13 @@ import 'dart:io';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:streamkit_tts/models/chat_to_speech_config_model.dart';
 import 'package:streamkit_tts/models/config_model.dart';
 import 'package:streamkit_tts/models/enums/languages_enum.dart';
 import 'package:streamkit_tts/screens/home/home.dart';
+import 'package:streamkit_tts/screens/trakteer/trakteer.dart';
 import 'package:streamkit_tts/services/chat_to_speech_service.dart';
 import 'package:streamkit_tts/services/version_check_service.dart';
 import 'package:streamkit_tts/utils/beat_saver_util.dart';
@@ -116,6 +118,8 @@ class MyApp extends HookWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    final paneIndex = useState(0);
+
     return FluentApp(
       title: "StreamKit Chat Reader",
       debugShowCheckedModeBanner: false,
@@ -125,9 +129,29 @@ class MyApp extends HookWidget {
       ),
       home: NavigationView(
         appBar: streamKitAppBar(context),
+        pane: NavigationPane(
+          selected: paneIndex.value,
+          onChanged: (value) {
+            paneIndex.value = value;
+          },
+          displayMode: PaneDisplayMode.compact,
+          items: [
+            PaneItem(
+              icon: SvgPicture.asset("assets/images/twitch_icon.svg"),
+              title: const Text("Twitch"),
+            ),
+            PaneItem(
+              icon: Image.asset('assets/images/trakteer_icon.png'),
+              title: const Text("Trakteer"),
+            ),
+          ],
+        ),
         content: NavigationBody(
-          index: 0,
-          children: const [Home()],
+          index: paneIndex.value,
+          children: const [
+            Home(),
+            Trakteer(),
+          ],
         ),
       ),
     );
@@ -155,8 +179,8 @@ class MyApp extends HookWidget {
       automaticallyImplyLeading: false,
       height: 36.0,
       leading: const Padding(
-        child: Text("🧈", style: TextStyle(fontSize: 24)),
         padding: EdgeInsets.only(bottom: 4.0),
+        child: Text("🧈", style: TextStyle(fontSize: 24)),
       ),
     );
   }

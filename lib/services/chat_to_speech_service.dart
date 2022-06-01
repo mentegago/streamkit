@@ -11,6 +11,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:streamkit_tts/models/config_model.dart';
 import 'package:streamkit_tts/models/enums/languages_enum.dart';
 import 'package:streamkit_tts/models/twitch/twitch_message.dart';
+import 'package:streamkit_tts/services/trakteer_chat_service.dart';
 import 'package:streamkit_tts/services/twitch_chat_service.dart';
 import 'package:streamkit_tts/utils/beat_saver_util.dart';
 import 'package:streamkit_tts/utils/external_config_util.dart';
@@ -58,6 +59,7 @@ class ChatToSpeechService extends ChangeNotifier {
   final double _minMessageSpeedUpFactor = 1;
 
   final _twitch = TwitchChatService();
+  final _trakteer = TrakteerChatService();
   final _messageQueue = Queue<ChatToSpeechMessage>();
 
   final Config _config;
@@ -91,6 +93,38 @@ class ChatToSpeechService extends ChangeNotifier {
     getTemporaryDirectory().then((dir) {
       _streamKitDir = "${dir.path}\\StreamKitTmpAudio";
       _cleanUpAndPrepareStreamKitDir();
+    });
+
+    _trakteer.messageStream.listen((notification) {
+      String message =
+          "${notification.supporterName} mentraktir ${notification.quantity} ${notification.unit}";
+
+      if (notification.supporterMessage?.isNotEmpty ?? false) {
+        message += "dengan pesan:";
+      }
+
+      _addMessageToQueue(
+        ChatToSpeechMessage(
+          message: message,
+          language: Language.indonesian,
+          disallowDequeue: true,
+          disallowSpeedUp: true,
+        ),
+      );
+
+      if (notification.supporterMessage?.isNotEmpty ?? false) {
+        _addMessageToQueue(
+          ChatToSpeechMessage(
+            message: notification.supporterMessage ?? "",
+            language: languageDetectionUtil.getLanguage(
+              notification.supporterMessage ?? "",
+              whitelistedLanguages: Language.values.toSet(),
+            ),
+            disallowDequeue: true,
+            disallowSpeedUp: true,
+          ),
+        );
+      }
     });
 
     _configChanged();
@@ -223,7 +257,10 @@ class ChatToSpeechService extends ChangeNotifier {
     }
   }
 
-  void _addMessageToQueue(ChatToSpeechMessage message) {
+  void _addMessageToQueue(
+    ChatToSpeechMessage message, {
+    bool sendToTop = false,
+  }) {
     while (_messageQueue.length > _maxMessageQueueLength) {
       final message =
           _messageQueue.firstWhereOrNull((element) => !element.disallowDequeue);
@@ -232,7 +269,13 @@ class ChatToSpeechService extends ChangeNotifier {
       _messageQueue.remove(message);
       _cleanMessage(message);
     }
-    _messageQueue.add(message);
+
+    if (sendToTop) {
+      _messageQueue.addFirst(message);
+    } else {
+      _messageQueue.add(message);
+    }
+
     _performMessageQueueDownload();
   }
 
@@ -312,10 +355,12 @@ class ChatToSpeechService extends ChangeNotifier {
     final file = await _downloadFile(url, "${const Uuid().v4()}.mp3");
     if (file != null) {
       message.audio = file;
-      await _durationCheckPlayer.stop();
-      await _durationCheckPlayer.setAudioSource(AudioSource.uri(file.uri));
-      if ((_durationCheckPlayer.duration?.inSeconds ?? 0) < 60) {
-        message.audioDuration = _durationCheckPlayer.duration;
+      if (!message.disallowSpeedUp) {
+        await _durationCheckPlayer.stop();
+        await _durationCheckPlayer.setAudioSource(AudioSource.uri(file.uri));
+        if ((_durationCheckPlayer.duration?.inSeconds ?? 0) < 60) {
+          message.audioDuration = _durationCheckPlayer.duration;
+        }
       }
     } else {
       _messageQueue.remove(message);

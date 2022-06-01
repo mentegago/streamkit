@@ -1,0 +1,1 @@
+enum MessageSource { twitch, trakteer }
