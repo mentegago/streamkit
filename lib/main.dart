@@ -21,6 +21,8 @@ import 'package:streamkit_tts/utils/misc_tts_util.dart';
 import 'package:version/version.dart';
 
 Timer? _saveConfigTimer;
+bool trakteerFeatureFlag = false;
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final externalConfigUtil = ExternalConfig();
@@ -131,23 +133,25 @@ class MyApp extends HookWidget {
       ),
       home: NavigationView(
         appBar: streamKitAppBar(context),
-        pane: NavigationPane(
-          selected: paneIndex.value,
-          onChanged: (value) {
-            paneIndex.value = value;
-          },
-          displayMode: PaneDisplayMode.compact,
-          items: [
-            PaneItem(
-              icon: SvgPicture.asset("assets/images/twitch_icon.svg"),
-              title: const Text("Twitch"),
-            ),
-            PaneItem(
-              icon: Image.asset('assets/images/trakteer_icon.png'),
-              title: const Text("Trakteer"),
-            ),
-          ],
-        ),
+        pane: trakteerFeatureFlag
+            ? NavigationPane(
+                selected: paneIndex.value,
+                onChanged: (value) {
+                  paneIndex.value = value;
+                },
+                displayMode: PaneDisplayMode.compact,
+                items: [
+                  PaneItem(
+                    icon: SvgPicture.asset("assets/images/twitch_icon.svg"),
+                    title: const Text("Twitch"),
+                  ),
+                  PaneItem(
+                    icon: Image.asset('assets/images/trakteer_icon.png'),
+                    title: const Text("Trakteer"),
+                  ),
+                ],
+              )
+            : null,
         content: NavigationBody(
           index: paneIndex.value,
           children: const [
