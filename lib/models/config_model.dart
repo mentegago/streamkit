@@ -1,6 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:streamkit_tts/models/chat_to_speech_config_model.dart';
 import 'package:streamkit_tts/models/enums/languages_enum.dart';
+import 'package:streamkit_tts/models/enums/tts_source.dart';
 
 class Config extends ChangeNotifier {
   ChatToSpeechConfiguration chatToSpeechConfiguration;
@@ -78,5 +79,11 @@ class Config extends ChangeNotifier {
         volume: volume,
       ),
     );
+  }
+
+  void setTtsSource(TtsSource source) {
+    setChatToSpeechConfiguration(chatToSpeechConfiguration.copyWith(
+      ttsSource: source,
+    ));
   }
 }

@@ -16,6 +16,19 @@ extension LanguageExtension on Language {
     }
   }
 
+  String get tikTokSpeaker {
+    switch (this) {
+      case Language.english:
+        return 'en_us_001';
+      case Language.indonesian:
+        return 'id_001';
+      case Language.japanese:
+        return 'jp_001';
+      case Language.french:
+        return 'fr_001';
+    }
+  }
+
   String get displayName {
     switch (this) {
       case Language.english:

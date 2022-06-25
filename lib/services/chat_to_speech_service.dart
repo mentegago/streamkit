@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'package:collection/collection.dart';
@@ -10,6 +11,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:streamkit_tts/models/config_model.dart';
 import 'package:streamkit_tts/models/enums/languages_enum.dart';
+import 'package:streamkit_tts/models/enums/tts_source.dart';
 import 'package:streamkit_tts/models/twitch/twitch_message.dart';
 import 'package:streamkit_tts/services/trakteer_chat_service.dart';
 import 'package:streamkit_tts/services/twitch_chat_service.dart';
@@ -55,8 +57,8 @@ class ChatToSpeechService extends ChangeNotifier {
       120; // Important due to Google Translate API limit.
   final _maxMessageQueueTotalDurationMilliseconds = 20000;
   final _maxMessageDurationMilliseconds = 8000;
-  final double _maxMessageSpeedUpFactor = 5;
-  final double _minMessageSpeedUpFactor = 1;
+  final double _maxMessageSpeedUpFactor = 2.2;
+  final double _minMessageSpeedUpFactor = 1.0;
 
   final _twitch = TwitchChatService();
   final _trakteer = TrakteerChatService();
@@ -329,6 +331,52 @@ class ChatToSpeechService extends ChangeNotifier {
     _performMessageAudioQueueSpeak();
   }
 
+  Future<File?> _downloadFromTikTokTTS({
+    required String speaker,
+    required String text,
+    required String filename,
+  }) async {
+    final uri = Uri.parse(
+        "https://api16-normal-useast5.us.tiktokv.com/media/api/text/speech/invoke/");
+
+    final response = await http.post(
+      uri,
+      body: {
+        'text_speaker': speaker,
+        'req_text': text,
+      },
+    );
+
+    if (response.statusCode != 200) return null;
+    try {
+      final json = jsonDecode(response.body);
+      if (json['data'] == null || json['data']['v_str'] == null) return null;
+      return _fileFromBase64(json['data']['v_str'], filename);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<File?> _downloadFromGoogleTTS({
+    required String text,
+    required String language,
+    required String filename,
+  }) async {
+    final url = Uri(
+      scheme: "https",
+      host: "translate.google.com",
+      path: "translate_tts",
+      queryParameters: {
+        "ie": "UTF-8",
+        "q": text,
+        "tl": language,
+        "client": "tw-ob"
+      },
+    );
+
+    return await _downloadFile(url, "${const Uuid().v4()}.mp3");
+  }
+
   void _performMessageQueueDownload() async {
     if (_isDownloading) return;
     final message =
@@ -340,19 +388,25 @@ class ChatToSpeechService extends ChangeNotifier {
     final language = message.language;
     final spokenText = message.message;
 
-    final url = Uri(
-      scheme: "https",
-      host: "translate.google.com",
-      path: "translate_tts",
-      queryParameters: {
-        "ie": "UTF-8",
-        "q": spokenText,
-        "tl": language.google,
-        "client": "tw-ob"
-      },
-    );
+    final filename = "${const Uuid().v4()}.mp3";
 
-    final file = await _downloadFile(url, "${const Uuid().v4()}.mp3");
+    File? file;
+    switch (_config.chatToSpeechConfiguration.ttsSource) {
+      case TtsSource.google:
+        file = await _downloadFromGoogleTTS(
+          text: spokenText,
+          language: language.google,
+          filename: filename,
+        );
+        break;
+      case TtsSource.tiktok:
+        file = await _downloadFromTikTokTTS(
+          speaker: language.tikTokSpeaker,
+          text: spokenText,
+          filename: filename,
+        );
+    }
+
     if (file != null) {
       message.audio = file;
       if (!message.disallowSpeedUp) {
@@ -394,6 +448,13 @@ class ChatToSpeechService extends ChangeNotifier {
     } catch (e) {
       return null;
     }
+  }
+
+  Future<File> _fileFromBase64(String base64, String filename) async {
+    final bytes = base64Decode(base64);
+    File file = File("$_streamKitDir\\$filename");
+    await file.writeAsBytes(bytes);
+    return file;
   }
 
   void _cleanUpAndPrepareStreamKitDir() {

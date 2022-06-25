@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 
 import 'package:streamkit_tts/models/enums/languages_enum.dart';
+import 'package:streamkit_tts/models/enums/tts_source.dart';
 
 class ChatToSpeechConfiguration {
   final Set<String> channels;
@@ -14,6 +15,7 @@ class ChatToSpeechConfiguration {
   final double volume;
   final bool readBsr;
   final bool readBsrSafely;
+  final TtsSource ttsSource;
 
   ChatToSpeechConfiguration({
     required this.channels,
@@ -25,6 +27,7 @@ class ChatToSpeechConfiguration {
     required this.volume,
     required this.readBsr,
     required this.readBsrSafely,
+    required this.ttsSource,
   });
 
   ChatToSpeechConfiguration copyWith({
@@ -37,6 +40,7 @@ class ChatToSpeechConfiguration {
     double? volume,
     bool? readBsr,
     bool? readBsrSafely,
+    TtsSource? ttsSource,
   }) {
     return ChatToSpeechConfiguration(
       channels: channels ?? this.channels,
@@ -49,6 +53,7 @@ class ChatToSpeechConfiguration {
       volume: volume ?? this.volume,
       readBsr: readBsr ?? this.readBsr,
       readBsrSafely: readBsrSafely ?? this.readBsrSafely,
+      ttsSource: ttsSource ?? this.ttsSource,
     );
   }
 
@@ -64,6 +69,7 @@ class ChatToSpeechConfiguration {
     result.addAll({'volume': volume});
     result.addAll({'readBsr': readBsr});
     result.addAll({'readBsrSafely': readBsrSafely});
+    result.addAll({'ttsSource': ttsSource.string});
 
     return result;
   }
@@ -80,6 +86,8 @@ class ChatToSpeechConfiguration {
       volume: map['volume']?.toDouble() ?? 0.0,
       readBsr: map['readBsr'] ?? false,
       readBsrSafely: map['readBsrSafely'] ?? false,
+      ttsSource: TtsSourceParser.fromString(map['ttsSource'] ?? '') ??
+          TtsSource.google,
     );
   }
 
@@ -116,6 +124,7 @@ class ChatToSpeechConfiguration {
       volume: volume,
       readBsr: config?["readBsr"] ?? true,
       readBsrSafely: false,
+      ttsSource: TtsSource.google,
     );
   }
 

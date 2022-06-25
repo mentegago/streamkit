@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:streamkit_tts/models/chat_to_speech_config_model.dart';
 import 'package:streamkit_tts/models/config_model.dart';
 import 'package:streamkit_tts/models/enums/languages_enum.dart';
+import 'package:streamkit_tts/models/enums/tts_source.dart';
 import 'package:streamkit_tts/screens/home/home.dart';
 import 'package:streamkit_tts/screens/trakteer/trakteer.dart';
 import 'package:streamkit_tts/services/chat_to_speech_service.dart';
@@ -108,6 +109,7 @@ Future<Config> loadConfigurations(
       volume: 100.0,
       ignoreEmotes: true,
       readBsrSafely: false,
+      ttsSource: TtsSource.google,
     ),
   );
 }
