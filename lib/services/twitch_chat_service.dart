@@ -189,8 +189,7 @@ class TwitchChatService {
 
   void _fetchBttvEmotes(String channel) async {
     if (_bttvEmotes[channel] != null) return;
-    final url = Uri.parse(
-        "https://customapi.aidenwallis.co.uk/api/v1/emotes/$channel/bttv");
+    final url = Uri.parse("https://decapi.me/bttv/emotes/$channel");
     final response = await http.get(url);
     if (response.statusCode != 200) return;
 
