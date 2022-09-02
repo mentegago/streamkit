@@ -55,7 +55,7 @@ class ChatToSpeechService extends ChangeNotifier {
   final _maxMessageQueueLength = 100;
   final _maxCharacterLength =
       120; // Important due to Google Translate API limit.
-  final _maxMessageQueueTotalDurationMilliseconds = 30000;
+  final _maxMessageQueueTotalDurationMilliseconds = 20000;
   final _maxMessageDurationMilliseconds = 10000;
   final double _maxMessageSpeedUpFactor = 2.5;
   final double _minMessageSpeedUpFactor = 1.0;
