@@ -52,12 +52,12 @@ class ChatToSpeechService extends ChangeNotifier {
 
   late String _streamKitDir;
 
-  final _maxMessageQueueLength = 15;
+  final _maxMessageQueueLength = 100;
   final _maxCharacterLength =
       120; // Important due to Google Translate API limit.
-  final _maxMessageQueueTotalDurationMilliseconds = 20000;
-  final _maxMessageDurationMilliseconds = 8000;
-  final double _maxMessageSpeedUpFactor = 2.2;
+  final _maxMessageQueueTotalDurationMilliseconds = 30000;
+  final _maxMessageDurationMilliseconds = 10000;
+  final double _maxMessageSpeedUpFactor = 2.5;
   final double _minMessageSpeedUpFactor = 1.0;
 
   final _twitch = TwitchChatService();
@@ -70,6 +70,9 @@ class ChatToSpeechService extends ChangeNotifier {
   Stream<TwitchError> get errorStream => _twitch.error;
   var _isDownloading = false;
   var _isSpeaking = false;
+
+  var _lastMessageUsername = "";
+  var _lastMessageTime = 0;
 
   ChatToSpeechService({
     required Config config,
@@ -180,7 +183,13 @@ class ChatToSpeechService extends ChangeNotifier {
 
     String spokenText = messageText.toLowerCase();
 
-    if (_config.chatToSpeechConfiguration.readUsername) {
+    // If last message was sent by the same user, and it was less than 20 seconds ago, don't read the username. Else, respect the readUsername config.
+    final shouldReadUsername = _config.chatToSpeechConfiguration.readUsername &&
+        (_lastMessageUsername != message.username ||
+            (DateTime.now().millisecondsSinceEpoch - _lastMessageTime >
+                20 * 1000));
+
+    if (shouldReadUsername) {
       spokenText = "${message.username.replaceAll("_", " ")}, $spokenText";
     }
 
@@ -199,6 +208,9 @@ class ChatToSpeechService extends ChangeNotifier {
         language: language,
       ),
     );
+
+    _lastMessageUsername = message.username;
+    _lastMessageTime = DateTime.now().millisecondsSinceEpoch;
   }
 
   String _fixNames(Language language, String spokenText) {
