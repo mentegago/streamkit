@@ -15,7 +15,7 @@ extension TtsSourceExtension on TtsSource {
       case TtsSource.google:
         return 'Google Translate';
       case TtsSource.tiktok:
-        return 'TikTok';
+        return 'TikTok (Beta)';
     }
   }
 }

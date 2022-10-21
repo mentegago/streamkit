@@ -1,6 +1,7 @@
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:provider/provider.dart';
+import 'package:streamkit_tts/models/enums/tts_source.dart';
 import 'package:streamkit_tts/screens/home/widgets/chat_reader_status_info.dart';
 
 import 'package:streamkit_tts/screens/home/widgets/config_groups/bs_config_group.dart';
@@ -23,6 +24,7 @@ class Home extends HookWidget {
 
     useEffect(() => _errorStateEffect(context));
     useEffect(() => _versionCheckEffect(context));
+    useEffect(() => _chatToSpeechErrorEffect(context));
 
     return ScaffoldPage(
       header: const PageHeader(
@@ -95,6 +97,31 @@ class Home extends HookWidget {
             ),
           );
       }
+    });
+
+    return subscription.cancel;
+  }
+
+  // Currently exclusively used for TikTok TTS error.
+  Function()? _chatToSpeechErrorEffect(BuildContext context) {
+    final errorStream =
+        context.read<ChatToSpeechService>().chatToSpeechErrorMessage;
+    final subscription = errorStream.listen((errorMessage) {
+      showDialog(
+        context: context,
+        builder: (context) => ContentDialog(
+          title: const Text("TikTok TTS Error"),
+          content: Text(errorMessage),
+          actions: [
+            Button(
+              child: const Text("Ok"),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      );
     });
 
     return subscription.cancel;
