@@ -137,6 +137,8 @@ class ChatToSpeechService extends ChangeNotifier {
       }
     });
 
+    _player.setPitch(
+        0.0); // setPitch() currently changes audio balance instead of pitch. Default pitch value is 1.0, meaning audio will only play on the right channel. (https://github.com/bdlukaa/just_audio/issues/4)
     _configChanged();
   }
 
