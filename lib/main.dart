@@ -211,7 +211,10 @@ class StreamKitTitleBar extends HookWidget {
 
     if (version != null) {
       final versionParsed = Version.parse(version);
-      titleBarText += " ${versionParsed.major}.${versionParsed.minor}";
+      titleBarText += " ${versionParsed.major}";
+      if (versionParsed.minor != 0 || versionParsed.patch != 0) {
+        titleBarText += ".${versionParsed.minor}";
+      }
       if (versionParsed.patch != 0) {
         titleBarText += ".${versionParsed.patch}";
       }
@@ -232,8 +235,8 @@ class StreamKitTitleBar extends HookWidget {
         opacity: visible.value ? 0.5 : 0.0,
         duration: const Duration(milliseconds: 100),
         child: Container(
-          child: Text(titleBarText),
           alignment: Alignment.center,
+          child: Text(titleBarText),
         ),
       ),
     );

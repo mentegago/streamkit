@@ -122,7 +122,7 @@ class ChatToSpeechConfiguration {
       languages: languages,
       enabled: config?["enabled"] ?? false,
       volume: volume,
-      readBsr: config?["readBsr"] ?? true,
+      readBsr: config?["readBsr"] ?? false,
       readBsrSafely: false,
       ttsSource: TtsSource.google,
     );

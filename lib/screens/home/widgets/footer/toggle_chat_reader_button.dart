@@ -1,6 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:streamkit_tts/models/config_model.dart';
+import 'package:streamkit_tts/screens/home/widgets/twitch_channel_selection_dialog.dart';
 import 'package:streamkit_tts/services/chat_to_speech_service.dart';
 import 'package:streamkit_tts/services/twitch_chat_service.dart';
 
@@ -21,21 +22,10 @@ class ToggleChatReaderButton extends StatelessWidget {
     final onPressed = (() {
       if (config.chatToSpeechConfiguration.channels.isEmpty) {
         showDialog(
-          context: context,
-          builder: (context) => ContentDialog(
-            title: const Text("No channel"),
-            content: const Text(
-                "Please select a channel for StreamKit to read from!"),
-            actions: [
-              Button(
-                child: const Text("Ok"),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          ),
-        );
+            context: context,
+            builder: (context) => const TwitchChannelSelectionDialog(
+                  enableChatReaderWithoutAsking: true,
+                ));
         return;
       }
       config.setEnabled(!config.chatToSpeechConfiguration.enabled);
