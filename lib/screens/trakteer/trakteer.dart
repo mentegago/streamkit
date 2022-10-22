@@ -19,7 +19,6 @@ class Trakteer extends HookWidget {
     final scrollController = useScrollController();
 
     useEffect(() => _errorStateEffect(context));
-    useEffect(() => _versionCheckEffect(context));
 
     return FluentTheme(
       data: ThemeData(
@@ -90,61 +89,5 @@ class Trakteer extends HookWidget {
     });
 
     return subscription.cancel;
-  }
-
-  Function()? _versionCheckEffect(BuildContext context) {
-    final versionCheckService = context.read<VersionCheckService>();
-
-    versionCheckService.addListener(() {
-      final status = versionCheckService.status;
-      String? updateMessage;
-      String? updateTitle;
-
-      switch (status.state) {
-        case VersionState.loading:
-        case VersionState.error:
-        case VersionState.upToDate:
-          break;
-        case VersionState.outdated:
-          updateTitle = "Out of date";
-          updateMessage =
-              "StreamKit is out of date. Please update to the latest version (${status.latestVersion}).";
-          break;
-        case VersionState.beta:
-          updateTitle = "Prerelease Version";
-          updateMessage =
-              "You are running prerelease version of StreamKit. Some features may not work properly.";
-          break;
-      }
-
-      if (updateTitle != null && updateMessage != null) {
-        showDialog(
-          context: context,
-          builder: (context) => ContentDialog(
-            title: Text(updateTitle ?? ""),
-            content: Text(updateMessage ?? ""),
-            actions: [
-              Button(
-                child: const Text("Later"),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-              FilledButton(
-                child: const Text("Download latest stable"),
-                onPressed: () {
-                  launchUrlString(versionCheckService.downloadUrl);
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          ),
-        );
-      }
-    });
-
-    return () {
-      versionCheckService.removeListener(() {});
-    };
   }
 }

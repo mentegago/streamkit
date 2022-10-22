@@ -17,17 +17,22 @@ enum VersionState {
 class VersionStatus {
   final VersionState state;
   final String latestVersion;
+  final String downloadUrl;
+  final String? announcement;
+  final String? announcementUrl;
 
   VersionStatus({
     required this.state,
     this.latestVersion = "0.0.0",
+    required this.downloadUrl,
+    this.announcement,
+    this.announcementUrl,
   });
 }
 
 class VersionCheckService extends ChangeNotifier {
-  final _apiUrl =
-      "https://api.github.com/repos/mentegago/streamkit/releases/latest";
-  String get downloadUrl =>
+  final _apiUrl = "https://pastebin.com/raw/Mkvrte4C";
+  final String _defaultDownloadUrl =
       "https://github.com/mentegago/streamkit/releases/latest";
 
   late VersionStatus _status;
@@ -47,45 +52,73 @@ class VersionCheckService extends ChangeNotifier {
   }
 
   void _checkLatestVersion() async {
-    _updateState(VersionStatus(state: VersionState.loading));
+    // I really don't want version checking system to crash the app.
+    try {
+      _updateState(VersionStatus(
+        state: VersionState.loading,
+        downloadUrl: _defaultDownloadUrl,
+      ));
 
-    final response = await http.get(
-      Uri.parse(_apiUrl),
-    );
-    if (response.statusCode != 200) {
-      _updateState(VersionStatus(state: VersionState.error));
-      return;
-    }
-
-    final Map<String, dynamic> json = jsonDecode(response.body);
-    final tagName = json['tag_name'] as String;
-    final packageInfo = await PackageInfo.fromPlatform();
-
-    final currentVersion = Version.parse(packageInfo.version);
-    final latestVersion = Version.parse(tagName);
-
-    if (latestVersion > currentVersion) {
-      _updateState(
-        VersionStatus(
-          state: VersionState.outdated,
-          latestVersion: tagName,
-        ),
-        currentVersion: packageInfo.version,
+      final response = await http.get(
+        Uri.parse(_apiUrl),
       );
-    } else if (latestVersion == currentVersion) {
-      _updateState(
+
+      if (response.statusCode != 200) {
+        _updateState(VersionStatus(
+          state: VersionState.error,
+          downloadUrl: _defaultDownloadUrl,
+        ));
+        return;
+      }
+
+      final Map<String, dynamic> json = jsonDecode(response.body);
+      final String latestVersionString = json["latestVersion"];
+      final String downloadUrl = json["downloadUrl"] ?? _defaultDownloadUrl;
+
+      final packageInfo = await PackageInfo.fromPlatform();
+
+      final currentVersion = Version.parse(packageInfo.version);
+      final latestVersion = Version.parse(latestVersionString);
+
+      if (latestVersion > currentVersion) {
+        _updateState(
+          VersionStatus(
+            state: VersionState.outdated,
+            latestVersion: latestVersionString,
+            downloadUrl: downloadUrl,
+            announcement: json["outOfDateAnnouncement"],
+            announcementUrl: json["outOfDateAnnouncementUrl"],
+          ),
+          currentVersion: packageInfo.version,
+        );
+      } else if (latestVersion == currentVersion) {
+        _updateState(
           VersionStatus(
             state: VersionState.upToDate,
-            latestVersion: tagName,
+            latestVersion: latestVersionString,
+            downloadUrl: downloadUrl,
+            announcement: json["currentAnnouncement"],
+            announcementUrl: json["currentAnnouncementUrl"],
           ),
-          currentVersion: packageInfo.version);
-    } else {
-      _updateState(
+          currentVersion: packageInfo.version,
+        );
+      } else {
+        _updateState(
           VersionStatus(
             state: VersionState.beta,
-            latestVersion: tagName,
+            latestVersion: latestVersionString,
+            downloadUrl: downloadUrl,
+            announcement: json["currentAnnouncement"],
+            announcementUrl: json["currentAnnouncementUrl"],
           ),
-          currentVersion: packageInfo.version);
+          currentVersion: packageInfo.version,
+        );
+      }
+    } catch (e) {
+      _updateState(VersionStatus(
+        state: VersionState.error,
+        downloadUrl: _defaultDownloadUrl,
+      ));
     }
   }
 }
