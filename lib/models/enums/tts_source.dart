@@ -25,8 +25,6 @@ class TtsSourceParser {
     switch (string) {
       case 'google':
         return TtsSource.google;
-      case 'tiktok':
-        return TtsSource.tiktok;
     }
     return null;
   }

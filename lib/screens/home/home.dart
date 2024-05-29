@@ -36,8 +36,8 @@ class HomeNewVersionWidget extends HookWidget {
 
     final message = versionStatus.announcement ??
         (versionStatus.state == VersionState.outdated
-            ? "StreamKit ${versionStatus.latestVersion} is now available! Click here to download"
-            : "You're running prerelease version! Click here to download latest stable");
+            ? "StreamKit ${versionStatus.latestVersion} is now available!"
+            : "You're running prerelease version!");
 
     final actionUrl =
         versionStatus.announcementUrl ?? versionStatus.downloadUrl;
@@ -73,14 +73,14 @@ class Home extends HookWidget {
     useEffect(() => _chatToSpeechErrorEffect(context));
 
     return ScaffoldPage(
-      header: PageHeader(
-        title: const Text("StreamKit Chat Reader"),
-        commandBar: Row(
-          children: const [
+      header: const PageHeader(
+        title: Text("StreamKit Chat Reader"),
+        commandBar: Wrap(
+          alignment: WrapAlignment.end,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: 8.0,
+          children: [
             HomeNewVersionWidget(),
-            SizedBox(
-              width: 12,
-            ),
             ChatReaderStatus(),
           ],
         ),
@@ -95,17 +95,17 @@ class Home extends HookWidget {
           controller: scrollController,
           child: Scrollbar(
             controller: scrollController,
-            child: Column(
+            child: const Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const TwitchChannelBox(),
-                const SizedBox(height: 32.0),
+                TwitchChannelBox(),
+                SizedBox(height: 32.0),
                 Wrap(
                   crossAxisAlignment: WrapCrossAlignment.start,
                   alignment: WrapAlignment.start,
                   spacing: 48.0,
                   runSpacing: 32.0,
-                  children: const [
+                  children: [
                     TtsConfigGroup(),
                     LanguagesConfigGroup(),
                     BeatSaberConfigGroup(),
@@ -118,9 +118,9 @@ class Home extends HookWidget {
       ),
       bottomBar: Container(
         padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 18.0),
-        child: Row(
+        child: const Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: const [
+          children: [
             VolumeControl(),
             ToggleChatReaderButton(),
           ],

@@ -27,8 +27,9 @@ class LanguagesConfigGroup extends StatelessWidget {
       title: "Languages",
       tooltip:
           "StreamKit will detect the language pattern of each chat message and choose one of the selected language that matches the most.",
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Wrap(
+        direction: Axis.vertical,
+        spacing: 8,
         children: [
           const SizedBox(height: 8.0),
           ...languageWidgets,

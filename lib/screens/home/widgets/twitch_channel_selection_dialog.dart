@@ -35,12 +35,14 @@ class TwitchChannelSelectionDialog extends HookWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          TextBox(
-            header: "Enter Twitch channel username",
-            placeholder: "",
-            controller: usernameController,
-            focusNode: usernameFocusNode,
-            autofocus: true,
+          InfoLabel(
+            label: "Enter Twitch channel username",
+            child: TextBox(
+              placeholder: "",
+              controller: usernameController,
+              focusNode: usernameFocusNode,
+              autofocus: true,
+            ),
           ),
           if (showUsernameEmptyError.value)
             Text(

@@ -39,7 +39,7 @@ class TrakteerWidgetBox extends StatelessWidget {
     })();
 
     return FluentTheme(
-      data: ThemeData(brightness: Brightness.dark),
+      data: FluentThemeData(brightness: Brightness.dark),
       child: Card(
         backgroundColor: const Color.fromARGB(255, 190, 30, 45).toAccentColor(),
         child: Container(
@@ -126,12 +126,14 @@ class TwitchChannelSelectionDialog extends HookWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          TextBox(
-            header: "Enter Twitch channel username",
-            placeholder: "",
-            controller: usernameController,
-            focusNode: usernameFocusNode,
-            autofocus: true,
+          InfoLabel(
+            label: "Enter Twitch channel username",
+            child: TextBox(
+              placeholder: "",
+              controller: usernameController,
+              focusNode: usernameFocusNode,
+              autofocus: true,
+            ),
           ),
           if (showUsernameEmptyError.value)
             Text(

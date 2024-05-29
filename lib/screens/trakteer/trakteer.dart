@@ -21,7 +21,7 @@ class Trakteer extends HookWidget {
     useEffect(() => _errorStateEffect(context));
 
     return FluentTheme(
-      data: ThemeData(
+      data: FluentThemeData(
         brightness: Brightness.dark,
         accentColor: const Color.fromARGB(255, 190, 30, 45).toAccentColor(),
       ),

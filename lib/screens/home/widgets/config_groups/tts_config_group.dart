@@ -11,16 +11,16 @@ class TtsConfigGroup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ConfigGroup(
+    return const ConfigGroup(
       title: "Text-to-speech",
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
+      child: Wrap(
+        direction: Axis.vertical,
+        spacing: 8,
+        children: [
           SizedBox(height: 8.0),
           _ReadUsernameCheckbox(),
           _IgnoreExclamationCheckbox(),
           _IgnoreEmotesCheckbox(),
-          _AudioSourceDropDown(),
         ],
       ),
     );
@@ -107,7 +107,7 @@ class _AudioSourceDropDown extends StatelessWidget {
         SizedBox(
           width: 200,
           child: DropDownButton(
-            placement: FlyoutPlacement.start,
+            placement: FlyoutPlacementMode.left,
             title: Text(selectedTtsSource.displayName),
             items: ttsSources
                 .map(

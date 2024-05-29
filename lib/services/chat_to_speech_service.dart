@@ -164,6 +164,17 @@ class ChatToSpeechService extends ChangeNotifier {
       if (_config.chatToSpeechConfiguration.ignoreExclamationMark) return;
     }
 
+    if (_config.chatToSpeechConfiguration.isWhitelistingFilter &&
+        !_config.chatToSpeechConfiguration.filteredUsernames
+            .contains(message.username.toLowerCase())) {
+      // Whitelisting
+      return;
+    } else if (_config.chatToSpeechConfiguration.filteredUsernames
+        .contains(message.username.toLowerCase())) {
+      // Blacklisting
+      return;
+    }
+
     String messageText = _config.chatToSpeechConfiguration.ignoreEmotes
         ? message.emotelessMessage.trim()
         : message.message.trim();
@@ -356,7 +367,7 @@ class ChatToSpeechService extends ChangeNotifier {
     required String filename,
   }) async {
     final uri = Uri.parse(
-        "https://api22-normal-c-useast1a.tiktokv.com/media/api/text/speech/invoke/");
+        "https://api16-normal-v6.tiktokv.com/media/api/text/speech/invoke/");
 
     final response = await http.post(
       uri,
@@ -364,7 +375,7 @@ class ChatToSpeechService extends ChangeNotifier {
         'text_speaker': speaker,
         'req_text': text,
         'speaker_map_type': '0',
-        'aid': '1234',
+        'aid': '1233',
       },
       headers: {
         'User-Agent':
@@ -382,7 +393,10 @@ class ChatToSpeechService extends ChangeNotifier {
 
     try {
       final json = jsonDecode(response.body);
-      if (json['data'] == null || json['data']['v_str'] == null) return null;
+      if (json['data'] == null || json['data']['v_str'] == null) {
+        print("ERROR!");
+        return null;
+      }
       return _fileFromBase64(json['data']['v_str'], filename);
     } catch (_) {
       return null;

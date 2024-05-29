@@ -38,7 +38,7 @@ class TwitchChannelBox extends StatelessWidget {
     })();
 
     return FluentTheme(
-      data: ThemeData(brightness: Brightness.dark),
+      data: FluentThemeData(brightness: Brightness.dark),
       child: Card(
         backgroundColor:
             const Color.fromARGB(255, 100, 65, 165).toAccentColor(),
