@@ -112,6 +112,8 @@ Future<Config> loadConfigurations(
       ignoreEmotes: true,
       readBsrSafely: false,
       ttsSource: TtsSource.google,
+      filteredUsernames: {},
+      isWhitelistingFilter: false,
     ),
   );
 }
@@ -127,7 +129,7 @@ class MyApp extends HookWidget {
     return FluentApp(
       title: "StreamKit Chat Reader",
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
+      theme: FluentThemeData(
         brightness: Brightness.dark,
         accentColor: const Color.fromARGB(255, 100, 65, 165).toAccentColor(),
       ),
@@ -144,29 +146,24 @@ class MyApp extends HookWidget {
                   PaneItem(
                     icon: SvgPicture.asset("assets/images/twitch_icon.svg"),
                     title: const Text("Twitch"),
+                    body: const Home(),
                   ),
                   PaneItem(
                     icon: Image.asset('assets/images/trakteer_icon.png'),
                     title: const Text("Trakteer"),
+                    body: const Trakteer(),
                   ),
                 ],
               )
             : null,
-        content: NavigationBody(
-          index: paneIndex.value,
-          children: const [
-            Home(),
-            Trakteer(),
-          ],
-        ),
+        content: trakteerFeatureFlag ? null : const Home(),
       ),
     );
   }
 
   NavigationAppBar streamKitAppBar(BuildContext context) {
     return NavigationAppBar(
-      title: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      actions: Row(
         children: [
           Expanded(
             child: MoveWindow(
@@ -179,14 +176,17 @@ class MyApp extends HookWidget {
               colors: WindowButtonColors(iconNormal: Colors.white)),
           CloseWindowButton(
               colors: WindowButtonColors(
-                  iconNormal: Colors.white, mouseOver: Colors.red))
+                  iconNormal: Colors.white, mouseOver: Colors.red)),
         ],
       ),
       automaticallyImplyLeading: false,
       height: 36.0,
       leading: const Padding(
-        padding: EdgeInsets.only(bottom: 4.0),
-        child: Text("🧈", style: TextStyle(fontSize: 24)),
+        padding: EdgeInsets.only(bottom: 8.0, left: 12.0),
+        child: Text(
+          "🧈",
+          style: TextStyle(fontSize: 24),
+        ),
       ),
     );
   }
@@ -211,7 +211,10 @@ class StreamKitTitleBar extends HookWidget {
 
     if (version != null) {
       final versionParsed = Version.parse(version);
-      titleBarText += " ${versionParsed.major}.${versionParsed.minor}";
+      titleBarText += " ${versionParsed.major}";
+      if (versionParsed.minor != 0 || versionParsed.patch != 0) {
+        titleBarText += ".${versionParsed.minor}";
+      }
       if (versionParsed.patch != 0) {
         titleBarText += ".${versionParsed.patch}";
       }
@@ -232,8 +235,9 @@ class StreamKitTitleBar extends HookWidget {
         opacity: visible.value ? 0.5 : 0.0,
         duration: const Duration(milliseconds: 100),
         child: Container(
-          child: Text(titleBarText),
+          margin: const EdgeInsets.only(left: 96),
           alignment: Alignment.center,
+          child: Text(titleBarText),
         ),
       ),
     );

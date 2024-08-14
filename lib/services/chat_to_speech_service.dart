@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:streamkit_tts/models/config_model.dart';
 import 'package:streamkit_tts/models/enums/languages_enum.dart';
 import 'package:streamkit_tts/models/enums/tts_source.dart';
@@ -49,6 +50,7 @@ class ChatToSpeechService extends ChangeNotifier {
   final ExternalConfig _externalConfigUtil;
   final MiscTts _miscTtsUtil;
   final BeatSaverUtil _beatSaverUtil;
+  final _chatToSpeechErrorMessage = PublishSubject<String>();
 
   late String _streamKitDir;
 
@@ -68,6 +70,9 @@ class ChatToSpeechService extends ChangeNotifier {
 
   var state = TwitchState.inactive;
   Stream<TwitchError> get errorStream => _twitch.error;
+  Stream<String> get chatToSpeechErrorMessage =>
+      _chatToSpeechErrorMessage.stream;
+
   var _isDownloading = false;
   var _isSpeaking = false;
 
@@ -132,6 +137,8 @@ class ChatToSpeechService extends ChangeNotifier {
       }
     });
 
+    _player.setPitch(
+        0.0); // setPitch() currently changes audio balance instead of pitch. Default pitch value is 1.0, meaning audio will only play on the right channel. (https://github.com/bdlukaa/just_audio/issues/4)
     _configChanged();
   }
 
@@ -155,6 +162,17 @@ class ChatToSpeechService extends ChangeNotifier {
     if (message.message.startsWith("!")) {
       _handleCommand(message);
       if (_config.chatToSpeechConfiguration.ignoreExclamationMark) return;
+    }
+
+    if (_config.chatToSpeechConfiguration.isWhitelistingFilter &&
+        !_config.chatToSpeechConfiguration.filteredUsernames
+            .contains(message.username.toLowerCase())) {
+      // Whitelisting
+      return;
+    } else if (_config.chatToSpeechConfiguration.filteredUsernames
+        .contains(message.username.toLowerCase())) {
+      // Blacklisting
+      return;
     }
 
     String messageText = _config.chatToSpeechConfiguration.ignoreEmotes
@@ -349,20 +367,36 @@ class ChatToSpeechService extends ChangeNotifier {
     required String filename,
   }) async {
     final uri = Uri.parse(
-        "https://api16-normal-useast5.us.tiktokv.com/media/api/text/speech/invoke/");
+        "https://api16-normal-v6.tiktokv.com/media/api/text/speech/invoke/");
 
     final response = await http.post(
       uri,
       body: {
         'text_speaker': speaker,
         'req_text': text,
+        'speaker_map_type': '0',
+        'aid': '1233',
+      },
+      headers: {
+        'User-Agent':
+            'com.zhiliaoapp.musically/2022600030 (Linux; U; Android 7.1.2; es_ES; SM-G988N; Build/NRD90M;tt-ok/3.12.13.1)',
+        'Cookie': 'sessionid=57b7d8b3e04228a24cc1e6d25387603a',
       },
     );
 
-    if (response.statusCode != 200) return null;
+    if (response.statusCode != 200) {
+      _config.setTtsSource(TtsSource.google);
+      _chatToSpeechErrorMessage.add(
+          "Failed to connect to TikTok TTS. StreamKit's TikTok TTS support is very unstable, so this is expected.\n\nStreamKit has automatically switched your speaker setting to Google Translate TTS to keep chat reader running.");
+      return null;
+    }
+
     try {
       final json = jsonDecode(response.body);
-      if (json['data'] == null || json['data']['v_str'] == null) return null;
+      if (json['data'] == null || json['data']['v_str'] == null) {
+        print("ERROR!");
+        return null;
+      }
       return _fileFromBase64(json['data']['v_str'], filename);
     } catch (_) {
       return null;
@@ -417,6 +451,15 @@ class ChatToSpeechService extends ChangeNotifier {
           text: spokenText,
           filename: filename,
         );
+
+        // If TikTok TTS fail, fallback to Google TTS
+        file ??= await _downloadFromGoogleTTS(
+          text: spokenText,
+          language: language.google,
+          filename: filename,
+        );
+
+        break;
     }
 
     if (file != null) {

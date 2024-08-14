@@ -16,6 +16,8 @@ class ChatToSpeechConfiguration {
   final bool readBsr;
   final bool readBsrSafely;
   final TtsSource ttsSource;
+  final Set<String> filteredUsernames;
+  final bool isWhitelistingFilter;
 
   ChatToSpeechConfiguration({
     required this.channels,
@@ -28,6 +30,8 @@ class ChatToSpeechConfiguration {
     required this.readBsr,
     required this.readBsrSafely,
     required this.ttsSource,
+    required this.filteredUsernames,
+    required this.isWhitelistingFilter,
   });
 
   ChatToSpeechConfiguration copyWith({
@@ -41,6 +45,8 @@ class ChatToSpeechConfiguration {
     bool? readBsr,
     bool? readBsrSafely,
     TtsSource? ttsSource,
+    Set<String>? filteredUsernames,
+    bool? isWhitelistingFilter,
   }) {
     return ChatToSpeechConfiguration(
       channels: channels ?? this.channels,
@@ -54,6 +60,8 @@ class ChatToSpeechConfiguration {
       readBsr: readBsr ?? this.readBsr,
       readBsrSafely: readBsrSafely ?? this.readBsrSafely,
       ttsSource: ttsSource ?? this.ttsSource,
+      filteredUsernames: filteredUsernames ?? this.filteredUsernames,
+      isWhitelistingFilter: isWhitelistingFilter ?? this.isWhitelistingFilter,
     );
   }
 
@@ -70,6 +78,8 @@ class ChatToSpeechConfiguration {
     result.addAll({'readBsr': readBsr});
     result.addAll({'readBsrSafely': readBsrSafely});
     result.addAll({'ttsSource': ttsSource.string});
+    result.addAll({'filteredUsernames': filteredUsernames.toList()});
+    result.addAll({'isWhitelistingFilter': isWhitelistingFilter});
 
     return result;
   }
@@ -88,10 +98,12 @@ class ChatToSpeechConfiguration {
       readBsrSafely: map['readBsrSafely'] ?? false,
       ttsSource: TtsSourceParser.fromString(map['ttsSource'] ?? '') ??
           TtsSource.google,
+      filteredUsernames: Set<String>.from(map['filteredUsernames'] ?? []),
+      isWhitelistingFilter: map['isWhitelistingFilter'] ?? false,
     );
   }
 
-  String toJson() => json.encode(toMap());
+  String toJson() => _prettyJson(toMap());
 
   factory ChatToSpeechConfiguration.fromJson(String source) =>
       ChatToSpeechConfiguration.fromMap(json.decode(source));
@@ -122,42 +134,17 @@ class ChatToSpeechConfiguration {
       languages: languages,
       enabled: config?["enabled"] ?? false,
       volume: volume,
-      readBsr: config?["readBsr"] ?? true,
+      readBsr: config?["readBsr"] ?? false,
       readBsrSafely: false,
       ttsSource: TtsSource.google,
+      filteredUsernames: Set<String>.from(config?["filteredUsernames"] ?? []),
+      isWhitelistingFilter: config?["isWhitelistingFilter"] ?? false,
     );
   }
 
-  @override
-  String toString() {
-    return 'ChatToSpeechConfiguration(channels: $channels, readUsername: $readUsername, ignoreExclamationMark: $ignoreExclamationMark, ignoreEmotes: $ignoreEmotes, languages: $languages, enabled: $enabled, volume: $volume, readBsr: $readBsr)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-
-    return other is ChatToSpeechConfiguration &&
-        setEquals(other.channels, channels) &&
-        other.readUsername == readUsername &&
-        other.ignoreExclamationMark == ignoreExclamationMark &&
-        other.ignoreEmotes == ignoreEmotes &&
-        setEquals(other.languages, languages) &&
-        other.enabled == enabled &&
-        other.volume == volume &&
-        other.readBsr == readBsr &&
-        other.readBsrSafely == readBsrSafely;
-  }
-
-  @override
-  int get hashCode {
-    return channels.hashCode ^
-        readUsername.hashCode ^
-        ignoreExclamationMark.hashCode ^
-        ignoreEmotes.hashCode ^
-        languages.hashCode ^
-        enabled.hashCode ^
-        volume.hashCode ^
-        readBsr.hashCode;
+  String _prettyJson(dynamic json) {
+    var spaces = ' ' * 4;
+    var encoder = JsonEncoder.withIndent(spaces);
+    return encoder.convert(json);
   }
 }

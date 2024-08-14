@@ -15,7 +15,7 @@ extension TtsSourceExtension on TtsSource {
       case TtsSource.google:
         return 'Google Translate';
       case TtsSource.tiktok:
-        return 'TikTok';
+        return 'TikTok (Beta)';
     }
   }
 }
@@ -25,8 +25,6 @@ class TtsSourceParser {
     switch (string) {
       case 'google':
         return TtsSource.google;
-      case 'tiktok':
-        return TtsSource.tiktok;
     }
     return null;
   }

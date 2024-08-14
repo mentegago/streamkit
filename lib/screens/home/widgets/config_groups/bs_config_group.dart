@@ -10,11 +10,12 @@ class BeatSaberConfigGroup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ConfigGroup(
+    return const ConfigGroup(
       title: "Beat Saber Specific",
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
+      child: Wrap(
+        direction: Axis.vertical,
+        spacing: 8,
+        children: [
           SizedBox(height: 8.0),
           _ReadBsrCheckbox(),
           _ReadBsrSafelyCheckbox(),

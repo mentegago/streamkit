@@ -15,7 +15,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 0.6.0+1
+version: 0.7.0+1
 
 environment:
   sdk: '>=2.16.2 <3.0.0'
@@ -35,25 +35,26 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
-  fluent_ui: ^3.12.0
-  flutter_hooks: ^0.18.4
-  flag: ^6.0.0
-  flutter_svg: ^1.0.3
-  bitsdojo_window: ^0.1.2
+  fluent_ui: 4.8.7
+  flutter_hooks: ^0.20.5
+  flag: ^7.0.0
+  flutter_svg: ^2.0.10+1
+  bitsdojo_window: ^0.1.6
   provider: ^6.0.2
   rxdart: ^0.27.3
-  web_socket_channel: ^2.1.0
-  http: ^0.13.4
-  download: ^0.0.1+1
-  just_audio: ^0.9.21
+  web_socket_channel: ^3.0.0
+  http: ^1.2.1
+  download: ^1.0.0
+  just_audio: ^0.9.29
+  just_audio_windows: ^0.2.1
   path_provider: ^2.0.9
-  just_audio_libwinmedia: ^0.0.4
-  uuid: ^3.0.6
+  uuid: ^4.4.0
   tuple: ^2.0.0
-  package_info_plus: ^1.4.2
-  version: ^2.0.0
+  package_info_plus: ^8.0.0
+  version: ^3.0.2
   url_launcher: ^6.1.0
   collection: ^1.16.0
+  audioplayers: ^6.0.0
 
 dev_dependencies:
   flutter_test:
@@ -64,7 +65,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^2.0.1
+  flutter_lints: ^4.0.0
   
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

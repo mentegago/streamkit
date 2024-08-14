@@ -14,6 +14,54 @@ import 'package:streamkit_tts/services/twitch_chat_service.dart';
 import 'package:streamkit_tts/services/version_check_service.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
+class HomeNewVersionWidget extends HookWidget {
+  const HomeNewVersionWidget({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final versionStatus =
+        context.select((VersionCheckService service) => service.status);
+
+    final shouldShow = versionStatus.state == VersionState.outdated ||
+        versionStatus.state == VersionState.beta ||
+        versionStatus.announcement != null;
+
+    if (!shouldShow) {
+      return const SizedBox();
+    }
+
+    final color = versionStatus.state != VersionState.upToDate
+        ? Colors.red
+        : Colors.green;
+
+    final message = versionStatus.announcement ??
+        (versionStatus.state == VersionState.outdated
+            ? "StreamKit ${versionStatus.latestVersion} is now available!"
+            : "You're running prerelease version!");
+
+    final actionUrl =
+        versionStatus.announcementUrl ?? versionStatus.downloadUrl;
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: GestureDetector(
+          onTap: () {
+            launchUrlString(actionUrl, mode: LaunchMode.inAppWebView);
+          },
+          child: Container(
+            padding:
+                const EdgeInsets.symmetric(vertical: 4.0, horizontal: 10.0),
+            color: color,
+            child: Text(message, style: const TextStyle(fontSize: 12.0)),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class Home extends HookWidget {
   const Home({Key? key}) : super(key: key);
 
@@ -22,12 +70,20 @@ class Home extends HookWidget {
     final scrollController = useScrollController();
 
     useEffect(() => _errorStateEffect(context));
-    useEffect(() => _versionCheckEffect(context));
+    useEffect(() => _chatToSpeechErrorEffect(context));
 
     return ScaffoldPage(
       header: const PageHeader(
         title: Text("StreamKit Chat Reader"),
-        commandBar: ChatReaderStatus(),
+        commandBar: Wrap(
+          alignment: WrapAlignment.end,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: 8.0,
+          children: [
+            HomeNewVersionWidget(),
+            ChatReaderStatus(),
+          ],
+        ),
       ),
       content: Container(
         alignment: Alignment.topLeft,
@@ -39,17 +95,17 @@ class Home extends HookWidget {
           controller: scrollController,
           child: Scrollbar(
             controller: scrollController,
-            child: Column(
+            child: const Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const TwitchChannelBox(),
-                const SizedBox(height: 32.0),
+                TwitchChannelBox(),
+                SizedBox(height: 32.0),
                 Wrap(
                   crossAxisAlignment: WrapCrossAlignment.start,
                   alignment: WrapAlignment.start,
                   spacing: 48.0,
                   runSpacing: 32.0,
-                  children: const [
+                  children: [
                     TtsConfigGroup(),
                     LanguagesConfigGroup(),
                     BeatSaberConfigGroup(),
@@ -62,9 +118,9 @@ class Home extends HookWidget {
       ),
       bottomBar: Container(
         padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 18.0),
-        child: Row(
+        child: const Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: const [
+          children: [
             VolumeControl(),
             ToggleChatReaderButton(),
           ],
@@ -100,59 +156,28 @@ class Home extends HookWidget {
     return subscription.cancel;
   }
 
-  Function()? _versionCheckEffect(BuildContext context) {
-    final versionCheckService = context.read<VersionCheckService>();
-
-    versionCheckService.addListener(() {
-      final status = versionCheckService.status;
-      String? updateMessage;
-      String? updateTitle;
-
-      switch (status.state) {
-        case VersionState.loading:
-        case VersionState.error:
-        case VersionState.upToDate:
-          break;
-        case VersionState.outdated:
-          updateTitle = "Out of date";
-          updateMessage =
-              "StreamKit is out of date. Please update to the latest version (${status.latestVersion}).";
-          break;
-        case VersionState.beta:
-          updateTitle = "Prerelease Version";
-          updateMessage =
-              "You are running prerelease version of StreamKit. Some features may not work properly.";
-          break;
-      }
-
-      if (updateTitle != null && updateMessage != null) {
-        showDialog(
-          context: context,
-          builder: (context) => ContentDialog(
-            title: Text(updateTitle ?? ""),
-            content: Text(updateMessage ?? ""),
-            actions: [
-              Button(
-                child: const Text("Later"),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-              FilledButton(
-                child: const Text("Download latest stable"),
-                onPressed: () {
-                  launchUrlString(versionCheckService.downloadUrl);
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          ),
-        );
-      }
+  // Currently exclusively used for TikTok TTS error.
+  Function()? _chatToSpeechErrorEffect(BuildContext context) {
+    final errorStream =
+        context.read<ChatToSpeechService>().chatToSpeechErrorMessage;
+    final subscription = errorStream.listen((errorMessage) {
+      showDialog(
+        context: context,
+        builder: (context) => ContentDialog(
+          title: const Text("TikTok TTS Error"),
+          content: Text(errorMessage),
+          actions: [
+            Button(
+              child: const Text("Ok"),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      );
     });
 
-    return () {
-      versionCheckService.removeListener(() {});
-    };
+    return subscription.cancel;
   }
 }
