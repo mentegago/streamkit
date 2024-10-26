@@ -21,11 +21,11 @@ class TwitchChatService {
   final String _nick;
   final String? _token;
 
-  Set<String> _channels = {};
+  final Set<String> _channels = {};
   Set<String> _targetChannels;
 
   Set<String> _globalBttvEmotes = {};
-  Map<String, Set<String>> _bttvEmotes = Map();
+  final Map<String, Set<String>> _bttvEmotes = {};
 
   IOWebSocketChannel? _wsChannel;
 

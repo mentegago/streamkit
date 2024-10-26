@@ -13,6 +13,7 @@ import 'package:streamkit_tts/models/enums/tts_source.dart';
 import 'package:streamkit_tts/screens/home/home.dart';
 import 'package:streamkit_tts/screens/trakteer/trakteer.dart';
 import 'package:streamkit_tts/services/chat_to_speech_service.dart';
+import 'package:streamkit_tts/services/composer_service.dart';
 import 'package:streamkit_tts/services/version_check_service.dart';
 import 'package:streamkit_tts/utils/beat_saver_util.dart';
 import 'package:streamkit_tts/utils/external_config_util.dart';
@@ -32,13 +33,14 @@ void main() async {
     configPath: externalConfigUtil.configPath,
     appPath: externalConfigUtil.appPath,
   );
-  final chatToSpeechService = ChatToSpeechService(
-    config: config,
-    languageDetectionUtil: LanguageDetection(),
-    externalConfigUtil: externalConfigUtil,
-    miscTtsUtil: MiscTts(),
-    beatSaverUtil: BeatSaverUtil(),
-  );
+  // final chatToSpeechService = ChatToSpeechService(
+  //   config: config,
+  //   languageDetectionUtil: LanguageDetection(),
+  //   externalConfigUtil: externalConfigUtil,
+  //   miscTtsUtil: MiscTts(),
+  //   beatSaverUtil: BeatSaverUtil(),
+  // );
+  final ComposerService composerService = AppComposerService(config: config);
   final versionCheckService = VersionCheckService();
 
   config.addListener(() {
@@ -56,8 +58,9 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => config),
-        ChangeNotifierProvider(create: (_) => chatToSpeechService),
+        // ChangeNotifierProvider(create: (_) => chatToSpeechService),
         ChangeNotifierProvider(create: (_) => versionCheckService),
+        Provider(create: (_) => composerService),
       ],
       child: const MyApp(),
     ),

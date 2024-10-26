@@ -40,11 +40,11 @@ class Trakteer extends HookWidget {
             controller: scrollController,
             child: Scrollbar(
               controller: scrollController,
-              child: Column(
+              child: const Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const TrakteerWidgetBox(),
-                  const SizedBox(height: 32.0),
+                  TrakteerWidgetBox(),
+                  SizedBox(height: 32.0),
                 ],
               ),
             ),
@@ -52,9 +52,9 @@ class Trakteer extends HookWidget {
         ),
         bottomBar: Container(
           padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 18.0),
-          child: Row(
+          child: const Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
+            children: [
               VolumeControl(),
               ToggleChatReaderButton(),
             ],

@@ -36,7 +36,7 @@ class TrakteerChatService {
 
   bool _isConnectionEstablished = false;
 
-  TrakteerChatService() {}
+  TrakteerChatService();
 
   void subscribeChannels(Set<String> channels) {
     _targetChannels.addAll(channels);

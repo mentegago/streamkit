@@ -69,8 +69,8 @@ class Home extends HookWidget {
   Widget build(BuildContext context) {
     final scrollController = useScrollController();
 
-    useEffect(() => _errorStateEffect(context));
-    useEffect(() => _chatToSpeechErrorEffect(context));
+    // useEffect(() => _errorStateEffect(context));
+    // useEffect(() => _chatToSpeechErrorEffect(context));
 
     return ScaffoldPage(
       header: const PageHeader(

@@ -47,26 +47,24 @@ abstract class Message {
 }
 
 class ChatMessage extends Message {
-  final String message;
+  final String rawMessage;
+  final String messageWithoutEmotes;
 
   ChatMessage({
-    required String id,
-    required String username,
-    required String suggestedSpeechMessage,
-    required Language language,
-    required this.message,
-  }) : super(
-          id: id,
-          username: username,
-          suggestedSpeechMessage: suggestedSpeechMessage,
-          language: language,
-        );
+    required super.id,
+    required super.username,
+    required super.suggestedSpeechMessage,
+    required super.language,
+    required this.rawMessage,
+    required this.messageWithoutEmotes,
+  });
 
   @override
   ChatMessage copyWith({
     String? username,
     String? suggestedSpeechMessage,
-    String? message,
+    String? rawMessage,
+    String? messageWithoutEmotes,
     Language? language,
   }) {
     return ChatMessage(
@@ -74,7 +72,8 @@ class ChatMessage extends Message {
       username: username ?? this.username,
       suggestedSpeechMessage:
           suggestedSpeechMessage ?? this.suggestedSpeechMessage,
-      message: message ?? this.message,
+      rawMessage: rawMessage ?? this.rawMessage,
+      messageWithoutEmotes: messageWithoutEmotes ?? this.messageWithoutEmotes,
       language: language ?? this.language,
     );
   }
