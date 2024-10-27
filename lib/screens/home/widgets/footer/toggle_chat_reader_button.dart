@@ -2,10 +2,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:streamkit_tts/models/config_model.dart';
 import 'package:streamkit_tts/screens/home/widgets/twitch_channel_selection_dialog.dart';
-import 'package:streamkit_tts/services/chat_to_speech_service.dart';
-import 'package:streamkit_tts/services/composers/app_composer_service.dart';
 import 'package:streamkit_tts/services/composers/composer_service.dart';
-import 'package:streamkit_tts/services/twitch_chat_service.dart';
 
 class ToggleChatReaderButton extends StatelessWidget {
   const ToggleChatReaderButton({

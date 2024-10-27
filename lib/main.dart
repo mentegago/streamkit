@@ -11,7 +11,6 @@ import 'package:streamkit_tts/models/config_model.dart';
 import 'package:streamkit_tts/models/enums/languages_enum.dart';
 import 'package:streamkit_tts/models/enums/tts_source.dart';
 import 'package:streamkit_tts/screens/home/home.dart';
-import 'package:streamkit_tts/screens/trakteer/trakteer.dart';
 import 'package:streamkit_tts/services/composers/app_composer_service.dart';
 import 'package:streamkit_tts/services/composers/composer_service.dart';
 import 'package:streamkit_tts/services/middlewares/bsr_middleware.dart';
@@ -167,11 +166,6 @@ class MyApp extends HookWidget {
                     icon: SvgPicture.asset("assets/images/twitch_icon.svg"),
                     title: const Text("Twitch"),
                     body: const Home(),
-                  ),
-                  PaneItem(
-                    icon: Image.asset('assets/images/trakteer_icon.png'),
-                    title: const Text("Trakteer"),
-                    body: const Trakteer(),
                   ),
                 ],
               )

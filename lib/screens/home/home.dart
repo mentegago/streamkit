@@ -9,9 +9,7 @@ import 'package:streamkit_tts/screens/home/widgets/config_groups/tts_config_grou
 import 'package:streamkit_tts/screens/home/widgets/footer/toggle_chat_reader_button.dart';
 import 'package:streamkit_tts/screens/home/widgets/twitch_channel_box.dart';
 import 'package:streamkit_tts/screens/home/widgets/footer/volume_control.dart';
-import 'package:streamkit_tts/services/chat_to_speech_service.dart';
 import 'package:streamkit_tts/services/composers/composer_service.dart';
-import 'package:streamkit_tts/services/twitch_chat_service.dart';
 import 'package:streamkit_tts/services/version_check_service.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
