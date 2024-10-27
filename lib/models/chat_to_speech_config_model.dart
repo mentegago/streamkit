@@ -17,6 +17,7 @@ class ChatToSpeechConfiguration {
   final Set<String> filteredUsernames;
   final bool isWhitelistingFilter;
   final bool ignoreEmptyMessage;
+  final bool ignoreUrls;
 
   ChatToSpeechConfiguration({
     required this.channels,
@@ -32,6 +33,7 @@ class ChatToSpeechConfiguration {
     required this.filteredUsernames,
     required this.isWhitelistingFilter,
     required this.ignoreEmptyMessage,
+    required this.ignoreUrls,
   });
 
   ChatToSpeechConfiguration copyWith({
@@ -48,6 +50,7 @@ class ChatToSpeechConfiguration {
     Set<String>? filteredUsernames,
     bool? isWhitelistingFilter,
     bool? ignoreEmptyMessage,
+    bool? ignoreUrls,
   }) {
     return ChatToSpeechConfiguration(
       channels: channels ?? this.channels,
@@ -64,6 +67,7 @@ class ChatToSpeechConfiguration {
       filteredUsernames: filteredUsernames ?? this.filteredUsernames,
       isWhitelistingFilter: isWhitelistingFilter ?? this.isWhitelistingFilter,
       ignoreEmptyMessage: ignoreEmptyMessage ?? this.ignoreEmptyMessage,
+      ignoreUrls: ignoreUrls ?? this.ignoreUrls,
     );
   }
 
@@ -83,6 +87,7 @@ class ChatToSpeechConfiguration {
     result.addAll({'filteredUsernames': filteredUsernames.toList()});
     result.addAll({'isWhitelistingFilter': isWhitelistingFilter});
     result.addAll({'ignoreEmptyMessage': ignoreEmptyMessage});
+    result.addAll({'ignoreUrls': ignoreUrls});
 
     return result;
   }
@@ -105,6 +110,7 @@ class ChatToSpeechConfiguration {
       filteredUsernames: Set<String>.from(map['filteredUsernames'] ?? []),
       isWhitelistingFilter: map['isWhitelistingFilter'] ?? false,
       ignoreEmptyMessage: map['ignoreEmptyMessage'] ?? true,
+      ignoreUrls: map['ignoreUrls'] ?? true,
     );
   }
 
@@ -145,6 +151,7 @@ class ChatToSpeechConfiguration {
       filteredUsernames: Set<String>.from(config?["filteredUsernames"] ?? []),
       isWhitelistingFilter: config?["isWhitelistingFilter"] ?? false,
       ignoreEmptyMessage: true,
+      ignoreUrls: true,
     );
   }
 

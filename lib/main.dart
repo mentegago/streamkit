@@ -20,6 +20,7 @@ import 'package:streamkit_tts/services/middlewares/name_fix_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/pachify_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/read_username_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/remove_emotes_middleware.dart';
+import 'package:streamkit_tts/services/middlewares/remove_urls_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/skip_empty_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/skip_exclamation_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/user_filter_middleware.dart';
@@ -43,10 +44,15 @@ void main() async {
   final ComposerService composerService = AppComposerService(
     config: config,
     middlewares: [
+      // Filter and command handler middlewares
       UserFilterMiddleware(config: config),
       BsrMiddleware(config: config),
       SkipExclamationMiddleware(config: config),
+
+      // Message clean-up middlewares
       RemoveEmotesMiddleware(config: config),
+      RemoveUrlsMiddleware(config: config),
+
       ForcedLanguageMiddleware(),
       PachifyMiddleware(
         externalConfig: externalConfigUtil,
@@ -135,6 +141,7 @@ Future<Config> loadConfigurations(
       filteredUsernames: {},
       isWhitelistingFilter: false,
       ignoreEmptyMessage: true,
+      ignoreUrls: true,
     ),
   );
 }
