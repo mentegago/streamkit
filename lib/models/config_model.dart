@@ -90,4 +90,14 @@ class Config extends ChangeNotifier {
       ),
     );
   }
+
+  void setUserFilter(
+      {required Set<String> usernames, required bool isWhitelistingFilter}) {
+    setChatToSpeechConfiguration(
+      chatToSpeechConfiguration.copyWith(
+        isWhitelistingFilter: isWhitelistingFilter,
+        filteredUsernames: usernames,
+      ),
+    );
+  }
 }

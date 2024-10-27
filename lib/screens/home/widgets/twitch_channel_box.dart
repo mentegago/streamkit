@@ -2,7 +2,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:streamkit_tts/models/config_model.dart';
-import 'package:streamkit_tts/screens/home/widgets/twitch_channel_selection_dialog.dart';
+import 'package:streamkit_tts/screens/home/widgets/dialogs/twitch_channel_selection_dialog.dart';
 
 class TwitchChannelBox extends StatelessWidget {
   const TwitchChannelBox({
