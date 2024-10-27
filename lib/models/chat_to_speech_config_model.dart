@@ -5,6 +5,7 @@ import 'package:streamkit_tts/models/enums/tts_source.dart';
 
 class ChatToSpeechConfiguration {
   final Set<String> channels;
+  final String youtubeVideoId;
   final bool readUsername;
   final bool ignoreExclamationMark;
   final bool ignoreEmotes;
@@ -21,6 +22,7 @@ class ChatToSpeechConfiguration {
 
   ChatToSpeechConfiguration({
     required this.channels,
+    required this.youtubeVideoId,
     required this.readUsername,
     required this.ignoreExclamationMark,
     required this.ignoreEmotes,
@@ -38,6 +40,7 @@ class ChatToSpeechConfiguration {
 
   ChatToSpeechConfiguration copyWith({
     Set<String>? channels,
+    String? youtubeVideoId,
     bool? readUsername,
     bool? ignoreExclamationMark,
     bool? ignoreEmotes,
@@ -54,6 +57,7 @@ class ChatToSpeechConfiguration {
   }) {
     return ChatToSpeechConfiguration(
       channels: channels ?? this.channels,
+      youtubeVideoId: youtubeVideoId ?? this.youtubeVideoId,
       readUsername: readUsername ?? this.readUsername,
       ignoreExclamationMark:
           ignoreExclamationMark ?? this.ignoreExclamationMark,
@@ -75,6 +79,7 @@ class ChatToSpeechConfiguration {
     final result = <String, dynamic>{};
 
     result.addAll({'channels': channels.toList()});
+    result.addAll({'youtubeVideoId': youtubeVideoId});
     result.addAll({'readUsername': readUsername});
     result.addAll({'ignoreExclamationMark': ignoreExclamationMark});
     result.addAll({'ignoreEmotes': ignoreEmotes});
@@ -95,6 +100,7 @@ class ChatToSpeechConfiguration {
   factory ChatToSpeechConfiguration.fromMap(Map<String, dynamic> map) {
     return ChatToSpeechConfiguration(
       channels: Set<String>.from(map['channels']),
+      youtubeVideoId: map["youtubeVideoId"] ?? "",
       readUsername: map['readUsername'] ?? true,
       ignoreExclamationMark: map['ignoreExclamationMark'] ?? true,
       ignoreEmotes: map['ignoreEmotes'] ?? true,
@@ -139,6 +145,7 @@ class ChatToSpeechConfiguration {
 
     return ChatToSpeechConfiguration(
       channels: Set<String>.from(config?["channels"] ?? []),
+      youtubeVideoId: config?["youtubeVideoId"] ?? "",
       readUsername: config?["readUsername"] ?? true,
       ignoreExclamationMark: config?["ignoreExclamationMark"] ?? true,
       ignoreEmotes: true,

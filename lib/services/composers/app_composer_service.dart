@@ -8,6 +8,7 @@ import 'package:streamkit_tts/services/outputs/google_tts_output.dart';
 import 'package:streamkit_tts/services/outputs/output_service.dart';
 import 'package:streamkit_tts/services/sources/source_service.dart';
 import 'package:streamkit_tts/services/sources/twitch_chat_source.dart';
+import 'package:streamkit_tts/services/sources/youtube_chat_source.dart';
 
 class AppComposerService implements ComposerService {
   final SourceService _sourceService;
@@ -27,7 +28,8 @@ class AppComposerService implements ComposerService {
     required config,
     required middlewares,
   })  : _config = config,
-        _sourceService = TwitchChatSource(config: config),
+        // _sourceService = TwitchChatSource(config: config),
+        _sourceService = YouTubeChatSource(config: config),
         _outputService = GoogleTtsOutput(config: config),
         _middlewares = middlewares {
     _sourceService.getMessageStream().listen(_onMessage);

@@ -129,6 +129,7 @@ Future<Config> loadConfigurations(
   return Config(
     chatToSpeechConfiguration: ChatToSpeechConfiguration(
       channels: {},
+      youtubeVideoId: "",
       enabled: false,
       ignoreExclamationMark: true,
       languages: {Language.english, Language.indonesian, Language.japanese},
@@ -159,7 +160,7 @@ class MyApp extends HookWidget {
       debugShowCheckedModeBanner: false,
       theme: FluentThemeData(
         brightness: Brightness.dark,
-        accentColor: const Color.fromARGB(255, 100, 65, 165).toAccentColor(),
+        accentColor: const Color.fromARGB(255, 255, 0, 0).toAccentColor(),
       ),
       home: NavigationView(
         appBar: streamKitAppBar(context),

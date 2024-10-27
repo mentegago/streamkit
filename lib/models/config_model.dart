@@ -28,6 +28,13 @@ class Config extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setYouTubeVideoId(String videoId) {
+    chatToSpeechConfiguration = chatToSpeechConfiguration.copyWith(
+      youtubeVideoId: videoId,
+    );
+    notifyListeners();
+  }
+
   void setLanguage(Language language, {required bool enabled}) {
     if (enabled) {
       setChatToSpeechConfiguration(
