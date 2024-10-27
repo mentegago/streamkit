@@ -7,7 +7,7 @@
 
 **This app is still in early stage.**
 
-![Screenshot](screenshots/streamkit_screenshot.jpg)
+![Screenshot](screenshots/streamkit_screenshot.png)
 
 
 StreamKit Chat Reader is a free Twitch chat reader (text-to-speech) app that supports Indonesian, English, and Japanese simultaneously. StreamKit automatically detects the language of each chat message and read with the appropriate TTS.
