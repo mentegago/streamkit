@@ -3,24 +3,36 @@ import 'package:streamkit_tts/models/config_model.dart';
 import 'package:streamkit_tts/models/enums/tts_source.dart';
 import 'package:streamkit_tts/screens/home/widgets/config_group.dart';
 import 'package:provider/provider.dart';
+import 'package:streamkit_tts/screens/home/widgets/dialogs/blacklist_dialog.dart';
 
 class TtsConfigGroup extends StatelessWidget {
   const TtsConfigGroup({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return const ConfigGroup(
+    return ConfigGroup(
       title: "Text-to-speech",
       child: Wrap(
         direction: Axis.vertical,
         spacing: 8,
         children: [
-          SizedBox(height: 8.0),
+          const SizedBox(height: 8.0),
           _ReadUsernameCheckbox(),
           _IgnoreExclamationCheckbox(),
           _IgnoreEmotesCheckbox(),
+          _RemoveUrls(),
+          const SizedBox(height: 1.0),
+          Button(
+            child: const Text("Change Filtered Users"),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => const BlacklistDialog(),
+              );
+            },
+          ),
         ],
       ),
     );
@@ -28,8 +40,6 @@ class TtsConfigGroup extends StatelessWidget {
 }
 
 class _IgnoreEmotesCheckbox extends StatelessWidget {
-  const _IgnoreEmotesCheckbox({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     final config = context.read<Config>();
@@ -41,14 +51,12 @@ class _IgnoreEmotesCheckbox extends StatelessWidget {
       onChanged: (isChecked) {
         config.setTtsConfig(ignoreEmotes: isChecked);
       },
-      content: const Text("Ignore emotes"),
+      content: const Text("Remove emotes"),
     );
   }
 }
 
 class _IgnoreExclamationCheckbox extends StatelessWidget {
-  const _IgnoreExclamationCheckbox({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     final config = context.read<Config>();
@@ -66,8 +74,6 @@ class _IgnoreExclamationCheckbox extends StatelessWidget {
 }
 
 class _ReadUsernameCheckbox extends StatelessWidget {
-  const _ReadUsernameCheckbox({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     final config = context.read<Config>();
@@ -84,9 +90,24 @@ class _ReadUsernameCheckbox extends StatelessWidget {
   }
 }
 
-class _AudioSourceDropDown extends StatelessWidget {
-  const _AudioSourceDropDown({Key? key}) : super(key: key);
+class _RemoveUrls extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final config = context.read<Config>();
+    final ignoreUrls = context
+        .select((Config config) => config.chatToSpeechConfiguration.ignoreUrls);
 
+    return Checkbox(
+      checked: ignoreUrls,
+      onChanged: (isChecked) {
+        config.setTtsConfig(ignoreUrls: isChecked);
+      },
+      content: const Text("Remove URLs"),
+    );
+  }
+}
+
+class _AudioSourceDropDown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final config = context.read<Config>();

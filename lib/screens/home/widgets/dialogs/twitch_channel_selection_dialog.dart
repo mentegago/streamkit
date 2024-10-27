@@ -5,9 +5,9 @@ import 'package:streamkit_tts/models/config_model.dart';
 
 class TwitchChannelSelectionDialog extends HookWidget {
   const TwitchChannelSelectionDialog({
-    Key? key,
+    super.key,
     this.enableChatReaderWithoutAsking = false,
-  }) : super(key: key);
+  });
 
   final bool enableChatReaderWithoutAsking;
 

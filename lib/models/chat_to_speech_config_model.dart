@@ -1,7 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
-
 import 'package:streamkit_tts/models/enums/languages_enum.dart';
 import 'package:streamkit_tts/models/enums/tts_source.dart';
 
@@ -18,6 +16,8 @@ class ChatToSpeechConfiguration {
   final TtsSource ttsSource;
   final Set<String> filteredUsernames;
   final bool isWhitelistingFilter;
+  final bool ignoreEmptyMessage;
+  final bool ignoreUrls;
 
   ChatToSpeechConfiguration({
     required this.channels,
@@ -32,6 +32,8 @@ class ChatToSpeechConfiguration {
     required this.ttsSource,
     required this.filteredUsernames,
     required this.isWhitelistingFilter,
+    required this.ignoreEmptyMessage,
+    required this.ignoreUrls,
   });
 
   ChatToSpeechConfiguration copyWith({
@@ -47,6 +49,8 @@ class ChatToSpeechConfiguration {
     TtsSource? ttsSource,
     Set<String>? filteredUsernames,
     bool? isWhitelistingFilter,
+    bool? ignoreEmptyMessage,
+    bool? ignoreUrls,
   }) {
     return ChatToSpeechConfiguration(
       channels: channels ?? this.channels,
@@ -62,6 +66,8 @@ class ChatToSpeechConfiguration {
       ttsSource: ttsSource ?? this.ttsSource,
       filteredUsernames: filteredUsernames ?? this.filteredUsernames,
       isWhitelistingFilter: isWhitelistingFilter ?? this.isWhitelistingFilter,
+      ignoreEmptyMessage: ignoreEmptyMessage ?? this.ignoreEmptyMessage,
+      ignoreUrls: ignoreUrls ?? this.ignoreUrls,
     );
   }
 
@@ -80,6 +86,8 @@ class ChatToSpeechConfiguration {
     result.addAll({'ttsSource': ttsSource.string});
     result.addAll({'filteredUsernames': filteredUsernames.toList()});
     result.addAll({'isWhitelistingFilter': isWhitelistingFilter});
+    result.addAll({'ignoreEmptyMessage': ignoreEmptyMessage});
+    result.addAll({'ignoreUrls': ignoreUrls});
 
     return result;
   }
@@ -87,19 +95,22 @@ class ChatToSpeechConfiguration {
   factory ChatToSpeechConfiguration.fromMap(Map<String, dynamic> map) {
     return ChatToSpeechConfiguration(
       channels: Set<String>.from(map['channels']),
-      readUsername: map['readUsername'] ?? false,
-      ignoreExclamationMark: map['ignoreExclamationMark'] ?? false,
-      ignoreEmotes: map['ignoreEmotes'] ?? false,
+      readUsername: map['readUsername'] ?? true,
+      ignoreExclamationMark: map['ignoreExclamationMark'] ?? true,
+      ignoreEmotes: map['ignoreEmotes'] ?? true,
       languages: Set<Language>.from(
-          map['languages']?.map((x) => LanguageParser.fromGoogle(x))),
+          map['languages']?.map((x) => LanguageParser.fromGoogle(x)) ??
+              [Language.english, Language.indonesian, Language.japanese]),
       enabled: map['enabled'] ?? false,
-      volume: map['volume']?.toDouble() ?? 0.0,
+      volume: map['volume']?.toDouble() ?? 100.0,
       readBsr: map['readBsr'] ?? false,
       readBsrSafely: map['readBsrSafely'] ?? false,
       ttsSource: TtsSourceParser.fromString(map['ttsSource'] ?? '') ??
           TtsSource.google,
       filteredUsernames: Set<String>.from(map['filteredUsernames'] ?? []),
       isWhitelistingFilter: map['isWhitelistingFilter'] ?? false,
+      ignoreEmptyMessage: map['ignoreEmptyMessage'] ?? true,
+      ignoreUrls: map['ignoreUrls'] ?? true,
     );
   }
 
@@ -139,6 +150,8 @@ class ChatToSpeechConfiguration {
       ttsSource: TtsSource.google,
       filteredUsernames: Set<String>.from(config?["filteredUsernames"] ?? []),
       isWhitelistingFilter: config?["isWhitelistingFilter"] ?? false,
+      ignoreEmptyMessage: true,
+      ignoreUrls: true,
     );
   }
 

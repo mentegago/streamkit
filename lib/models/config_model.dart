@@ -62,6 +62,7 @@ class Config extends ChangeNotifier {
     bool? readUsername,
     bool? ignoreExclamationMark,
     bool? ignoreEmotes,
+    bool? ignoreUrls,
   }) {
     setChatToSpeechConfiguration(
       chatToSpeechConfiguration.copyWith(
@@ -69,6 +70,7 @@ class Config extends ChangeNotifier {
         ignoreExclamationMark: ignoreExclamationMark ??
             chatToSpeechConfiguration.ignoreExclamationMark,
         ignoreEmotes: ignoreEmotes ?? chatToSpeechConfiguration.ignoreEmotes,
+        ignoreUrls: ignoreUrls ?? chatToSpeechConfiguration.ignoreUrls,
       ),
     );
   }
@@ -82,8 +84,20 @@ class Config extends ChangeNotifier {
   }
 
   void setTtsSource(TtsSource source) {
-    setChatToSpeechConfiguration(chatToSpeechConfiguration.copyWith(
-      ttsSource: source,
-    ));
+    setChatToSpeechConfiguration(
+      chatToSpeechConfiguration.copyWith(
+        ttsSource: source,
+      ),
+    );
+  }
+
+  void setUserFilter(
+      {required Set<String> usernames, required bool isWhitelistingFilter}) {
+    setChatToSpeechConfiguration(
+      chatToSpeechConfiguration.copyWith(
+        isWhitelistingFilter: isWhitelistingFilter,
+        filteredUsernames: usernames,
+      ),
+    );
   }
 }
