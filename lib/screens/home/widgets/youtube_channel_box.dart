@@ -39,7 +39,12 @@ class YouTubeChannelBox extends StatelessWidget {
           margin: const EdgeInsets.symmetric(horizontal: 4.0),
           child: Row(
             children: [
-              SvgPicture.asset("assets/images/youtube_icon.svg", height: 28.0),
+              SvgPicture.asset(
+                "assets/images/youtube_icon.svg",
+                height: 28.0,
+                colorFilter:
+                    const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+              ),
               const SizedBox(width: 8.0),
               ...channelInfoWidgets,
               OutlinedButton(
