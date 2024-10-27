@@ -14,7 +14,7 @@ import 'package:streamkit_tts/services/version_check_service.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class HomeNewVersionWidget extends HookWidget {
-  const HomeNewVersionWidget({Key? key}) : super(key: key);
+  const HomeNewVersionWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +62,7 @@ class HomeNewVersionWidget extends HookWidget {
 }
 
 class Home extends HookWidget {
-  const Home({Key? key}) : super(key: key);
+  const Home({super.key});
 
   @override
   Widget build(BuildContext context) {
