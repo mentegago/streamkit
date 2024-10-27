@@ -8,6 +8,7 @@ import 'package:streamkit_tts/services/outputs/google_tts_output.dart';
 import 'package:streamkit_tts/services/outputs/output_service.dart';
 import 'package:streamkit_tts/services/sources/source_service.dart';
 import 'package:streamkit_tts/services/sources/twitch_chat_source.dart';
+import 'package:streamkit_tts/services/sources/youtube_chat_source.dart';
 
 class AppComposerService implements ComposerService {
   final SourceService _sourceService;
@@ -21,7 +22,7 @@ class AppComposerService implements ComposerService {
   final _isEnabled = PublishSubject<bool>();
   final _errorMessage = PublishSubject<String>();
 
-  final int maxMessageQueue = 10;
+  final int _maxMessageQueue = 10;
 
   AppComposerService({
     required config,
@@ -98,6 +99,10 @@ class AppComposerService implements ComposerService {
 
     _queuedMessages.add(processedMessage);
 
+    while (_queuedMessages.length > _maxMessageQueue) {
+      _queuedMessages.removeAt(0);
+    }
+
     if (_queuedMessages.length == 1) {
       // No message in queue prior to this.
       _prepareNextMessage();
@@ -114,7 +119,7 @@ class AppComposerService implements ComposerService {
       final preparedMessage = await _outputService.prepareAudio(message);
       _queuedPreparedMessages.add(preparedMessage);
 
-      while (_queuedPreparedMessages.length > maxMessageQueue) {
+      while (_queuedPreparedMessages.length > _maxMessageQueue) {
         final removedMessage = _queuedPreparedMessages.removeAt(0);
         _outputService.cancelAudio(removedMessage);
       }
@@ -128,6 +133,7 @@ class AppComposerService implements ComposerService {
     }
 
     _queuedMessages.removeAt(0);
+    print("Done preparing");
     _prepareNextMessage();
   }
 
