@@ -18,6 +18,8 @@ class GoogleTtsOutput implements OutputService {
   final AudioPlayer _audioPlayer = AudioPlayer();
   final Config _config;
 
+  final int _maxMessageLength = 120; // Important for Google TTS limit.
+
   GoogleTtsOutput({required Config config}) : _config = config {
     _audioPlayer.play();
 
@@ -36,10 +38,9 @@ class GoogleTtsOutput implements OutputService {
   Future<PreparedMessage> prepareAudio(Message message) async {
     try {
       final String langCode = (message.language ?? Language.english).google;
-      final String text = Uri.encodeComponent(message.suggestedSpeechMessage);
-
-      // Construct the Google Translate TTS URL
-      // Note: This is an unofficial endpoint and may not be reliable for production use.
+      final String text = Uri.encodeComponent(
+        message.suggestedSpeechMessage.substring(0, _maxMessageLength),
+      );
       final String url =
           'https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=$langCode&q=$text';
 
