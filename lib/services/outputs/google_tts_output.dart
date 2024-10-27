@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:just_audio/just_audio.dart';
@@ -39,7 +40,13 @@ class GoogleTtsOutput implements OutputService {
     try {
       final String langCode = (message.language ?? Language.english).google;
       final String text = Uri.encodeComponent(
-        message.suggestedSpeechMessage.substring(0, _maxMessageLength),
+        message.suggestedSpeechMessage.substring(
+          0,
+          min(
+            message.suggestedSpeechMessage.length,
+            _maxMessageLength,
+          ),
+        ),
       );
       final String url =
           'https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=$langCode&q=$text';
