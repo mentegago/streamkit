@@ -2,13 +2,10 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:streamkit_tts/models/config_model.dart';
 import 'package:streamkit_tts/models/enums/languages_enum.dart';
 import 'package:streamkit_tts/services/interfaces/text_to_speech_service.dart';
-
-abstract class OutputService {
-  Future<PreparedMessage> prepareAudio(Message message);
-  Future<void> playAudio(PreparedMessage preparedMessage);
-}
+import 'package:streamkit_tts/services/outputs/output_service.dart';
 
 class GoogleTtsOutputPreparedMessage extends PreparedMessage {
   final File audioFile;
@@ -18,21 +15,26 @@ class GoogleTtsOutputPreparedMessage extends PreparedMessage {
 
 class GoogleTtsOutput implements OutputService {
   final AudioPlayer _audioPlayer = AudioPlayer();
+  final Config _config;
 
-  GoogleTtsOutput() {
-    _audioPlayer.processingStateStream.listen(
-      (event) {
-        print("Event: " + event.toString());
-      },
-    );
-
+  GoogleTtsOutput({required Config config}) : _config = config {
     _audioPlayer.play();
+
+    config.addListener(_handleConfigChange);
+    _handleConfigChange();
+  }
+
+  void _handleConfigChange() {
+    if ((_audioPlayer.volume * 100 - _config.chatToSpeechConfiguration.volume)
+            .abs() <
+        1) return;
+    _audioPlayer.setVolume(_config.chatToSpeechConfiguration.volume / 100.0);
   }
 
   @override
   Future<PreparedMessage> prepareAudio(Message message) async {
     try {
-      final String langCode = message.language.google;
+      final String langCode = (message.language ?? Language.english).google;
       final String text = Uri.encodeComponent(message.suggestedSpeechMessage);
 
       // Construct the Google Translate TTS URL
@@ -94,11 +96,19 @@ class GoogleTtsOutput implements OutputService {
           .timeout(const Duration(seconds: 5));
 
       // Delete the audio file after playback
-      await file.delete();
+      await cancelAudio(preparedMessage);
     } catch (e) {
       print('Error in playAudio: $e');
       // Optionally, rethrow or handle the error as needed
       throw e;
     }
+  }
+
+  @override
+  Future<void> cancelAudio(PreparedMessage preparedMessage) async {
+    if (preparedMessage is! GoogleTtsOutputPreparedMessage) {
+      return;
+    }
+    await preparedMessage.audioFile.delete();
   }
 }

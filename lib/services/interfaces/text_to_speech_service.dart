@@ -20,13 +20,15 @@ abstract class Message {
   final String id;
   final String username;
   final String suggestedSpeechMessage;
-  final Language language;
+  final Language? language;
+  final bool isSuggestedSpeechMessageFinalized;
 
   Message({
     required this.id,
     required this.username,
     required this.suggestedSpeechMessage,
-    required this.language,
+    this.language,
+    this.isSuggestedSpeechMessageFinalized = false,
   });
 
   Message copyWith({
@@ -46,35 +48,53 @@ abstract class Message {
   int get hashCode => id.hashCode;
 }
 
+class EmotePosition {
+  final int startPosition;
+  final int endPosition;
+
+  EmotePosition({
+    required this.startPosition,
+    required this.endPosition,
+  });
+}
+
 class ChatMessage extends Message {
   final String rawMessage;
-  final String messageWithoutEmotes;
+  final List<EmotePosition> emotePositions;
+  final List<String> emoteList;
 
   ChatMessage({
     required super.id,
     required super.username,
     required super.suggestedSpeechMessage,
-    required super.language,
+    super.language,
+    super.isSuggestedSpeechMessageFinalized = false,
     required this.rawMessage,
-    required this.messageWithoutEmotes,
+    this.emotePositions = const [],
+    this.emoteList = const [],
   });
 
   @override
   ChatMessage copyWith({
     String? username,
     String? suggestedSpeechMessage,
-    String? rawMessage,
-    String? messageWithoutEmotes,
     Language? language,
+    bool? isSuggestedSpeechMessageFinalized,
+    String? rawMessage,
+    List<EmotePosition>? emotePositions,
+    List<String>? emoteList,
   }) {
     return ChatMessage(
       id: id,
       username: username ?? this.username,
       suggestedSpeechMessage:
           suggestedSpeechMessage ?? this.suggestedSpeechMessage,
-      rawMessage: rawMessage ?? this.rawMessage,
-      messageWithoutEmotes: messageWithoutEmotes ?? this.messageWithoutEmotes,
       language: language ?? this.language,
+      isSuggestedSpeechMessageFinalized: isSuggestedSpeechMessageFinalized ??
+          this.isSuggestedSpeechMessageFinalized,
+      rawMessage: rawMessage ?? this.rawMessage,
+      emotePositions: emotePositions ?? this.emotePositions,
+      emoteList: emoteList ?? this.emoteList,
     );
   }
 }

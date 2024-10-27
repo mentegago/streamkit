@@ -10,6 +10,7 @@ import 'package:streamkit_tts/screens/home/widgets/footer/toggle_chat_reader_but
 import 'package:streamkit_tts/screens/home/widgets/twitch_channel_box.dart';
 import 'package:streamkit_tts/screens/home/widgets/footer/volume_control.dart';
 import 'package:streamkit_tts/services/chat_to_speech_service.dart';
+import 'package:streamkit_tts/services/composers/composer_service.dart';
 import 'package:streamkit_tts/services/twitch_chat_service.dart';
 import 'package:streamkit_tts/services/version_check_service.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -69,7 +70,7 @@ class Home extends HookWidget {
   Widget build(BuildContext context) {
     final scrollController = useScrollController();
 
-    // useEffect(() => _errorStateEffect(context));
+    useEffect(() => _errorStateEffect(context));
     // useEffect(() => _chatToSpeechErrorEffect(context));
 
     return ScaffoldPage(
@@ -130,42 +131,16 @@ class Home extends HookWidget {
   }
 
   Function()? _errorStateEffect(BuildContext context) {
-    final errorStream = context.read<ChatToSpeechService>().errorStream;
-    final subscription = errorStream.listen((error) {
-      switch (error) {
-        case TwitchError.timeout:
-          showDialog(
-            context: context,
-            builder: (context) => ContentDialog(
-              title: const Text("Timeout"),
-              content: const Text(
-                  "Fail to connect to channel. Please make sure the username is correct."),
-              actions: [
-                Button(
-                  child: const Text("Ok"),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                ),
-              ],
-            ),
-          );
-      }
-    });
-
-    return subscription.cancel;
-  }
-
-  // Currently exclusively used for TikTok TTS error.
-  Function()? _chatToSpeechErrorEffect(BuildContext context) {
-    final errorStream =
-        context.read<ChatToSpeechService>().chatToSpeechErrorMessage;
+    final errorStream = context.read<ComposerService>().getErrorStream();
     final subscription = errorStream.listen((errorMessage) {
+      if (!context.mounted) return;
       showDialog(
         context: context,
         builder: (context) => ContentDialog(
-          title: const Text("TikTok TTS Error"),
-          content: Text(errorMessage),
+          title: const Text("Timeout"),
+          content: Text(
+            errorMessage,
+          ),
           actions: [
             Button(
               child: const Text("Ok"),

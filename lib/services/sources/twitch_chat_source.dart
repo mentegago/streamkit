@@ -1,27 +1,23 @@
+import 'dart:convert';
+
+import 'package:collection/collection.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:streamkit_tts/models/config_model.dart';
+import 'package:streamkit_tts/services/sources/source_service.dart';
 import 'package:twitch_chat/twitch_chat.dart';
-import 'package:web_socket_channel/io.dart';
-
-import 'package:streamkit_tts/models/enums/languages_enum.dart';
 import 'package:streamkit_tts/services/interfaces/text_to_speech_service.dart'
     as streamkit;
-
-abstract class SourceService {
-  Stream<streamkit.Message> getMessageStream();
-  Stream<SourceStatus> getStatusStream();
-}
-
-enum SourceStatus { inactive, active }
+import 'package:http/http.dart' as http;
 
 class TwitchChatSource implements SourceService {
   final _messageSubject = PublishSubject<streamkit.Message>();
   final _statusSubject = PublishSubject<SourceStatus>();
   final Config _config;
 
-  TwitchChat? _twitchChat;
+  List<String> _globalBttvEmotes = [];
+  List<String> _channelBttvEmotes = [];
 
-  IOWebSocketChannel? _wsChannel;
+  TwitchChat? _twitchChat;
 
   TwitchChatSource({required Config config}) : _config = config {
     _config.addListener(_onConfigChange);
@@ -52,6 +48,9 @@ class TwitchChatSource implements SourceService {
       _twitchChat = twitchChat;
       twitchChat.connect();
 
+      _fetchChannelBttvEmotes();
+      _fetchGlobalBttvEmotes();
+
       twitchChat.isConnected.addListener(() {
         if (twitchChat.isConnected.value) {
           _statusSubject.add(SourceStatus.active);
@@ -61,13 +60,34 @@ class TwitchChatSource implements SourceService {
       });
 
       twitchChat.chatStream.map((message) {
+        final rawMessage = message.message.trim();
+        final emotePositions = message.emotes.values.flattened
+            .map((positions) {
+              if (positions is! List<dynamic>) return null;
+              if (positions.length != 2) return null;
+
+              final startPosition = int.tryParse(positions.first);
+              final endPosition = int.tryParse(positions.last);
+
+              if (startPosition == null || endPosition == null) return null;
+
+              return streamkit.EmotePosition(
+                startPosition: startPosition,
+                endPosition: endPosition,
+              );
+            })
+            .nonNulls
+            .toList();
+
+        final thirdPartyEmotes = [..._globalBttvEmotes, ..._channelBttvEmotes];
+
         return streamkit.ChatMessage(
           id: DateTime.now().millisecondsSinceEpoch.toString(),
           username: message.username,
-          suggestedSpeechMessage: message.message,
-          language: Language.indonesian,
-          rawMessage: message.message,
-          messageWithoutEmotes: message.message,
+          suggestedSpeechMessage: rawMessage,
+          rawMessage: rawMessage,
+          emotePositions: emotePositions,
+          emoteList: thirdPartyEmotes,
         );
       }).listen((message) {
         _messageSubject.add(message);
@@ -84,12 +104,40 @@ class TwitchChatSource implements SourceService {
         disconnect();
       };
     } else if (channel != _twitchChat?.channel) {
-      _twitchChat?.changeChannel(channel);
+      disconnect();
+      connect(channel: channel);
     }
   }
 
   void disconnect() {
     _twitchChat?.close();
     _twitchChat = null;
+  }
+
+  void _fetchChannelBttvEmotes() async {
+    _channelBttvEmotes = [];
+
+    final url = Uri.parse(
+      "https://decapi.me/bttv/emotes/${_config.chatToSpeechConfiguration.channels.first}",
+    );
+    final response = await http.get(url);
+    if (response.statusCode != 200) return;
+    if (response.body.toLowerCase().contains("unable to retrieve")) return;
+
+    final emotes = response.body.split(' ');
+    _channelBttvEmotes = emotes;
+  }
+
+  void _fetchGlobalBttvEmotes() async {
+    if (_globalBttvEmotes.isNotEmpty) return;
+
+    final url = Uri.parse("https://api.betterttv.net/3/cached/emotes/global");
+    final response = await http.get(url);
+    final List<dynamic> json = jsonDecode(response.body);
+
+    _globalBttvEmotes = json
+        .where((emote) => emote['modifier'] == false)
+        .map((emote) => emote['code'] as String)
+        .toList();
   }
 }

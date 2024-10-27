@@ -12,12 +12,19 @@ import 'package:streamkit_tts/models/enums/languages_enum.dart';
 import 'package:streamkit_tts/models/enums/tts_source.dart';
 import 'package:streamkit_tts/screens/home/home.dart';
 import 'package:streamkit_tts/screens/trakteer/trakteer.dart';
-import 'package:streamkit_tts/services/chat_to_speech_service.dart';
-import 'package:streamkit_tts/services/composer_service.dart';
+import 'package:streamkit_tts/services/composers/app_composer_service.dart';
+import 'package:streamkit_tts/services/composers/composer_service.dart';
+import 'package:streamkit_tts/services/middlewares/bsr_middleware.dart';
+import 'package:streamkit_tts/services/middlewares/forced_language_middleware.dart';
+import 'package:streamkit_tts/services/middlewares/language_middleware.dart';
+import 'package:streamkit_tts/services/middlewares/name_fix_middleware.dart';
+import 'package:streamkit_tts/services/middlewares/pachify_middleware.dart';
+import 'package:streamkit_tts/services/middlewares/read_username_middleware.dart';
+import 'package:streamkit_tts/services/middlewares/remove_emotes_middleware.dart';
+import 'package:streamkit_tts/services/middlewares/skip_empty_middleware.dart';
+import 'package:streamkit_tts/services/middlewares/skip_exclamation_middleware.dart';
 import 'package:streamkit_tts/services/version_check_service.dart';
-import 'package:streamkit_tts/utils/beat_saver_util.dart';
 import 'package:streamkit_tts/utils/external_config_util.dart';
-import 'package:streamkit_tts/utils/language_detection_util.dart';
 import 'package:streamkit_tts/utils/misc_tts_util.dart';
 import 'package:version/version.dart';
 
@@ -33,14 +40,23 @@ void main() async {
     configPath: externalConfigUtil.configPath,
     appPath: externalConfigUtil.appPath,
   );
-  // final chatToSpeechService = ChatToSpeechService(
-  //   config: config,
-  //   languageDetectionUtil: LanguageDetection(),
-  //   externalConfigUtil: externalConfigUtil,
-  //   miscTtsUtil: MiscTts(),
-  //   beatSaverUtil: BeatSaverUtil(),
-  // );
-  final ComposerService composerService = AppComposerService(config: config);
+  final ComposerService composerService = AppComposerService(
+    config: config,
+    middlewares: [
+      BsrMiddleware(config: config),
+      SkipExclamationMiddleware(config: config),
+      RemoveEmotesMiddleware(config: config),
+      ForcedLanguageMiddleware(),
+      PachifyMiddleware(
+        externalConfig: externalConfigUtil,
+        miscTtsUtil: MiscTts(),
+      ),
+      LanguageMiddleware(config: config),
+      SkipEmptyMiddleware(config: config),
+      ReadUsernameMiddleware(config: config),
+      NameFixMiddleware(externalConfig: externalConfigUtil),
+    ],
+  );
   final versionCheckService = VersionCheckService();
 
   config.addListener(() {
@@ -101,7 +117,7 @@ Future<Config> loadConfigurations(
 
       return Config(chatToSpeechConfiguration: config);
     }
-  } catch (e) {}
+  } catch (_) {}
 
   return Config(
     chatToSpeechConfiguration: ChatToSpeechConfiguration(
@@ -117,12 +133,13 @@ Future<Config> loadConfigurations(
       ttsSource: TtsSource.google,
       filteredUsernames: {},
       isWhitelistingFilter: false,
+      ignoreEmptyMessage: true,
     ),
   );
 }
 
 class MyApp extends HookWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   // This widget is the root of your application.
   @override
@@ -196,7 +213,7 @@ class MyApp extends HookWidget {
 }
 
 class StreamKitTitleBar extends HookWidget {
-  const StreamKitTitleBar({Key? key}) : super(key: key);
+  const StreamKitTitleBar({super.key});
 
   @override
   Widget build(BuildContext context) {

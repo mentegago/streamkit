@@ -1,0 +1,30 @@
+import 'package:streamkit_tts/services/interfaces/text_to_speech_service.dart';
+import 'package:streamkit_tts/services/middlewares/middleware.dart';
+import 'package:streamkit_tts/utils/external_config_util.dart';
+import 'package:streamkit_tts/utils/misc_tts_util.dart';
+
+class PachifyMiddleware implements Middleware {
+  final MiscTts _miscTtsUtil;
+  final ExternalConfig _externalConfig;
+
+  PachifyMiddleware({
+    required MiscTts miscTtsUtil,
+    required externalConfig,
+  })  : _miscTtsUtil = miscTtsUtil,
+        _externalConfig = externalConfig;
+
+  @override
+  Future<Message?> process(Message message) async {
+    if (message is! ChatMessage) return message;
+    var messageText = _miscTtsUtil.pachify(
+      message.suggestedSpeechMessage,
+      username: message.username,
+      panciList: _externalConfig.panciList,
+    );
+    messageText = _miscTtsUtil.warafy(messageText);
+
+    return message.copyWith(
+      suggestedSpeechMessage: messageText,
+    );
+  }
+}
