@@ -8,7 +8,6 @@ import 'package:streamkit_tts/services/outputs/google_tts_output.dart';
 import 'package:streamkit_tts/services/outputs/output_service.dart';
 import 'package:streamkit_tts/services/sources/source_service.dart';
 import 'package:streamkit_tts/services/sources/twitch_chat_source.dart';
-import 'package:streamkit_tts/services/sources/youtube_chat_source.dart';
 
 class AppComposerService implements ComposerService {
   final SourceService _sourceService;
@@ -43,6 +42,10 @@ class AppComposerService implements ComposerService {
 
   void _onConfigChanged() {
     _isEnabled.add(_config.chatToSpeechConfiguration.enabled);
+    if (!_config.chatToSpeechConfiguration.enabled) {
+      _queuedMessages.clear();
+      _queuedPreparedMessages.clear();
+    }
   }
 
   void _watchForInfiniteLoading(_) async {
@@ -132,8 +135,7 @@ class AppComposerService implements ComposerService {
       print(e);
     }
 
-    _queuedMessages.removeAt(0);
-    print("Done preparing");
+    if (_queuedMessages.isNotEmpty) _queuedMessages.removeAt(0);
     _prepareNextMessage();
   }
 
@@ -149,7 +151,7 @@ class AppComposerService implements ComposerService {
       print(e);
     }
 
-    _queuedPreparedMessages.removeAt(0);
+    if (_queuedPreparedMessages.isNotEmpty) _queuedPreparedMessages.removeAt(0);
     _playNextMessage();
   }
 }
