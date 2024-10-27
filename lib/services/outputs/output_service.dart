@@ -1,4 +1,5 @@
-import 'package:streamkit_tts/services/interfaces/text_to_speech_service.dart';
+import 'package:streamkit_tts/models/messages/message.dart';
+import 'package:streamkit_tts/models/messages/prepared_message.dart';
 
 abstract class OutputService {
   Future<PreparedMessage> prepareAudio(Message message);

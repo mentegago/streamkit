@@ -1,13 +1,13 @@
 import 'package:rxdart/rxdart.dart';
 import 'package:streamkit_tts/models/config_model.dart';
+import 'package:streamkit_tts/models/messages/message.dart';
+import 'package:streamkit_tts/models/messages/prepared_message.dart';
 import 'package:streamkit_tts/services/composers/composer_service.dart';
 import 'package:streamkit_tts/services/middlewares/middleware.dart';
 import 'package:streamkit_tts/services/outputs/google_tts_output.dart';
 import 'package:streamkit_tts/services/outputs/output_service.dart';
 import 'package:streamkit_tts/services/sources/source_service.dart';
 import 'package:streamkit_tts/services/sources/twitch_chat_source.dart';
-
-import '../interfaces/text_to_speech_service.dart';
 
 class AppComposerService implements ComposerService {
   final SourceService _sourceService;

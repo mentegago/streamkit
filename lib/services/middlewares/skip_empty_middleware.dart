@@ -1,5 +1,6 @@
 import 'package:streamkit_tts/models/config_model.dart';
-import 'package:streamkit_tts/services/interfaces/text_to_speech_service.dart';
+import 'package:streamkit_tts/models/messages/chat_message.dart';
+import 'package:streamkit_tts/models/messages/message.dart';
 import 'package:streamkit_tts/services/middlewares/middleware.dart';
 
 class SkipEmptyMiddleware implements Middleware {

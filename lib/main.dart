@@ -22,6 +22,7 @@ import 'package:streamkit_tts/services/middlewares/read_username_middleware.dart
 import 'package:streamkit_tts/services/middlewares/remove_emotes_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/skip_empty_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/skip_exclamation_middleware.dart';
+import 'package:streamkit_tts/services/middlewares/user_filter_middleware.dart';
 import 'package:streamkit_tts/services/version_check_service.dart';
 import 'package:streamkit_tts/utils/external_config_util.dart';
 import 'package:streamkit_tts/utils/misc_tts_util.dart';
@@ -42,6 +43,7 @@ void main() async {
   final ComposerService composerService = AppComposerService(
     config: config,
     middlewares: [
+      UserFilterMiddleware(config: config),
       BsrMiddleware(config: config),
       SkipExclamationMiddleware(config: config),
       RemoveEmotesMiddleware(config: config),

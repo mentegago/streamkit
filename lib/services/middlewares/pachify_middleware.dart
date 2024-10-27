@@ -1,4 +1,5 @@
-import 'package:streamkit_tts/services/interfaces/text_to_speech_service.dart';
+import 'package:streamkit_tts/models/messages/chat_message.dart';
+import 'package:streamkit_tts/models/messages/message.dart';
 import 'package:streamkit_tts/services/middlewares/middleware.dart';
 import 'package:streamkit_tts/utils/external_config_util.dart';
 import 'package:streamkit_tts/utils/misc_tts_util.dart';

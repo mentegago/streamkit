@@ -3,14 +3,14 @@ import 'dart:convert';
 import 'package:collection/collection.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:streamkit_tts/models/config_model.dart';
+import 'package:streamkit_tts/models/messages/chat_message.dart' as streamkit;
+import 'package:streamkit_tts/models/messages/message.dart';
 import 'package:streamkit_tts/services/sources/source_service.dart';
 import 'package:twitch_chat/twitch_chat.dart';
-import 'package:streamkit_tts/services/interfaces/text_to_speech_service.dart'
-    as streamkit;
 import 'package:http/http.dart' as http;
 
 class TwitchChatSource implements SourceService {
-  final _messageSubject = PublishSubject<streamkit.Message>();
+  final _messageSubject = PublishSubject<Message>();
   final _statusSubject = PublishSubject<SourceStatus>();
   final Config _config;
 
@@ -25,7 +25,7 @@ class TwitchChatSource implements SourceService {
   }
 
   @override
-  Stream<streamkit.Message> getMessageStream() {
+  Stream<Message> getMessageStream() {
     return _messageSubject.stream;
   }
 

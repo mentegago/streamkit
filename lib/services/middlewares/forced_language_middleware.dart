@@ -1,5 +1,6 @@
 import 'package:streamkit_tts/models/enums/languages_enum.dart';
-import 'package:streamkit_tts/services/interfaces/text_to_speech_service.dart';
+import 'package:streamkit_tts/models/messages/chat_message.dart';
+import 'package:streamkit_tts/models/messages/message.dart';
 import 'package:streamkit_tts/services/middlewares/middleware.dart';
 
 class ForcedLanguageMiddleware implements Middleware {

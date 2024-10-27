@@ -1,52 +1,5 @@
 import 'package:streamkit_tts/models/enums/languages_enum.dart';
-
-abstract class TextToSpeechServiceProtocol {
-  Future<PreparedMessage?> prepareSpeechForMessage(Message message);
-  Future<void> removePreparedMessage(Message message);
-  Future<void> playPreparedMessage(Message message);
-}
-
-class PreparedMessage {
-  final Message message;
-  final double? duration;
-
-  PreparedMessage({
-    required this.message,
-    this.duration,
-  });
-}
-
-abstract class Message {
-  final String id;
-  final String username;
-  final String suggestedSpeechMessage;
-  final Language? language;
-  final bool isSuggestedSpeechMessageFinalized;
-
-  Message({
-    required this.id,
-    required this.username,
-    required this.suggestedSpeechMessage,
-    this.language,
-    this.isSuggestedSpeechMessageFinalized = false,
-  });
-
-  Message copyWith({
-    String? username,
-    String? suggestedSpeechMessage,
-    Language? language,
-  });
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-
-    return other is Message && other.id == id;
-  }
-
-  @override
-  int get hashCode => id.hashCode;
-}
+import 'package:streamkit_tts/models/messages/message.dart';
 
 class EmotePosition {
   final int startPosition;

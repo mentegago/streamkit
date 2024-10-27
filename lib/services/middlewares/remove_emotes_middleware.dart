@@ -1,7 +1,8 @@
 import 'dart:math';
 
 import 'package:streamkit_tts/models/config_model.dart';
-import 'package:streamkit_tts/services/interfaces/text_to_speech_service.dart';
+import 'package:streamkit_tts/models/messages/chat_message.dart';
+import 'package:streamkit_tts/models/messages/message.dart';
 import 'package:streamkit_tts/services/middlewares/middleware.dart';
 import 'package:collection/collection.dart';
 import 'package:streamkit_tts/utils/clean_message_util.dart';

@@ -4,7 +4,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:streamkit_tts/models/config_model.dart';
 import 'package:streamkit_tts/models/enums/languages_enum.dart';
-import 'package:streamkit_tts/services/interfaces/text_to_speech_service.dart';
+import 'package:streamkit_tts/models/messages/message.dart';
+import 'package:streamkit_tts/models/messages/prepared_message.dart';
 import 'package:streamkit_tts/services/outputs/output_service.dart';
 
 class GoogleTtsOutputPreparedMessage extends PreparedMessage {

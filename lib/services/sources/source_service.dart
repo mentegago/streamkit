@@ -1,4 +1,4 @@
-import 'package:streamkit_tts/services/interfaces/text_to_speech_service.dart';
+import 'package:streamkit_tts/models/messages/message.dart';
 
 abstract class SourceService {
   Stream<Message> getMessageStream();
