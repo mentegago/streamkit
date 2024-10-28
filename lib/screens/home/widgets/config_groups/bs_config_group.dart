@@ -5,8 +5,8 @@ import 'package:provider/provider.dart';
 
 class BeatSaberConfigGroup extends StatelessWidget {
   const BeatSaberConfigGroup({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +26,7 @@ class BeatSaberConfigGroup extends StatelessWidget {
 }
 
 class _ReadBsrCheckbox extends StatelessWidget {
-  const _ReadBsrCheckbox({Key? key}) : super(key: key);
+  const _ReadBsrCheckbox({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +45,7 @@ class _ReadBsrCheckbox extends StatelessWidget {
 }
 
 class _ReadBsrSafelyCheckbox extends StatelessWidget {
-  const _ReadBsrSafelyCheckbox({Key? key}) : super(key: key);
+  const _ReadBsrSafelyCheckbox({super.key});
 
   @override
   Widget build(BuildContext context) {

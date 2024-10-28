@@ -24,8 +24,12 @@ class ExternalConfig {
   late final String _configPath;
 
   ExternalConfig() {
-    loadPanciList();
-    loadNameFixList();
+    _loadExternalConfigs();
+  }
+
+  void _loadExternalConfigs() async {
+    loadPanciList().onError((_, __) {});
+    loadNameFixList().onError((_, __) {});
   }
 
   Future<void> loadConfigPath() async {
@@ -40,20 +44,31 @@ class ExternalConfig {
   }
 
   Future<void> loadPanciList() async {
-    http.get(Uri.parse("https://pastebin.com/raw/NtEsN3nQ")).then((response) {
+    try {
+      final response = await http.get(Uri.parse(
+        "https://pastebin.com/raw/NtEsN3nQ",
+      ));
+
       if (response.statusCode != 200) return;
       _panciList.clear();
+
       response.body.split(',').forEach((element) {
         if (element.trim().isEmpty) return;
         _panciList.add(element);
       });
-    });
+    } catch (_) {
+      rethrow;
+    }
   }
 
   Future<void> loadNameFixList() async {
-    http.get(Uri.parse("https://pastebin.com/raw/vrrsngeG")).then((response) {
+    try {
+      final response =
+          await http.get(Uri.parse("https://pastebin.com/raw/vrrsngeG"));
       if (response.statusCode != 200) return;
       _nameFixConfig = NameFixConfig.fromJson(json.decode(response.body));
-    });
+    } catch (_) {
+      rethrow;
+    }
   }
 }

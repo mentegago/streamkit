@@ -44,12 +44,27 @@ class TwitchChatSource implements SourceService {
 
   void connect({required String channel}) async {
     if (_twitchChat == null) {
-      final twitchChat = TwitchChat.anonymous(channel);
+      final twitchChat = TwitchChat(
+        channel,
+        'justinfan1243',
+        '',
+        onDone: () {
+          _statusSubject.add(SourceStatus.inactive);
+          disconnect();
+        },
+        onError: () {
+          _statusSubject.add(SourceStatus.inactive);
+          disconnect();
+          connect(channel: channel);
+        },
+      );
       _twitchChat = twitchChat;
       twitchChat.connect();
 
-      _fetchChannelBttvEmotes();
-      _fetchGlobalBttvEmotes();
+      try {
+        _fetchChannelBttvEmotes();
+        _fetchGlobalBttvEmotes();
+      } catch (_) {}
 
       twitchChat.isConnected.addListener(() {
         if (twitchChat.isConnected.value) {
@@ -92,17 +107,6 @@ class TwitchChatSource implements SourceService {
       }).listen((message) {
         _messageSubject.add(message);
       });
-
-      twitchChat.onError = () {
-        _statusSubject.add(SourceStatus.inactive);
-        disconnect();
-        connect(channel: channel);
-      };
-
-      twitchChat.onDone = () {
-        _statusSubject.add(SourceStatus.inactive);
-        disconnect();
-      };
     } else if (channel != _twitchChat?.channel) {
       disconnect();
       connect(channel: channel);
@@ -117,27 +121,35 @@ class TwitchChatSource implements SourceService {
   void _fetchChannelBttvEmotes() async {
     _channelBttvEmotes = [];
 
-    final url = Uri.parse(
-      "https://decapi.me/bttv/emotes/${_config.chatToSpeechConfiguration.channels.first}",
-    );
-    final response = await http.get(url);
-    if (response.statusCode != 200) return;
-    if (response.body.toLowerCase().contains("unable to retrieve")) return;
+    try {
+      final url = Uri.parse(
+        "https://decapi.me/bttv/emotes/${_config.chatToSpeechConfiguration.channels.first}",
+      );
+      final response = await http.get(url);
+      if (response.statusCode != 200) return;
+      if (response.body.toLowerCase().contains("unable to retrieve")) return;
 
-    final emotes = response.body.split(' ');
-    _channelBttvEmotes = emotes;
+      final emotes = response.body.split(' ');
+      _channelBttvEmotes = emotes;
+    } catch (_) {
+      rethrow;
+    }
   }
 
   void _fetchGlobalBttvEmotes() async {
     if (_globalBttvEmotes.isNotEmpty) return;
 
-    final url = Uri.parse("https://api.betterttv.net/3/cached/emotes/global");
-    final response = await http.get(url);
-    final List<dynamic> json = jsonDecode(response.body);
+    try {
+      final url = Uri.parse("https://api.betterttv.net/3/cached/emotes/global");
+      final response = await http.get(url);
+      final List<dynamic> json = jsonDecode(response.body);
 
-    _globalBttvEmotes = json
-        .where((emote) => emote['modifier'] == false)
-        .map((emote) => emote['code'] as String)
-        .toList();
+      _globalBttvEmotes = json
+          .where((emote) => emote['modifier'] == false)
+          .map((emote) => emote['code'] as String)
+          .toList();
+    } catch (_) {
+      rethrow;
+    }
   }
 }

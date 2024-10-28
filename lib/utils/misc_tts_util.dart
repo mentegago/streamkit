@@ -27,9 +27,15 @@ class MiscTts {
   }
 
   String warafy(String text) {
-    return text.replaceAll(
-      RegExp(r'(( |^|\n|\r)(w|ｗ){2,}( |$|\n|\r))'),
-      'わらわら',
-    );
+    if (text == "w" || text == "ｗ") return "わら";
+    return text
+        .replaceAll(
+          RegExp(r'(( |^|\n|\r)(w|ｗ){2,}( |$|\n|\r))'),
+          'わらわら',
+        )
+        .replaceAllMapped(
+          RegExp(r'([一-龯ぁ-んァ-ン？！?!])(w|ｗ)+( |$|\n|\r)'),
+          (m) => "${m[1]}わら",
+        );
   }
 }

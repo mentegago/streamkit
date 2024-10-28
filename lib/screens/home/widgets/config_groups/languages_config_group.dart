@@ -7,8 +7,8 @@ import 'package:streamkit_tts/screens/home/widgets/text_with_flag.dart';
 
 class LanguagesConfigGroup extends StatelessWidget {
   const LanguagesConfigGroup({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -41,9 +41,9 @@ class LanguagesConfigGroup extends StatelessWidget {
 
 class _LanguageCheckbox extends StatelessWidget {
   const _LanguageCheckbox({
-    Key? key,
+    super.key,
     required this.language,
-  }) : super(key: key);
+  });
 
   final Language language;
 

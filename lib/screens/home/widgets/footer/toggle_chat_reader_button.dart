@@ -6,8 +6,8 @@ import 'package:streamkit_tts/services/composers/composer_service.dart';
 
 class ToggleChatReaderButton extends StatelessWidget {
   const ToggleChatReaderButton({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {

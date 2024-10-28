@@ -32,7 +32,7 @@ class BlacklistDialog extends HookWidget {
         children: [
           InfoLabel(
             label:
-                'Enter the usernames of chatters you\'d like StreamKit to ignore, separated by commas.\n\nExample: streamelements,streamlabs',
+                'Enter the usernames of chatters you\'d like StreamKit to ignore, separated by commas.\n\nExample: streamelements,streamlabs,nightbot',
             child: TextBox(
               placeholder: "",
               controller: usernameController,

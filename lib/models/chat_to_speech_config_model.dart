@@ -107,7 +107,7 @@ class ChatToSpeechConfiguration {
       languages: Set<Language>.from(
           map['languages']?.map((x) => LanguageParser.fromGoogle(x)) ??
               [Language.english, Language.indonesian, Language.japanese]),
-      enabled: map['enabled'] ?? false,
+      enabled: false, // For YouTube, always set to false.
       volume: map['volume']?.toDouble() ?? 100.0,
       readBsr: map['readBsr'] ?? false,
       readBsrSafely: map['readBsrSafely'] ?? false,

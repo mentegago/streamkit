@@ -13,7 +13,9 @@ import 'package:streamkit_tts/models/enums/tts_source.dart';
 import 'package:streamkit_tts/screens/home/home.dart';
 import 'package:streamkit_tts/services/composers/app_composer_service.dart';
 import 'package:streamkit_tts/services/composers/composer_service.dart';
+import 'package:streamkit_tts/services/language_detection_service.dart';
 import 'package:streamkit_tts/services/middlewares/bsr_middleware.dart';
+import 'package:streamkit_tts/services/middlewares/dev_commands_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/forced_language_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/language_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/name_fix_middleware.dart';
@@ -24,6 +26,8 @@ import 'package:streamkit_tts/services/middlewares/remove_urls_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/skip_empty_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/skip_exclamation_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/user_filter_middleware.dart';
+import 'package:streamkit_tts/services/outputs/google_tts_output.dart';
+import 'package:streamkit_tts/services/sources/youtube_chat_source.dart';
 import 'package:streamkit_tts/services/version_check_service.dart';
 import 'package:streamkit_tts/utils/external_config_util.dart';
 import 'package:streamkit_tts/utils/misc_tts_util.dart';
@@ -41,10 +45,20 @@ void main() async {
     configPath: externalConfigUtil.configPath,
     appPath: externalConfigUtil.appPath,
   );
+  final LanguageDetectionService languageDetectionService =
+      AppLanguageDetectionService();
+
+  final versionCheckService = VersionCheckService();
+
   final ComposerService composerService = AppComposerService(
     config: config,
+    sourceService: YouTubeChatSource(config: config),
     middlewares: [
       // Filter and command handler middlewares
+      DevCommandsMiddleware(
+        externalConfig: externalConfigUtil,
+        versionCheckService: versionCheckService,
+      ),
       UserFilterMiddleware(config: config),
       BsrMiddleware(config: config),
       SkipExclamationMiddleware(config: config),
@@ -58,13 +72,16 @@ void main() async {
         externalConfig: externalConfigUtil,
         miscTtsUtil: MiscTts(),
       ),
-      LanguageMiddleware(config: config),
+      LanguageMiddleware(
+        config: config,
+        languageDetectionService: languageDetectionService,
+      ),
       SkipEmptyMiddleware(config: config),
       ReadUsernameMiddleware(config: config),
       NameFixMiddleware(externalConfig: externalConfigUtil),
     ],
+    outputService: GoogleTtsOutput(config: config),
   );
-  final versionCheckService = VersionCheckService();
 
   config.addListener(() {
     _saveConfigTimer?.cancel();
@@ -81,7 +98,6 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => config),
-        // ChangeNotifierProvider(create: (_) => chatToSpeechService),
         ChangeNotifierProvider(create: (_) => versionCheckService),
         Provider(create: (_) => composerService),
       ],
@@ -105,7 +121,7 @@ void saveConfigurations(Config config, {required String configPath}) {
 
 Future<Config> loadConfigurations(
     {required String configPath, required String appPath}) async {
-  final file = File('$configPath\\config.json');
+  final file = File('$configPath\\config_youtube.json');
 
   if (file.existsSync()) {
     final config = ChatToSpeechConfiguration.fromJson(file.readAsStringSync());
@@ -113,7 +129,8 @@ Future<Config> loadConfigurations(
   }
 
   try {
-    final oldConfigFile = File('$appPath\\streamkit_configurations.json');
+    final oldConfigFile =
+        File('$appPath\\streamkit_configurations_youtube.json');
     if (oldConfigFile.existsSync()) {
       final config = ChatToSpeechConfiguration.fromOldJson(
           oldConfigFile.readAsStringSync());

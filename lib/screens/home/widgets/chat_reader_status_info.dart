@@ -16,7 +16,7 @@ class ChatReaderStatus extends HookWidget {
       builder: (context, snapshot) => Container(
         decoration: BoxDecoration(
           color: snapshot.data == ComposerStatus.active
-              ? Color.fromARGB(255, 0, 255, 0)
+              ? const Color.fromARGB(255, 0, 255, 0)
               : Colors.red.normal,
           shape: BoxShape.circle,
         ),

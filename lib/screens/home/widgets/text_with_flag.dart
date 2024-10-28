@@ -3,10 +3,10 @@ import 'package:fluent_ui/fluent_ui.dart';
 
 class TextWithFlag extends StatelessWidget {
   const TextWithFlag({
-    Key? key,
+    super.key,
     required this.flagCode,
     required this.text,
-  }) : super(key: key);
+  });
 
   final FlagsCode flagCode;
   final String text;

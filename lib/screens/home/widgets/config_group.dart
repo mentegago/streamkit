@@ -2,11 +2,11 @@ import 'package:fluent_ui/fluent_ui.dart';
 
 class ConfigGroup extends StatelessWidget {
   const ConfigGroup({
-    Key? key,
+    super.key,
     required this.child,
     required this.title,
     this.tooltip = "",
-  }) : super(key: key);
+  });
 
   final Widget child;
   final String title;
