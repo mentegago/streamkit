@@ -1,5 +1,4 @@
 import 'dart:collection';
-import 'dart:io';
 
 import 'package:rxdart/rxdart.dart';
 import 'package:streamkit_tts/models/config_model.dart';
