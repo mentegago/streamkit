@@ -178,7 +178,7 @@ class MyApp extends HookWidget {
         accentColor: const Color.fromARGB(255, 100, 65, 165).toAccentColor(),
       ),
       home: NavigationView(
-        appBar: streamKitAppBar(context),
+        appBar: Platform.isWindows ? streamKitAppBar(context) : null,
         pane: trakteerFeatureFlag
             ? NavigationPane(
                 selected: paneIndex.value,
