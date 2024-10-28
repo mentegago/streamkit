@@ -14,7 +14,7 @@ class ReadUsernameMiddleware implements Middleware {
     if (_config.chatToSpeechConfiguration.readUsername) {
       return message.copyWith(
         suggestedSpeechMessage:
-            "${message.username}, ${message.suggestedSpeechMessage}",
+            "${message.username.toLowerCase().replaceAll("_", " ")}, ${message.suggestedSpeechMessage}",
       );
     }
 

@@ -32,6 +32,7 @@ class AppComposerService implements ComposerService {
 
   final _maxMessageQueue = 10;
   final _maxMessagePrepareTime = const Duration(seconds: 10);
+  final _maxMiddlewareProcessTime = const Duration(seconds: 10);
 
   bool _isPlayingMessage = false;
 
@@ -115,7 +116,14 @@ class AppComposerService implements ComposerService {
     for (final middleware in _middlewares) {
       if (processedMessage == null) break;
       if (processedMessage.isSuggestedSpeechMessageFinalized) break;
-      processedMessage = await middleware.process(processedMessage);
+      processedMessage = await middleware
+          .process(
+            processedMessage,
+          )
+          .timeout(
+            _maxMiddlewareProcessTime,
+            onTimeout: () => processedMessage,
+          );
     }
 
     if (processedMessage == null) return;
