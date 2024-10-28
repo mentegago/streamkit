@@ -27,6 +27,7 @@ class MiscTts {
   }
 
   String warafy(String text) {
+    if (text == "w" || text == "ｗ") return "わら";
     return text
         .replaceAll(
           RegExp(r'(( |^|\n|\r)(w|ｗ){2,}( |$|\n|\r))'),
