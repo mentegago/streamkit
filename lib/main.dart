@@ -15,6 +15,7 @@ import 'package:streamkit_tts/services/composers/app_composer_service.dart';
 import 'package:streamkit_tts/services/composers/composer_service.dart';
 import 'package:streamkit_tts/services/language_detection_service.dart';
 import 'package:streamkit_tts/services/middlewares/bsr_middleware.dart';
+import 'package:streamkit_tts/services/middlewares/dev_commands_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/forced_language_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/language_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/name_fix_middleware.dart';
@@ -47,11 +48,17 @@ void main() async {
   final LanguageDetectionService languageDetectionService =
       AppLanguageDetectionService();
 
+  final versionCheckService = VersionCheckService();
+
   final ComposerService composerService = AppComposerService(
     config: config,
     sourceService: TwitchChatSource(config: config),
     middlewares: [
       // Filter and command handler middlewares
+      DevCommandsMiddleware(
+        externalConfig: externalConfigUtil,
+        versionCheckService: versionCheckService,
+      ),
       UserFilterMiddleware(config: config),
       BsrMiddleware(config: config),
       SkipExclamationMiddleware(config: config),
@@ -75,7 +82,6 @@ void main() async {
     ],
     outputService: GoogleTtsOutput(config: config),
   );
-  final versionCheckService = VersionCheckService();
 
   config.addListener(() {
     _saveConfigTimer?.cancel();
