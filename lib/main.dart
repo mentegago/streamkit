@@ -13,6 +13,7 @@ import 'package:streamkit_tts/models/enums/tts_source.dart';
 import 'package:streamkit_tts/screens/home/home.dart';
 import 'package:streamkit_tts/services/composers/app_composer_service.dart';
 import 'package:streamkit_tts/services/composers/composer_service.dart';
+import 'package:streamkit_tts/services/language_detection_service.dart';
 import 'package:streamkit_tts/services/middlewares/bsr_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/forced_language_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/language_middleware.dart';
@@ -43,6 +44,9 @@ void main() async {
     configPath: externalConfigUtil.configPath,
     appPath: externalConfigUtil.appPath,
   );
+  final LanguageDetectionService languageDetectionService =
+      AppLanguageDetectionService();
+
   final ComposerService composerService = AppComposerService(
     config: config,
     sourceService: TwitchChatSource(config: config),
@@ -61,7 +65,10 @@ void main() async {
         externalConfig: externalConfigUtil,
         miscTtsUtil: MiscTts(),
       ),
-      LanguageMiddleware(config: config),
+      LanguageMiddleware(
+        config: config,
+        languageDetectionService: languageDetectionService,
+      ),
       SkipEmptyMiddleware(config: config),
       ReadUsernameMiddleware(config: config),
       NameFixMiddleware(externalConfig: externalConfigUtil),

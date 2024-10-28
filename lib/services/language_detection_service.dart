@@ -4,12 +4,19 @@ import 'package:flutter/services.dart';
 import 'package:streamkit_tts/models/enums/languages_enum.dart';
 import 'package:tuple/tuple.dart';
 
-class LanguageDetection {
+abstract class LanguageDetectionService {
+  Language getLanguage(
+    String text, {
+    required Set<Language> whitelistedLanguages,
+  });
+}
+
+class AppLanguageDetectionService implements LanguageDetectionService {
   static Map<String, dynamic> enModel = {};
   static Map<String, dynamic> idModel = {};
   static Map<String, dynamic> frModel = {};
 
-  LanguageDetection() {
+  AppLanguageDetectionService() {
     _loadLanguageModels();
   }
 
@@ -26,6 +33,7 @@ class LanguageDetection {
     frModel = json.decode(frJsonString);
   }
 
+  @override
   Language getLanguage(
     String text, {
     required Set<Language> whitelistedLanguages,
