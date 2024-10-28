@@ -20,6 +20,7 @@ class TtsConfigGroup extends StatelessWidget {
         children: [
           const SizedBox(height: 8.0),
           _ReadUsernameCheckbox(),
+          _RemoveVtuberGroupName(),
           _IgnoreExclamationCheckbox(),
           _IgnoreEmotesCheckbox(),
           _RemoveUrls(),
@@ -85,7 +86,7 @@ class _ReadUsernameCheckbox extends StatelessWidget {
       onChanged: (isChecked) {
         config.setTtsConfig(readUsername: isChecked);
       },
-      content: const Text("Read username"),
+      content: const Text("Read name"),
     );
   }
 }
@@ -103,6 +104,23 @@ class _RemoveUrls extends StatelessWidget {
         config.setTtsConfig(ignoreUrls: isChecked);
       },
       content: const Text("Remove URLs"),
+    );
+  }
+}
+
+class _RemoveVtuberGroupName extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final config = context.read<Config>();
+    final ignoreVtuberGroupName = context.select((Config config) =>
+        config.chatToSpeechConfiguration.ignoreVtuberGroupName);
+
+    return Checkbox(
+      checked: ignoreVtuberGroupName,
+      onChanged: (isChecked) {
+        config.setTtsConfig(ignoreVtuberGroupName: isChecked);
+      },
+      content: const Text("Remove Vtuber Group Name"),
     );
   }
 }

@@ -70,6 +70,7 @@ class Config extends ChangeNotifier {
     bool? ignoreExclamationMark,
     bool? ignoreEmotes,
     bool? ignoreUrls,
+    bool? ignoreVtuberGroupName,
   }) {
     setChatToSpeechConfiguration(
       chatToSpeechConfiguration.copyWith(
@@ -78,6 +79,8 @@ class Config extends ChangeNotifier {
             chatToSpeechConfiguration.ignoreExclamationMark,
         ignoreEmotes: ignoreEmotes ?? chatToSpeechConfiguration.ignoreEmotes,
         ignoreUrls: ignoreUrls ?? chatToSpeechConfiguration.ignoreUrls,
+        ignoreVtuberGroupName: ignoreVtuberGroupName ??
+            chatToSpeechConfiguration.ignoreVtuberGroupName,
       ),
     );
   }

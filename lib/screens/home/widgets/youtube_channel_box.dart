@@ -19,12 +19,15 @@ class YouTubeChannelBox extends StatelessWidget {
       if (videoId.isEmpty) {
         return [
           const Expanded(
-            child: Text("No youtube video ID set."),
+            child: Text("No youtube live video ID set."),
           ),
         ];
       } else {
         return [
-          Text("YouTube Video ID:", style: themeData.typography.bodyStrong),
+          Text(
+            "YouTube Live Video ID:",
+            style: themeData.typography.bodyStrong,
+          ),
           const SizedBox(width: 4.0),
           Expanded(child: Text(videoId)),
         ];

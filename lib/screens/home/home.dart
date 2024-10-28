@@ -7,7 +7,6 @@ import 'package:streamkit_tts/screens/home/widgets/config_groups/bs_config_group
 import 'package:streamkit_tts/screens/home/widgets/config_groups/languages_config_group.dart';
 import 'package:streamkit_tts/screens/home/widgets/config_groups/tts_config_group.dart';
 import 'package:streamkit_tts/screens/home/widgets/footer/toggle_chat_reader_button.dart';
-import 'package:streamkit_tts/screens/home/widgets/twitch_channel_box.dart';
 import 'package:streamkit_tts/screens/home/widgets/footer/volume_control.dart';
 import 'package:streamkit_tts/screens/home/widgets/youtube_channel_box.dart';
 import 'package:streamkit_tts/services/composers/composer_service.dart';

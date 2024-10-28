@@ -1,7 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:streamkit_tts/models/config_model.dart';
-import 'package:streamkit_tts/screens/home/widgets/dialogs/twitch_channel_selection_dialog.dart';
+import 'package:streamkit_tts/screens/home/widgets/dialogs/youtube_video_selection_dialog.dart';
 import 'package:streamkit_tts/services/composers/composer_service.dart';
 
 class ToggleChatReaderButton extends StatelessWidget {
@@ -15,10 +15,10 @@ class ToggleChatReaderButton extends StatelessWidget {
     final config = context.read<Config>();
 
     final onPressed = (() {
-      if (config.chatToSpeechConfiguration.channels.isEmpty) {
+      if (config.chatToSpeechConfiguration.youtubeVideoId.isEmpty) {
         showDialog(
           context: context,
-          builder: (context) => const TwitchChannelSelectionDialog(
+          builder: (context) => const YoutubeVideoSelectionDialog(
             enableChatReaderWithoutAsking: true,
           ),
         );

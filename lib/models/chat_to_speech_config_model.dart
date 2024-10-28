@@ -19,6 +19,7 @@ class ChatToSpeechConfiguration {
   final bool isWhitelistingFilter;
   final bool ignoreEmptyMessage;
   final bool ignoreUrls;
+  final bool ignoreVtuberGroupName;
 
   ChatToSpeechConfiguration({
     required this.channels,
@@ -36,6 +37,7 @@ class ChatToSpeechConfiguration {
     required this.isWhitelistingFilter,
     required this.ignoreEmptyMessage,
     required this.ignoreUrls,
+    required this.ignoreVtuberGroupName,
   });
 
   ChatToSpeechConfiguration copyWith({
@@ -54,6 +56,7 @@ class ChatToSpeechConfiguration {
     bool? isWhitelistingFilter,
     bool? ignoreEmptyMessage,
     bool? ignoreUrls,
+    bool? ignoreVtuberGroupName,
   }) {
     return ChatToSpeechConfiguration(
       channels: channels ?? this.channels,
@@ -72,6 +75,8 @@ class ChatToSpeechConfiguration {
       isWhitelistingFilter: isWhitelistingFilter ?? this.isWhitelistingFilter,
       ignoreEmptyMessage: ignoreEmptyMessage ?? this.ignoreEmptyMessage,
       ignoreUrls: ignoreUrls ?? this.ignoreUrls,
+      ignoreVtuberGroupName:
+          ignoreVtuberGroupName ?? this.ignoreVtuberGroupName,
     );
   }
 
@@ -93,6 +98,7 @@ class ChatToSpeechConfiguration {
     result.addAll({'isWhitelistingFilter': isWhitelistingFilter});
     result.addAll({'ignoreEmptyMessage': ignoreEmptyMessage});
     result.addAll({'ignoreUrls': ignoreUrls});
+    result.addAll({'ignoreVtuberGroupName': ignoreVtuberGroupName});
 
     return result;
   }
@@ -107,7 +113,8 @@ class ChatToSpeechConfiguration {
       languages: Set<Language>.from(
           map['languages']?.map((x) => LanguageParser.fromGoogle(x)) ??
               [Language.english, Language.indonesian, Language.japanese]),
-      enabled: false, // For YouTube, always set to false.
+      enabled:
+          false, // For YouTube, always set to false as there's no guarantee that live video ID is still alive.
       volume: map['volume']?.toDouble() ?? 100.0,
       readBsr: map['readBsr'] ?? false,
       readBsrSafely: map['readBsrSafely'] ?? false,
@@ -117,6 +124,7 @@ class ChatToSpeechConfiguration {
       isWhitelistingFilter: map['isWhitelistingFilter'] ?? false,
       ignoreEmptyMessage: map['ignoreEmptyMessage'] ?? true,
       ignoreUrls: map['ignoreUrls'] ?? true,
+      ignoreVtuberGroupName: map['ignoreVtuberGroupName'] ?? true,
     );
   }
 
@@ -159,6 +167,7 @@ class ChatToSpeechConfiguration {
       isWhitelistingFilter: config?["isWhitelistingFilter"] ?? false,
       ignoreEmptyMessage: true,
       ignoreUrls: true,
+      ignoreVtuberGroupName: true,
     );
   }
 

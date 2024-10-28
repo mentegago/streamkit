@@ -26,6 +26,7 @@ import 'package:streamkit_tts/services/middlewares/remove_urls_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/skip_empty_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/skip_exclamation_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/user_filter_middleware.dart';
+import 'package:streamkit_tts/services/middlewares/vtuber_name_filter_middleware.dart';
 import 'package:streamkit_tts/services/outputs/google_tts_output.dart';
 import 'package:streamkit_tts/services/sources/youtube_chat_source.dart';
 import 'package:streamkit_tts/services/version_check_service.dart';
@@ -77,6 +78,7 @@ void main() async {
         languageDetectionService: languageDetectionService,
       ),
       SkipEmptyMiddleware(config: config),
+      VtuberNameFilterMiddleware(config: config),
       ReadUsernameMiddleware(config: config),
       NameFixMiddleware(externalConfig: externalConfigUtil),
     ],
@@ -115,7 +117,7 @@ void main() async {
 }
 
 void saveConfigurations(Config config, {required String configPath}) {
-  final file = File('$configPath\\config.json');
+  final file = File('$configPath\\config_youtube.json');
   file.writeAsStringSync(config.chatToSpeechConfiguration.toJson());
 }
 
@@ -160,6 +162,7 @@ Future<Config> loadConfigurations(
       isWhitelistingFilter: false,
       ignoreEmptyMessage: true,
       ignoreUrls: true,
+      ignoreVtuberGroupName: true,
     ),
   );
 }
