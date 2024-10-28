@@ -1,3 +1,4 @@
+import 'package:streamkit_tts/models/enums/languages_enum.dart';
 import 'package:streamkit_tts/models/messages/chat_message.dart';
 import 'package:streamkit_tts/models/messages/message.dart';
 import 'package:streamkit_tts/services/middlewares/middleware.dart';
@@ -33,6 +34,7 @@ class DevCommandsMiddleware implements Middleware {
           suggestedSpeechMessage:
               "This user is running StreamKit ${_versionCheckService.currentVersion ?? "unknown version"}",
           isSuggestedSpeechMessageFinalized: true,
+          language: Language.english,
         );
     }
 
