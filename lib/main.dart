@@ -24,6 +24,8 @@ import 'package:streamkit_tts/services/middlewares/remove_urls_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/skip_empty_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/skip_exclamation_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/user_filter_middleware.dart';
+import 'package:streamkit_tts/services/outputs/google_tts_output.dart';
+import 'package:streamkit_tts/services/sources/twitch_chat_source.dart';
 import 'package:streamkit_tts/services/version_check_service.dart';
 import 'package:streamkit_tts/utils/external_config_util.dart';
 import 'package:streamkit_tts/utils/misc_tts_util.dart';
@@ -43,6 +45,7 @@ void main() async {
   );
   final ComposerService composerService = AppComposerService(
     config: config,
+    sourceService: TwitchChatSource(config: config),
     middlewares: [
       // Filter and command handler middlewares
       UserFilterMiddleware(config: config),
@@ -63,6 +66,7 @@ void main() async {
       ReadUsernameMiddleware(config: config),
       NameFixMiddleware(externalConfig: externalConfigUtil),
     ],
+    outputService: GoogleTtsOutput(config: config),
   );
   final versionCheckService = VersionCheckService();
 
@@ -81,7 +85,6 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => config),
-        // ChangeNotifierProvider(create: (_) => chatToSpeechService),
         ChangeNotifierProvider(create: (_) => versionCheckService),
         Provider(create: (_) => composerService),
       ],

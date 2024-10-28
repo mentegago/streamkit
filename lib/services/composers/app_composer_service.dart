@@ -1,13 +1,24 @@
+import 'dart:collection';
+import 'dart:io';
+
 import 'package:rxdart/rxdart.dart';
 import 'package:streamkit_tts/models/config_model.dart';
 import 'package:streamkit_tts/models/messages/message.dart';
 import 'package:streamkit_tts/models/messages/prepared_message.dart';
 import 'package:streamkit_tts/services/composers/composer_service.dart';
 import 'package:streamkit_tts/services/middlewares/middleware.dart';
-import 'package:streamkit_tts/services/outputs/google_tts_output.dart';
 import 'package:streamkit_tts/services/outputs/output_service.dart';
 import 'package:streamkit_tts/services/sources/source_service.dart';
-import 'package:streamkit_tts/services/sources/twitch_chat_source.dart';
+
+class QueueItem {
+  final Message message;
+  PreparedMessage? preparedMessage;
+
+  QueueItem({
+    required this.message,
+    this.preparedMessage,
+  });
+}
 
 class AppComposerService implements ComposerService {
   final SourceService _sourceService;
@@ -15,21 +26,25 @@ class AppComposerService implements ComposerService {
   final List<Middleware> _middlewares;
   final Config _config;
 
-  final List<Message> _queuedMessages = [];
-  final List<PreparedMessage> _queuedPreparedMessages = [];
+  final List<QueueItem> _messageQueue = [];
 
   final _isEnabled = PublishSubject<bool>();
   final _errorMessage = PublishSubject<String>();
 
-  final int _maxMessageQueue = 10;
+  final _maxMessageQueue = 10;
+  final _maxMessagePrepareTime = const Duration(seconds: 10);
+
+  bool _isPlayingMessage = false;
 
   AppComposerService({
     required config,
+    required sourceService,
     required middlewares,
+    required outputService,
   })  : _config = config,
-        _sourceService = TwitchChatSource(config: config),
-        _outputService = GoogleTtsOutput(config: config),
-        _middlewares = middlewares {
+        _sourceService = sourceService,
+        _middlewares = middlewares,
+        _outputService = outputService {
     _sourceService.getMessageStream().listen(_onMessage);
     _config.addListener(_onConfigChanged);
 
@@ -43,8 +58,14 @@ class AppComposerService implements ComposerService {
   void _onConfigChanged() {
     _isEnabled.add(_config.chatToSpeechConfiguration.enabled);
     if (!_config.chatToSpeechConfiguration.enabled) {
-      _queuedMessages.clear();
-      _queuedPreparedMessages.clear();
+      _messageQueue
+          .map((queueItem) => queueItem.preparedMessage)
+          .nonNulls
+          .forEach((preparedMessage) {
+        _outputService.cancelPreparedMessage(preparedMessage);
+      });
+
+      _messageQueue.clear();
     }
   }
 
@@ -100,58 +121,58 @@ class AppComposerService implements ComposerService {
 
     if (processedMessage == null) return;
 
-    _queuedMessages.add(processedMessage);
+    final queueItem = QueueItem(message: processedMessage);
 
-    while (_queuedMessages.length > _maxMessageQueue) {
-      _queuedMessages.removeAt(0);
-    }
-
-    if (_queuedMessages.length == 1) {
-      // No message in queue prior to this.
-      _prepareNextMessage();
-    }
-  }
-
-  void _prepareNextMessage() async {
-    final message = _queuedMessages.firstOrNull;
-    if (message == null) {
-      return;
-    }
-
-    try {
-      final preparedMessage = await _outputService.prepareAudio(message);
-      _queuedPreparedMessages.add(preparedMessage);
-
-      while (_queuedPreparedMessages.length > _maxMessageQueue) {
-        final removedMessage = _queuedPreparedMessages.removeAt(0);
-        _outputService.cancelAudio(removedMessage);
+    _outputService
+        .prepareMessage(queueItem.message)
+        .timeout(_maxMessagePrepareTime)
+        .then((preparedMessage) {
+      if (!_messageQueue.contains(queueItem)) {
+        // Message no longer in queue
+        _outputService.cancelPreparedMessage(preparedMessage);
+        return;
       }
 
-      if (_queuedPreparedMessages.length == 1) {
-        // No message in queue prior to this.
-        _playNextMessage();
-      }
-    } catch (e) {
+      queueItem.preparedMessage = preparedMessage;
+      _playNextMessage();
+    }, onError: (e) {
       print(e);
-    }
+      _messageQueue.remove(queueItem);
+    });
 
-    if (_queuedMessages.isNotEmpty) _queuedMessages.removeAt(0);
-    _prepareNextMessage();
+    _messageQueue.add(queueItem);
+
+    while (_messageQueue.length > _maxMessageQueue) {
+      final preparedMessage = _messageQueue.removeAt(0).preparedMessage;
+      if (preparedMessage != null) {
+        _outputService.cancelPreparedMessage(preparedMessage);
+      }
+    }
   }
 
   void _playNextMessage() async {
-    final preparedMessage = _queuedPreparedMessages.firstOrNull;
-    if (preparedMessage == null) {
+    if (_isPlayingMessage) return;
+    _isPlayingMessage = true;
+
+    if (_messageQueue.isEmpty) {
+      _isPlayingMessage = false;
       return;
     }
 
-    try {
-      await _outputService.playAudio(preparedMessage);
-    } catch (e) {
-      print(e);
+    final queueItem = _messageQueue.first;
+    final preparedMessage = queueItem.preparedMessage;
+    if (preparedMessage == null) {
+      _isPlayingMessage = false;
+      return;
     }
 
-    if (_queuedPreparedMessages.isNotEmpty) _queuedPreparedMessages.removeAt(0);
+    _messageQueue.remove(queueItem);
+
+    try {
+      await _outputService.playMessage(preparedMessage);
+    } catch (_) {}
+
+    _isPlayingMessage = false;
     _playNextMessage();
   }
 }

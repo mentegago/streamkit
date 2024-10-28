@@ -18,8 +18,11 @@ class GoogleTtsOutputPreparedMessage extends PreparedMessage {
 class GoogleTtsOutput implements OutputService {
   final AudioPlayer _audioPlayer = AudioPlayer();
   final Config _config;
+  Directory? _tempAudioDir;
 
-  final int _maxMessageLength = 120; // Important for Google TTS limit.
+  final _maxMessageLength = 120; // Important for Google TTS limit.
+  final _audioPlayTimeout = const Duration(seconds: 30); // In case audio hangs.
+  final _audioPrepareTimeout = const Duration(seconds: 10);
 
   GoogleTtsOutput({required Config config}) : _config = config {
     _audioPlayer.play();
@@ -30,13 +33,18 @@ class GoogleTtsOutput implements OutputService {
 
   void _handleConfigChange() {
     if ((_audioPlayer.volume * 100 - _config.chatToSpeechConfiguration.volume)
-            .abs() <
-        1) return;
-    _audioPlayer.setVolume(_config.chatToSpeechConfiguration.volume / 100.0);
+            .abs() >
+        1) {
+      _audioPlayer.setVolume(_config.chatToSpeechConfiguration.volume / 100.0);
+    }
+
+    if (!_config.chatToSpeechConfiguration.enabled) {
+      _audioPlayer.stop();
+    }
   }
 
   @override
-  Future<PreparedMessage> prepareAudio(Message message) async {
+  Future<PreparedMessage> prepareMessage(Message message) async {
     try {
       final String langCode = (message.language ?? Language.english).google;
       final String text = Uri.encodeComponent(
@@ -56,31 +64,52 @@ class GoogleTtsOutput implements OutputService {
         headers: {
           'User-Agent': 'Mozilla/5.0', // Google requires a user-agent header
         },
+      ).timeout(
+        _audioPrepareTimeout,
+        onTimeout: () => http.Response("", 500),
       );
 
       if (response.statusCode == 200) {
         // Get the temporary directory
-        final Directory tempDir = await getTemporaryDirectory();
-        final String filePath = '${tempDir.path}/${message.id}.mp3';
+        final Directory tempDir = _tempAudioDir ??
+            await getTemporaryDirectory().then((dir) async {
+              final directory = Directory(
+                Platform.isWindows
+                    ? '${dir.path}\\Mentega StreamKit'
+                    : '${dir.path}/Mentega StreamKit',
+              );
+
+              if (await directory.exists()) {
+                await directory.delete(recursive: true);
+              }
+
+              return await directory.create(recursive: true);
+            });
+
+        _tempAudioDir = tempDir;
+
+        final String filePath = Platform.isWindows
+            ? '${tempDir.path}\\streamkit_${message.id}.mp3'
+            : '${tempDir.path}/streamkit_${message.id}.mp3';
         final File file = File(filePath);
 
         // Write the audio data to the file
         await file.writeAsBytes(response.bodyBytes);
 
         return GoogleTtsOutputPreparedMessage(
-            audioFile: file, message: message);
+          audioFile: file,
+          message: message,
+        );
       } else {
-        print('Failed to download audio: ${response.statusCode}');
-        throw 'Failed to download audio';
+        throw 'Failed to download audio: ${response.statusCode}';
       }
     } catch (e) {
-      print('Error in prepareAudio: $e');
-      throw 'Failed to prepare audio';
+      throw 'Failed to prepare audio: $e';
     }
   }
 
   @override
-  Future<void> playAudio(PreparedMessage preparedMessage) async {
+  Future<void> playMessage(PreparedMessage preparedMessage) async {
     try {
       if (preparedMessage is! GoogleTtsOutputPreparedMessage) {
         return;
@@ -101,23 +130,28 @@ class GoogleTtsOutput implements OutputService {
 
       // Wait until playback is complete
       await _audioPlayer.processingStateStream
-          .firstWhere((state) => state == ProcessingState.completed)
-          .timeout(const Duration(seconds: 5));
+          .firstWhere((state) =>
+              state == ProcessingState.completed ||
+              state == ProcessingState.idle)
+          .timeout(_audioPlayTimeout);
+
+      // Making sure that if audio player timed out, stop the audio.
+      await _audioPlayer.stop();
 
       // Delete the audio file after playback
-      await cancelAudio(preparedMessage);
+      await cancelPreparedMessage(preparedMessage);
     } catch (e) {
-      print('Error in playAudio: $e');
-      // Optionally, rethrow or handle the error as needed
-      throw e;
+      throw 'Error in playAudio: $e';
     }
   }
 
   @override
-  Future<void> cancelAudio(PreparedMessage preparedMessage) async {
+  Future<void> cancelPreparedMessage(PreparedMessage preparedMessage) async {
     if (preparedMessage is! GoogleTtsOutputPreparedMessage) {
       return;
     }
-    await preparedMessage.audioFile.delete();
+    try {
+      await preparedMessage.audioFile.delete();
+    } catch (_) {}
   }
 }
