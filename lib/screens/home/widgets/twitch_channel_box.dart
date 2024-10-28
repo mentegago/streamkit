@@ -6,8 +6,8 @@ import 'package:streamkit_tts/screens/home/widgets/dialogs/twitch_channel_select
 
 class TwitchChannelBox extends StatelessWidget {
   const TwitchChannelBox({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {

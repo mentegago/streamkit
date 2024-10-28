@@ -4,8 +4,8 @@ import 'package:provider/provider.dart';
 
 class VolumeControl extends StatelessWidget {
   const VolumeControl({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
