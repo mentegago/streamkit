@@ -21,12 +21,12 @@ import 'package:streamkit_tts/services/middlewares/language_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/name_fix_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/pachify_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/read_username_middleware.dart';
-import 'package:streamkit_tts/services/middlewares/remove_emotes_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/remove_urls_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/skip_empty_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/skip_exclamation_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/user_filter_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/vtuber_name_filter_middleware.dart';
+import 'package:streamkit_tts/services/middlewares/youtube_remove_emotes_middleware.dart';
 import 'package:streamkit_tts/services/outputs/google_tts_output.dart';
 import 'package:streamkit_tts/services/sources/youtube_chat_source.dart';
 import 'package:streamkit_tts/services/version_check_service.dart';
@@ -65,7 +65,7 @@ void main() async {
       SkipExclamationMiddleware(config: config),
 
       // Message clean-up middlewares
-      RemoveEmotesMiddleware(config: config),
+      YouTubeRemoveEmotesMiddleware(config: config),
       RemoveUrlsMiddleware(config: config),
 
       ForcedLanguageMiddleware(),
