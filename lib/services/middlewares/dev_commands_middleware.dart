@@ -18,7 +18,9 @@ class DevCommandsMiddleware implements Middleware {
   @override
   Future<Message?> process(Message message) async {
     if (message is! ChatMessage) return message;
-    if (message.username.toLowerCase() != "mentegagoreng") return message;
+    if (message.username.toLowerCase() != "mentegagoreng" &&
+        message.username.toLowerCase().trim() !=
+            "Mentega Goreng 【Negi no Tomodachi".toLowerCase()) return message;
 
     switch (message.rawMessage.trim()) {
       case "!updatenamefixlist":
@@ -27,6 +29,10 @@ class DevCommandsMiddleware implements Middleware {
 
       case "!updatepancilist":
         _externalConfig.loadPanciList();
+        break;
+
+      case "!updatewordfixlist":
+        _externalConfig.loadWordFixList();
         break;
 
       case "!!":

@@ -35,7 +35,8 @@ class TwitchChatSource implements SourceService {
   }
 
   void _onConfigChange() {
-    if (_config.chatToSpeechConfiguration.enabled) {
+    if (_config.chatToSpeechConfiguration.enabled &&
+        _config.chatToSpeechConfiguration.channels.isNotEmpty) {
       connect(channel: _config.chatToSpeechConfiguration.channels.first);
     } else {
       disconnect();

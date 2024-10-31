@@ -9,9 +9,11 @@ class ExternalConfig {
 
   final Set<String> _panciList = {};
   NameFixConfig _nameFixConfig = NameFixConfig(names: [], namesMap: {});
+  NameFixConfig _wordFixConfig = NameFixConfig(names: [], namesMap: {});
 
   Set<String> get panciList => _panciList;
   NameFixConfig get nameFixConfig => _nameFixConfig;
+  NameFixConfig get wordFixConfig => _wordFixConfig;
   String get appPath => _appPath;
   String get configPath => _configPath;
 
@@ -30,6 +32,7 @@ class ExternalConfig {
   void _loadExternalConfigs() async {
     loadPanciList().onError((_, __) {});
     loadNameFixList().onError((_, __) {});
+    loadWordFixList().onError((_, __) {});
   }
 
   Future<void> loadConfigPath() async {
@@ -67,6 +70,17 @@ class ExternalConfig {
           await http.get(Uri.parse("https://pastebin.com/raw/vrrsngeG"));
       if (response.statusCode != 200) return;
       _nameFixConfig = NameFixConfig.fromJson(json.decode(response.body));
+    } catch (_) {
+      rethrow;
+    }
+  }
+
+  Future<void> loadWordFixList() async {
+    try {
+      final response =
+          await http.get(Uri.parse("https://pastebin.com/raw/q6yjNmSi"));
+      if (response.statusCode != 200) return;
+      _wordFixConfig = NameFixConfig.fromJson(json.decode(response.body));
     } catch (_) {
       rethrow;
     }

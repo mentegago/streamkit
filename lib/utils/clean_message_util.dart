@@ -4,6 +4,7 @@ extension CleanMessage on String {
     String replacement = "",
     bool replaceEndOfSentenceWord = false,
     bool caseInsensitive = false,
+    bool isUsername = false,
   }) {
     String result = this;
 
@@ -11,10 +12,18 @@ extension CleanMessage on String {
     String punctuation = '.,!?:;';
 
     for (String toReplace in replaceList) {
+      // Build the leading pattern
+      String leadingPattern;
+      if (isUsername) {
+        leadingPattern = r'(^|\s|@)';
+      } else {
+        leadingPattern = r'(^|\s)';
+      }
+
       // Build the regular expression pattern using string interpolation
       String patternString;
       if (replaceEndOfSentenceWord) {
-        patternString = r'(^|\s)' +
+        patternString = leadingPattern +
             RegExp.escape(toReplace) +
             r'(\s|[' +
             RegExp.escape(punctuation) +
