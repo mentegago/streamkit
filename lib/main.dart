@@ -18,6 +18,7 @@ import 'package:streamkit_tts/services/middlewares/bsr_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/dev_commands_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/forced_language_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/language_middleware.dart';
+import 'package:streamkit_tts/services/middlewares/message_cleanup_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/name_fix_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/pachify_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/read_username_middleware.dart';
@@ -79,6 +80,7 @@ void main() async {
       SkipEmptyMiddleware(config: config),
       ReadUsernameMiddleware(config: config),
       NameFixMiddleware(externalConfig: externalConfigUtil),
+      MessageCleanupMiddleware(),
     ],
     outputService: GoogleTtsOutput(config: config),
   );
