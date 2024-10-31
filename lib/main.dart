@@ -27,6 +27,7 @@ import 'package:streamkit_tts/services/middlewares/remove_urls_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/skip_empty_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/skip_exclamation_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/user_filter_middleware.dart';
+import 'package:streamkit_tts/services/middlewares/word_fix_middleware.dart';
 import 'package:streamkit_tts/services/outputs/google_tts_output.dart';
 import 'package:streamkit_tts/services/sources/twitch_chat_source.dart';
 import 'package:streamkit_tts/services/version_check_service.dart';
@@ -80,6 +81,7 @@ void main() async {
       SkipEmptyMiddleware(config: config),
       ReadUsernameMiddleware(config: config),
       NameFixMiddleware(externalConfig: externalConfigUtil),
+      WordFixMiddleware(externalConfig: externalConfigUtil),
       MessageCleanupMiddleware(),
     ],
     outputService: GoogleTtsOutput(config: config),
