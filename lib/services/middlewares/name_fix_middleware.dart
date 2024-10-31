@@ -44,6 +44,7 @@ class NameFixMiddleware implements Middleware {
               replacement: name.$2 ?? '',
               replaceEndOfSentenceWord: true,
               caseInsensitive: true,
+              isUsername: true,
             );
 
             return replacedMessaged;
