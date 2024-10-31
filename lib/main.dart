@@ -3,14 +3,18 @@ import 'dart:io';
 
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:streamkit_tts/models/chat_to_speech_config_model.dart';
 import 'package:streamkit_tts/models/config_model.dart';
 import 'package:streamkit_tts/models/enums/languages_enum.dart';
 import 'package:streamkit_tts/models/enums/tts_source.dart';
 import 'package:streamkit_tts/screens/home/home.dart';
+import 'package:streamkit_tts/screens/legacy_home/home.dart';
+import 'package:streamkit_tts/screens/settings/settings.dart';
 import 'package:streamkit_tts/services/composers/app_composer_service.dart';
 import 'package:streamkit_tts/services/composers/composer_service.dart';
 import 'package:streamkit_tts/services/language_detection_service.dart';
@@ -38,6 +42,7 @@ bool trakteerFeatureFlag = false;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   final externalConfigUtil = ExternalConfig();
   await externalConfigUtil.loadConfigPath();
 
@@ -162,123 +167,29 @@ Future<Config> loadConfigurations(
   );
 }
 
-class MyApp extends HookWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    final paneIndex = useState(0);
-
-    return FluentApp(
-      title: "StreamKit Chat Reader",
-      debugShowCheckedModeBanner: false,
-      theme: FluentThemeData(
+    final baseTheme = ThemeData(
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: const Color.fromARGB(255, 170, 42, 255),
         brightness: Brightness.dark,
-        accentColor: const Color.fromARGB(255, 100, 65, 165).toAccentColor(),
       ),
-      home: NavigationView(
-        appBar: Platform.isWindows ? streamKitAppBar(context) : null,
-        pane: trakteerFeatureFlag
-            ? NavigationPane(
-                selected: paneIndex.value,
-                onChanged: (value) {
-                  paneIndex.value = value;
-                },
-                displayMode: PaneDisplayMode.compact,
-                items: [
-                  PaneItem(
-                    icon: SvgPicture.asset("assets/images/twitch_icon.svg"),
-                    title: const Text("Twitch"),
-                    body: const Home(),
-                  ),
-                ],
-              )
-            : null,
-        content: trakteerFeatureFlag ? null : const Home(),
-      ),
+      useMaterial3: true,
     );
-  }
-
-  NavigationAppBar streamKitAppBar(BuildContext context) {
-    return NavigationAppBar(
-      actions: Row(
-        children: [
-          Expanded(
-            child: MoveWindow(
-              child: const StreamKitTitleBar(),
-            ),
-          ),
-          MinimizeWindowButton(
-              colors: WindowButtonColors(iconNormal: Colors.white)),
-          MaximizeWindowButton(
-              colors: WindowButtonColors(iconNormal: Colors.white)),
-          CloseWindowButton(
-              colors: WindowButtonColors(
-                  iconNormal: Colors.white, mouseOver: Colors.red)),
-        ],
+    return MaterialApp(
+      title: 'StreamKit Chat Reader',
+      theme: baseTheme.copyWith(
+        textTheme: GoogleFonts.plusJakartaSansTextTheme(baseTheme.textTheme),
       ),
-      automaticallyImplyLeading: false,
-      height: 36.0,
-      leading: const Padding(
-        padding: EdgeInsets.only(bottom: 8.0, left: 12.0),
-        child: Text(
-          "🧈",
-          style: TextStyle(fontSize: 24),
-        ),
-      ),
-    );
-  }
-}
-
-class StreamKitTitleBar extends HookWidget {
-  const StreamKitTitleBar({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final visible = useState(false);
-    final versionCheckService = context.watch<VersionCheckService>();
-
-    final version = versionCheckService.currentVersion;
-    final versionInfo = versionCheckService.status.state == VersionState.beta
-        ? "prerelease"
-        : versionCheckService.status.state == VersionState.outdated
-            ? "outdated"
-            : "";
-
-    String titleBarText = "StreamKit";
-
-    if (version != null) {
-      final versionParsed = Version.parse(version);
-      titleBarText += " ${versionParsed.major}";
-      if (versionParsed.minor != 0 || versionParsed.patch != 0) {
-        titleBarText += ".${versionParsed.minor}";
-      }
-      if (versionParsed.patch != 0) {
-        titleBarText += ".${versionParsed.patch}";
-      }
-    }
-
-    if (versionInfo.isNotEmpty) {
-      titleBarText += " ($versionInfo)";
-    }
-
-    return MouseRegion(
-      onEnter: (event) {
-        visible.value = true;
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const HomeScreen(),
+        '/settings': (context) => const SettingsScreen(),
       },
-      onExit: (event) {
-        visible.value = false;
-      },
-      child: AnimatedOpacity(
-        opacity: visible.value ? 0.5 : 0.0,
-        duration: const Duration(milliseconds: 100),
-        child: Container(
-          margin: const EdgeInsets.only(left: 96),
-          alignment: Alignment.center,
-          child: Text(titleBarText),
-        ),
-      ),
     );
   }
 }

@@ -1,9 +1,9 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:streamkit_tts/models/config_model.dart';
 import 'package:streamkit_tts/models/enums/tts_source.dart';
-import 'package:streamkit_tts/screens/home/widgets/config_group.dart';
+import 'package:streamkit_tts/screens/legacy_home/widgets/config_group.dart';
 import 'package:provider/provider.dart';
-import 'package:streamkit_tts/screens/home/widgets/dialogs/blacklist_dialog.dart';
+import 'package:streamkit_tts/screens/legacy_home/widgets/dialogs/blacklist_dialog.dart';
 
 class TtsConfigGroup extends StatelessWidget {
   const TtsConfigGroup({
