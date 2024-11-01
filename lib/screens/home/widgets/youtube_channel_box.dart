@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:streamkit_tts/models/config_model.dart';
 import 'package:streamkit_tts/screens/home/widgets/dialogs/youtube_video_selection_dialog.dart';
+import 'package:streamkit_tts/utils/youtube_util.dart';
 
 class YouTubeChannelBox extends StatelessWidget {
   const YouTubeChannelBox({
@@ -29,7 +30,7 @@ class YouTubeChannelBox extends StatelessWidget {
             style: themeData.typography.bodyStrong,
           ),
           const SizedBox(width: 4.0),
-          Expanded(child: Text(videoId)),
+          Expanded(child: Text(videoId.youtubeVideoId ?? "")),
         ];
       }
     })();

@@ -7,6 +7,7 @@ import 'package:streamkit_tts/models/config_model.dart';
 import 'package:streamkit_tts/models/messages/chat_message.dart' as streamkit;
 import 'package:streamkit_tts/models/messages/message.dart';
 import 'package:streamkit_tts/services/sources/source_service.dart';
+import 'package:streamkit_tts/utils/youtube_util.dart';
 
 class YouTubeChatSource implements SourceService {
   final _messageSubject = PublishSubject<Message>();
@@ -44,11 +45,15 @@ class YouTubeChatSource implements SourceService {
 
   void connect({required String videoId}) async {
     if (_isConnected) return;
+    final extractedVideoId = videoId.youtubeVideoId;
+
+    if (extractedVideoId == null) return;
+
     _isConnected = true;
     _statusSubject.add(SourceStatus.active);
 
     // Get the initial continuation token, API key, and context
-    await _getInitialData(videoId);
+    await _getInitialData(extractedVideoId);
 
     if (_continuation == null || _apiKey == null || _context == null) {
       _statusSubject.add(SourceStatus.inactive);
@@ -60,8 +65,8 @@ class YouTubeChatSource implements SourceService {
     _fetchLiveChatMessages();
   }
 
-  Future<void> _getInitialData(String videoId) async {
-    final url = Uri.parse('https://www.youtube.com/watch?v=$videoId');
+  Future<void> _getInitialData(String extractedVideoId) async {
+    final url = Uri.parse('https://www.youtube.com/watch?v=$extractedVideoId');
 
     final response = await http.get(url, headers: {
       'User-Agent': 'Mozilla/5.0',
