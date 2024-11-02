@@ -84,7 +84,7 @@ void main() async {
       ReadUsernameMiddleware(config: config),
       NameFixMiddleware(externalConfig: externalConfigUtil),
       WordFixMiddleware(externalConfig: externalConfigUtil),
-      MessageCleanupMiddleware(),
+      MessageCleanupMiddleware(config: config),
     ],
     outputService: GoogleTtsOutput(config: config),
   );
@@ -167,6 +167,7 @@ Future<Config> loadConfigurations(
       ignoreEmptyMessage: true,
       ignoreUrls: true,
       ignoreVtuberGroupName: true,
+      disableAKeongFilter: false,
     ),
   );
 }

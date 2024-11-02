@@ -20,6 +20,7 @@ class ChatToSpeechConfiguration {
   final bool ignoreEmptyMessage;
   final bool ignoreUrls;
   final bool ignoreVtuberGroupName;
+  final bool disableAKeongFilter;
 
   ChatToSpeechConfiguration({
     required this.channels,
@@ -38,6 +39,7 @@ class ChatToSpeechConfiguration {
     required this.ignoreEmptyMessage,
     required this.ignoreUrls,
     required this.ignoreVtuberGroupName,
+    required this.disableAKeongFilter,
   });
 
   ChatToSpeechConfiguration copyWith({
@@ -57,6 +59,7 @@ class ChatToSpeechConfiguration {
     bool? ignoreEmptyMessage,
     bool? ignoreUrls,
     bool? ignoreVtuberGroupName,
+    bool? disableAKeongFilter,
   }) {
     return ChatToSpeechConfiguration(
       channels: channels ?? this.channels,
@@ -77,6 +80,7 @@ class ChatToSpeechConfiguration {
       ignoreUrls: ignoreUrls ?? this.ignoreUrls,
       ignoreVtuberGroupName:
           ignoreVtuberGroupName ?? this.ignoreVtuberGroupName,
+      disableAKeongFilter: disableAKeongFilter ?? this.disableAKeongFilter,
     );
   }
 
@@ -99,6 +103,7 @@ class ChatToSpeechConfiguration {
     result.addAll({'ignoreEmptyMessage': ignoreEmptyMessage});
     result.addAll({'ignoreUrls': ignoreUrls});
     result.addAll({'ignoreVtuberGroupName': ignoreVtuberGroupName});
+    result.addAll({'disableAKeongFilter': disableAKeongFilter});
 
     return result;
   }
@@ -125,6 +130,7 @@ class ChatToSpeechConfiguration {
       ignoreEmptyMessage: map['ignoreEmptyMessage'] ?? true,
       ignoreUrls: map['ignoreUrls'] ?? true,
       ignoreVtuberGroupName: map['ignoreVtuberGroupName'] ?? true,
+      disableAKeongFilter: map['disableAKeongFilter'] ?? false,
     );
   }
 
@@ -168,6 +174,7 @@ class ChatToSpeechConfiguration {
       ignoreEmptyMessage: true,
       ignoreUrls: true,
       ignoreVtuberGroupName: true,
+      disableAKeongFilter: false,
     );
   }
 
