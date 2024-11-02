@@ -29,6 +29,7 @@ import 'package:streamkit_tts/services/middlewares/skip_exclamation_middleware.d
 import 'package:streamkit_tts/services/middlewares/user_filter_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/word_fix_middleware.dart';
 import 'package:streamkit_tts/services/outputs/google_tts_output.dart';
+import 'package:streamkit_tts/services/outputs/voicevox_tts_output.dart';
 import 'package:streamkit_tts/services/sources/twitch_chat_source.dart';
 import 'package:streamkit_tts/services/version_check_service.dart';
 import 'package:streamkit_tts/utils/external_config_util.dart';
@@ -84,7 +85,7 @@ void main() async {
       WordFixMiddleware(externalConfig: externalConfigUtil),
       MessageCleanupMiddleware(),
     ],
-    outputService: GoogleTtsOutput(config: config),
+    outputService: VoiceVoxOutput(config: config),
   );
 
   config.addListener(() {
