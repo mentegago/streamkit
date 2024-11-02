@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 
 class MenuSettings extends StatelessWidget {
@@ -61,52 +59,61 @@ class MenuSettings extends StatelessWidget {
           child: Row(
             children: [
               if (left != null) left,
-              const SizedBox(
-                width: 12.0,
-              ),
+              const SizedBox(width: 12.0),
               Expanded(
                 child: Wrap(
                   direction: Axis.horizontal,
                   crossAxisAlignment: WrapCrossAlignment.center,
                   spacing: 8.0,
                   children: [
-                    Text(
-                      title,
-                    ),
+                    Text(title),
                     if (description != null)
-                      SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: IconButton.filledTonal(
-                          padding: const EdgeInsets.all(0),
-                          onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog.adaptive(
-                                content: Text(description),
-                                actions: [
-                                  TextButton(
-                                    child: const Text('Ok'),
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                  )
-                                ],
-                              ),
-                            );
-                          },
-                          icon: const Icon(
-                            Icons.question_mark,
-                            size: 12,
-                          ),
-                        ),
-                      )
+                      _DescriptionButton(description: description)
                   ],
                 ),
               ),
               if (right != null) right,
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _DescriptionButton extends StatelessWidget {
+  const _DescriptionButton({
+    required this.description,
+  });
+
+  final String description;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 24,
+      height: 24,
+      child: IconButton.filledTonal(
+        padding: const EdgeInsets.all(0),
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              content: Text(description),
+              actions: [
+                TextButton(
+                  child: const Text('Ok'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                )
+              ],
+            ),
+          );
+        },
+        icon: const Icon(
+          Icons.question_mark,
+          size: 12,
         ),
       ),
     );
