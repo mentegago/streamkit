@@ -29,6 +29,10 @@ class DevCommandsMiddleware implements Middleware {
         _externalConfig.loadPanciList();
         break;
 
+      case "!updatewordfixlist":
+        _externalConfig.loadWordFixList();
+        break;
+
       case "!!":
         return message.copyWith(
           suggestedSpeechMessage:

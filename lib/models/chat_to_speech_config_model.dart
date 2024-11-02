@@ -18,6 +18,7 @@ class ChatToSpeechConfiguration {
   final bool isWhitelistingFilter;
   final bool ignoreEmptyMessage;
   final bool ignoreUrls;
+  final bool disableAKeongFilter;
 
   ChatToSpeechConfiguration({
     required this.channels,
@@ -34,6 +35,7 @@ class ChatToSpeechConfiguration {
     required this.isWhitelistingFilter,
     required this.ignoreEmptyMessage,
     required this.ignoreUrls,
+    required this.disableAKeongFilter,
   });
 
   ChatToSpeechConfiguration copyWith({
@@ -51,6 +53,7 @@ class ChatToSpeechConfiguration {
     bool? isWhitelistingFilter,
     bool? ignoreEmptyMessage,
     bool? ignoreUrls,
+    bool? disableAKeongFilter,
   }) {
     return ChatToSpeechConfiguration(
       channels: channels ?? this.channels,
@@ -68,6 +71,7 @@ class ChatToSpeechConfiguration {
       isWhitelistingFilter: isWhitelistingFilter ?? this.isWhitelistingFilter,
       ignoreEmptyMessage: ignoreEmptyMessage ?? this.ignoreEmptyMessage,
       ignoreUrls: ignoreUrls ?? this.ignoreUrls,
+      disableAKeongFilter: disableAKeongFilter ?? this.disableAKeongFilter,
     );
   }
 
@@ -88,6 +92,7 @@ class ChatToSpeechConfiguration {
     result.addAll({'isWhitelistingFilter': isWhitelistingFilter});
     result.addAll({'ignoreEmptyMessage': ignoreEmptyMessage});
     result.addAll({'ignoreUrls': ignoreUrls});
+    result.addAll({'disableAKeongFilter': disableAKeongFilter});
 
     return result;
   }
@@ -111,6 +116,7 @@ class ChatToSpeechConfiguration {
       isWhitelistingFilter: map['isWhitelistingFilter'] ?? false,
       ignoreEmptyMessage: map['ignoreEmptyMessage'] ?? true,
       ignoreUrls: map['ignoreUrls'] ?? true,
+      disableAKeongFilter: map['disableAKeongFilter'] ?? false,
     );
   }
 
@@ -152,6 +158,7 @@ class ChatToSpeechConfiguration {
       isWhitelistingFilter: config?["isWhitelistingFilter"] ?? false,
       ignoreEmptyMessage: true,
       ignoreUrls: true,
+      disableAKeongFilter: false,
     );
   }
 

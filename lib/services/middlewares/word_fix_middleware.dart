@@ -5,10 +5,10 @@ import 'package:streamkit_tts/services/middlewares/middleware.dart';
 import 'package:streamkit_tts/utils/clean_message_util.dart';
 import 'package:streamkit_tts/utils/external_config_util.dart';
 
-class NameFixMiddleware implements Middleware {
+class WordFixMiddleware implements Middleware {
   final ExternalConfig _externalConfig;
 
-  NameFixMiddleware({
+  WordFixMiddleware({
     required externalConfig,
   }) : _externalConfig = externalConfig;
 
@@ -19,7 +19,7 @@ class NameFixMiddleware implements Middleware {
     final language = message.language;
     if (language == null) return message;
 
-    final updatedMessage = _externalConfig.nameFixConfig.names
+    final updatedMessage = _externalConfig.wordFixConfig.names
         .map((name) {
           switch (language) {
             case Language.english:
@@ -44,7 +44,6 @@ class NameFixMiddleware implements Middleware {
               replacement: name.$2 ?? '',
               replaceEndOfSentenceWord: true,
               caseInsensitive: true,
-              isUsername: true,
             );
 
             return replacedMessaged;
