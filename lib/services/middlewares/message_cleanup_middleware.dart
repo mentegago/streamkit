@@ -1,10 +1,13 @@
+import 'package:streamkit_tts/models/config_model.dart';
 import 'package:streamkit_tts/models/enums/languages_enum.dart';
 import 'package:streamkit_tts/models/messages/chat_message.dart';
 import 'package:streamkit_tts/models/messages/message.dart';
 import 'package:streamkit_tts/services/middlewares/middleware.dart';
 
 class MessageCleanupMiddleware implements Middleware {
-  MessageCleanupMiddleware();
+  final Config _config;
+
+  MessageCleanupMiddleware({required config}) : _config = config;
 
   @override
   Future<Message?> process(Message message) async {
@@ -17,12 +20,14 @@ class MessageCleanupMiddleware implements Middleware {
         )
         .trim();
 
-    if (message.language == Language.indonesian) {
-      suggestedSpeechMessage =
-          _replaceAtSymbol(suggestedSpeechMessage, withText: 'et');
-    } else if (message.language == Language.japanese) {
-      suggestedSpeechMessage =
-          _replaceAtSymbol(suggestedSpeechMessage, withText: 'アット');
+    if (!_config.chatToSpeechConfiguration.disableAKeongFilter) {
+      if (message.language == Language.indonesian) {
+        suggestedSpeechMessage =
+            _replaceAtSymbol(suggestedSpeechMessage, withText: 'et');
+      } else if (message.language == Language.japanese) {
+        suggestedSpeechMessage =
+            _replaceAtSymbol(suggestedSpeechMessage, withText: 'アット');
+      }
     }
 
     return message.copyWith(

@@ -162,6 +162,7 @@ Future<Config> loadConfigurations(
       isWhitelistingFilter: false,
       ignoreEmptyMessage: true,
       ignoreUrls: true,
+      disableAKeongFilter: false,
     ),
   );
 }
