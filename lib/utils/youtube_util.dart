@@ -29,15 +29,32 @@ extension YouTubeStringExtension on String {
           return vId;
         }
 
-        // Check for '/embed/VIDEO_ID' or '/v/VIDEO_ID'
         List<String> pathSegments = uri.pathSegments;
+
+        // Handle '/embed/VIDEO_ID', '/v/VIDEO_ID', '/e/VIDEO_ID', '/live/VIDEO_ID'
         if (pathSegments.isNotEmpty) {
           int index = pathSegments.indexWhere((segment) =>
-              segment == 'embed' || segment == 'v' || segment == 'e');
-          if (index != -1 && pathSegments.length > index + 1) {
-            String id = pathSegments[index + 1];
-            if (idRegExp.hasMatch(id)) {
-              return id;
+              segment == 'embed' ||
+              segment == 'v' ||
+              segment == 'e' ||
+              segment == 'live' ||
+              segment == 'video');
+
+          if (index != -1) {
+            // For '/video/VIDEO_ID/...'
+            if (pathSegments[index] == 'video' &&
+                pathSegments.length > index + 1) {
+              String id = pathSegments[index + 1];
+              if (idRegExp.hasMatch(id)) {
+                return id;
+              }
+            }
+            // For '/live/VIDEO_ID' or other patterns
+            else if (pathSegments.length > index + 1) {
+              String id = pathSegments[index + 1];
+              if (idRegExp.hasMatch(id)) {
+                return id;
+              }
             }
           }
         }
@@ -59,8 +76,9 @@ extension YouTubeStringExtension on String {
     final RegExp regex = RegExp(
       r'^(?:https?:\/\/)?' // Optional scheme
       r'(?:www\.)?' // Optional www
-      r'(?:youtube\.com|youtu\.be)' // Domain
-      r'(?:\/(?:[\w\-]+\?v=|embed\/|v\/))?' // Optional path prefixes
+      r'(?:m\.)?' // Optional mobile prefix
+      r'(?:youtube\.com|youtu\.be|youtube-nocookie\.com)' // Domain
+      r'(?:\/(?:[\w\-]+\?v=|embed\/|v\/|e\/|live\/|watch\?v=))?' // Optional path prefixes
       r'([\w\-]{11})' // Video ID
       r'(?:\S+)?$', // Optional query parameters
       caseSensitive: false,

@@ -2,7 +2,6 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:streamkit_tts/models/config_model.dart';
-import 'package:streamkit_tts/services/sources/youtube_chat_source.dart';
 import 'package:streamkit_tts/utils/youtube_util.dart';
 
 class YoutubeVideoSelectionDialog extends HookWidget {
@@ -39,7 +38,7 @@ class YoutubeVideoSelectionDialog extends HookWidget {
         children: [
           InfoLabel(
             label:
-                "Enter YouTube Live Video ID or URL. \n\nExamples:\nhttps://www.youtube.com/watch?v=dQw4w9WgXcQ\nhttps://youtu.be/dQw4w9WgXcQ\ndQw4w9WgXcQ\n",
+                "Enter YouTube Live Video ID or URL. \n\nExamples:\n• https://youtube.com/watch?v=dQw4w9WgXcQ\n• https://youtube.com/live/dQw4w9WgXcQ\n• https://youtu.be/dQw4w9WgXcQ\n• dQw4w9WgXcQ\n",
             child: TextBox(
               placeholder: "",
               controller: videoIdController,
