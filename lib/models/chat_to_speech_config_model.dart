@@ -6,7 +6,6 @@ import 'package:streamkit_tts/models/enums/tts_source.dart';
 class ChatToSpeechConfiguration {
   final Set<String> channels;
   final bool readUsername;
-  final bool readUsernameOnEmptyMessage;
   final bool ignoreExclamationMark;
   final bool ignoreEmotes;
   final Set<Language> languages;
@@ -24,7 +23,6 @@ class ChatToSpeechConfiguration {
   ChatToSpeechConfiguration({
     required this.channels,
     required this.readUsername,
-    required this.readUsernameOnEmptyMessage,
     required this.ignoreExclamationMark,
     required this.ignoreEmotes,
     required this.languages,
@@ -61,8 +59,6 @@ class ChatToSpeechConfiguration {
     return ChatToSpeechConfiguration(
       channels: channels ?? this.channels,
       readUsername: readUsername ?? this.readUsername,
-      readUsernameOnEmptyMessage:
-          readUsernameOnEmptyMessage ?? this.readUsernameOnEmptyMessage,
       ignoreExclamationMark:
           ignoreExclamationMark ?? this.ignoreExclamationMark,
       ignoreEmotes: ignoreEmotes ?? this.ignoreEmotes,
@@ -85,7 +81,6 @@ class ChatToSpeechConfiguration {
 
     result.addAll({'channels': channels.toList()});
     result.addAll({'readUsername': readUsername});
-    result.addAll({'readUsernameOnEmptyMessage': readUsernameOnEmptyMessage});
     result.addAll({'ignoreExclamationMark': ignoreExclamationMark});
     result.addAll({'ignoreEmotes': ignoreEmotes});
     result.addAll({'languages': languages.map((x) => x.google).toList()});
@@ -107,7 +102,6 @@ class ChatToSpeechConfiguration {
     return ChatToSpeechConfiguration(
       channels: Set<String>.from(map['channels']),
       readUsername: map['readUsername'] ?? true,
-      readUsernameOnEmptyMessage: map['readUsernameOnEmptyMessage'] ?? false,
       ignoreExclamationMark: map['ignoreExclamationMark'] ?? true,
       ignoreEmotes: map['ignoreEmotes'] ?? true,
       languages: Set<Language>.from(
@@ -135,7 +129,6 @@ class ChatToSpeechConfiguration {
         languages: {Language.english, Language.indonesian, Language.japanese},
         readBsr: false,
         readUsername: true,
-        readUsernameOnEmptyMessage: false,
         volume: 100.0,
         ignoreEmotes: true,
         readBsrSafely: false,

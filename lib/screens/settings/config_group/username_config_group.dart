@@ -4,13 +4,13 @@ import 'package:streamkit_tts/models/config_model.dart';
 import 'package:streamkit_tts/widgets/config_container.dart';
 import 'package:streamkit_tts/widgets/switch_settings.dart';
 
-class GeneralConfig extends StatelessWidget {
-  const GeneralConfig({super.key});
+class UsernameConfig extends StatelessWidget {
+  const UsernameConfig({super.key});
 
   @override
   Widget build(BuildContext context) {
     return const ConfigContainer(
-      title: "General",
+      title: "Name handling",
       children: [
         _ReadUsernameConfig(),
         _ReadUsernameEmptyMessageConfig(),
@@ -30,7 +30,7 @@ class _ReadUsernameConfig extends StatelessWidget {
 
     return SwitchSettings(
       isChecked: isChecked,
-      title: "Read username",
+      title: "Read chat sender's name",
       onChanged: (value) {
         context.read<Config>().setTtsConfig(readUsername: value);
       },
@@ -48,8 +48,7 @@ class _ReadUsernameEmptyMessageConfig extends StatelessWidget {
     );
 
     final isChecked = context.select(
-      (Config config) =>
-          config.chatToSpeechConfiguration.readUsernameOnEmptyMessage,
+      (Config config) => config.chatToSpeechConfiguration.ignoreEmptyMessage,
     );
 
     return isReadUsernameChecked
@@ -60,15 +59,14 @@ class _ReadUsernameEmptyMessageConfig extends StatelessWidget {
                 indent: 28,
               ),
               SwitchSettings(
-                isChecked: isChecked,
-                title:
-                    "Read username even if there is no readable message content",
+                isChecked: !isChecked,
+                title: "Read even if there is no readable message",
                 description:
                     "If the option to remove emotes or URLs is on, StreamKit will read the sender's username when a chat message has no readable content (only emotes or URLs).\n\nIf the option is off, StreamKit will skip the message.",
                 onChanged: (value) {
                   context
                       .read<Config>()
-                      .setTtsConfig(readUsernameOnEmptyMessage: value);
+                      .setTtsConfig(ignoreEmptyMessage: !value);
                 },
               ),
             ],
