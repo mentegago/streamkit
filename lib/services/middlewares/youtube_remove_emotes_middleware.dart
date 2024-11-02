@@ -15,7 +15,7 @@ class YouTubeRemoveEmotesMiddleware implements Middleware {
 
     return message.copyWith(
       suggestedSpeechMessage: message.suggestedSpeechMessage.replaceAll(
-        RegExp(r':[a-zA-Z0-9\_]+:'),
+        RegExp(r':[a-zA-Z0-9\_\-]+:'),
         '',
       ),
     );
