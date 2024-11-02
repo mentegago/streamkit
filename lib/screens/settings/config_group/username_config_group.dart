@@ -34,6 +34,7 @@ class _ReadUsernameConfig extends StatelessWidget {
       onChanged: (value) {
         context.read<Config>().setTtsConfig(readUsername: value);
       },
+      left: const Icon(Icons.speaker_notes_rounded),
     );
   }
 }
@@ -56,18 +57,19 @@ class _ReadUsernameEmptyMessageConfig extends StatelessWidget {
             children: [
               const Divider(
                 height: 1,
-                indent: 28,
+                indent: 50,
               ),
               SwitchSettings(
                 isChecked: !isChecked,
-                title: "Read even if there is no readable message",
+                title: "Read even when there is no readable message",
                 description:
-                    "If the option to remove emotes or URLs is on, StreamKit will read the sender's username when a chat message has no readable content (only emotes or URLs).\n\nIf the option is off, StreamKit will skip the message.",
+                    "If this option is turned on, StreamKit will read the chat sender's name even when the chat has no readable content (such as when it only contain emotes, and \"Remove emotes from message\" option is turned on).\n\nIf this option is off, StreamKit will skip the chat.",
                 onChanged: (value) {
                   context
                       .read<Config>()
                       .setTtsConfig(ignoreEmptyMessage: !value);
                 },
+                left: const Icon(Icons.chat_bubble),
               ),
             ],
           )

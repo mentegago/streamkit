@@ -15,7 +15,7 @@ class MessageCleanUpConfig extends StatelessWidget {
         _RemoveEmotesConfig(),
         Divider(
           height: 1,
-          indent: 28,
+          indent: 50,
         ),
         _RemoveUrlsConfig(),
       ],
@@ -34,10 +34,11 @@ class _RemoveEmotesConfig extends StatelessWidget {
 
     return SwitchSettings(
       isChecked: isChecked,
-      title: "Remove emotes from message",
+      title: "Remove emotes",
       onChanged: (value) {
         context.read<Config>().setTtsConfig(ignoreEmotes: value);
       },
+      left: const Icon(Icons.emoji_emotions),
     );
   }
 }
@@ -53,10 +54,11 @@ class _RemoveUrlsConfig extends StatelessWidget {
 
     return SwitchSettings(
       isChecked: isChecked,
-      title: "Remove URLs from message",
+      title: "Remove links / URLs",
       onChanged: (value) {
         context.read<Config>().setTtsConfig(ignoreUrls: value);
       },
+      left: const Icon(Icons.link_rounded),
     );
   }
 }

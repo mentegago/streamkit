@@ -16,9 +16,13 @@ class FilterConfig extends StatelessWidget {
         const _SkipExclamationConfig(),
         const Divider(
           height: 1,
-          indent: 28,
+          indent: 50,
         ),
-        MenuSettings.submenu(title: "User Filter", onPressed: () {}),
+        MenuSettings.submenu(
+          title: "User Filter",
+          onPressed: () {},
+          left: const Icon(Icons.people_alt_outlined),
+        ),
       ],
     );
   }
@@ -39,6 +43,7 @@ class _SkipExclamationConfig extends StatelessWidget {
       onChanged: (value) {
         context.read<Config>().setTtsConfig(ignoreExclamationMark: value);
       },
+      left: const Icon(Icons.warning_amber_rounded),
     );
   }
 }

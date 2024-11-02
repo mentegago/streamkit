@@ -35,7 +35,7 @@ class InnerScreen extends HookWidget {
                     ...children,
                     const SizedBox(
                       width: 1,
-                      height: 24,
+                      height: 8,
                     ),
                   ],
                 ),
