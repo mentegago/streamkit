@@ -6,6 +6,7 @@ import 'package:streamkit_tts/models/enums/tts_source.dart';
 class ChatToSpeechConfiguration {
   final Set<String> channels;
   final bool readUsername;
+  final bool readUsernameOnEmptyMessage;
   final bool ignoreExclamationMark;
   final bool ignoreEmotes;
   final Set<Language> languages;
@@ -23,6 +24,7 @@ class ChatToSpeechConfiguration {
   ChatToSpeechConfiguration({
     required this.channels,
     required this.readUsername,
+    required this.readUsernameOnEmptyMessage,
     required this.ignoreExclamationMark,
     required this.ignoreEmotes,
     required this.languages,
@@ -41,6 +43,7 @@ class ChatToSpeechConfiguration {
   ChatToSpeechConfiguration copyWith({
     Set<String>? channels,
     bool? readUsername,
+    bool? readUsernameOnEmptyMessage,
     bool? ignoreExclamationMark,
     bool? ignoreEmotes,
     Set<Language>? languages,
@@ -58,6 +61,8 @@ class ChatToSpeechConfiguration {
     return ChatToSpeechConfiguration(
       channels: channels ?? this.channels,
       readUsername: readUsername ?? this.readUsername,
+      readUsernameOnEmptyMessage:
+          readUsernameOnEmptyMessage ?? this.readUsernameOnEmptyMessage,
       ignoreExclamationMark:
           ignoreExclamationMark ?? this.ignoreExclamationMark,
       ignoreEmotes: ignoreEmotes ?? this.ignoreEmotes,
@@ -80,6 +85,7 @@ class ChatToSpeechConfiguration {
 
     result.addAll({'channels': channels.toList()});
     result.addAll({'readUsername': readUsername});
+    result.addAll({'readUsernameOnEmptyMessage': readUsernameOnEmptyMessage});
     result.addAll({'ignoreExclamationMark': ignoreExclamationMark});
     result.addAll({'ignoreEmotes': ignoreEmotes});
     result.addAll({'languages': languages.map((x) => x.google).toList()});
@@ -101,6 +107,7 @@ class ChatToSpeechConfiguration {
     return ChatToSpeechConfiguration(
       channels: Set<String>.from(map['channels']),
       readUsername: map['readUsername'] ?? true,
+      readUsernameOnEmptyMessage: map['readUsernameOnEmptyMessage'] ?? false,
       ignoreExclamationMark: map['ignoreExclamationMark'] ?? true,
       ignoreEmotes: map['ignoreEmotes'] ?? true,
       languages: Set<Language>.from(
@@ -120,47 +127,30 @@ class ChatToSpeechConfiguration {
     );
   }
 
+  factory ChatToSpeechConfiguration.defaultConfig() =>
+      ChatToSpeechConfiguration(
+        channels: {},
+        enabled: false,
+        ignoreExclamationMark: true,
+        languages: {Language.english, Language.indonesian, Language.japanese},
+        readBsr: false,
+        readUsername: true,
+        readUsernameOnEmptyMessage: false,
+        volume: 100.0,
+        ignoreEmotes: true,
+        readBsrSafely: false,
+        ttsSource: TtsSource.google,
+        filteredUsernames: {},
+        isWhitelistingFilter: false,
+        ignoreEmptyMessage: true,
+        ignoreUrls: true,
+        disableAKeongFilter: false,
+      );
+
   String toJson() => _prettyJson(toMap());
 
   factory ChatToSpeechConfiguration.fromJson(String source) =>
       ChatToSpeechConfiguration.fromMap(json.decode(source));
-
-  factory ChatToSpeechConfiguration.fromOldJson(String source) {
-    final json = jsonDecode(source);
-    final config = json["chatToSpeech"];
-    final languages = Set<String>.from(
-            config?["languages"] ?? ["indonesian", "english", "japanese"])
-        .map((e) {
-      switch (e) {
-        case "indonesian":
-          return Language.indonesian;
-        case "japanese":
-          return Language.japanese;
-        case "english":
-        default:
-          return Language.english;
-      }
-    }).toSet();
-    final volume = (config?["volume"]?.toDouble() ?? 0.0) * 100.0;
-
-    return ChatToSpeechConfiguration(
-      channels: Set<String>.from(config?["channels"] ?? []),
-      readUsername: config?["readUsername"] ?? true,
-      ignoreExclamationMark: config?["ignoreExclamationMark"] ?? true,
-      ignoreEmotes: true,
-      languages: languages,
-      enabled: config?["enabled"] ?? false,
-      volume: volume,
-      readBsr: config?["readBsr"] ?? false,
-      readBsrSafely: false,
-      ttsSource: TtsSource.google,
-      filteredUsernames: Set<String>.from(config?["filteredUsernames"] ?? []),
-      isWhitelistingFilter: config?["isWhitelistingFilter"] ?? false,
-      ignoreEmptyMessage: true,
-      ignoreUrls: true,
-      disableAKeongFilter: false,
-    );
-  }
 
   String _prettyJson(dynamic json) {
     var spaces = ' ' * 4;

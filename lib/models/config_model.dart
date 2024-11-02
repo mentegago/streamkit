@@ -60,6 +60,7 @@ class Config extends ChangeNotifier {
 
   void setTtsConfig({
     bool? readUsername,
+    bool? readUsernameOnEmptyMessage,
     bool? ignoreExclamationMark,
     bool? ignoreEmotes,
     bool? ignoreUrls,
@@ -67,6 +68,8 @@ class Config extends ChangeNotifier {
     setChatToSpeechConfiguration(
       chatToSpeechConfiguration.copyWith(
         readUsername: readUsername ?? chatToSpeechConfiguration.readUsername,
+        readUsernameOnEmptyMessage: readUsernameOnEmptyMessage ??
+            chatToSpeechConfiguration.readUsernameOnEmptyMessage,
         ignoreExclamationMark: ignoreExclamationMark ??
             chatToSpeechConfiguration.ignoreExclamationMark,
         ignoreEmotes: ignoreEmotes ?? chatToSpeechConfiguration.ignoreEmotes,

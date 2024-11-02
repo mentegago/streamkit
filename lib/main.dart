@@ -14,7 +14,9 @@ import 'package:streamkit_tts/models/enums/languages_enum.dart';
 import 'package:streamkit_tts/models/enums/tts_source.dart';
 import 'package:streamkit_tts/screens/home/home.dart';
 import 'package:streamkit_tts/screens/legacy_home/home.dart';
+import 'package:streamkit_tts/screens/settings/beat_saber_settings.dart';
 import 'package:streamkit_tts/screens/settings/settings.dart';
+import 'package:streamkit_tts/widgets/inner_screen.dart';
 import 'package:streamkit_tts/services/composers/app_composer_service.dart';
 import 'package:streamkit_tts/services/composers/composer_service.dart';
 import 'package:streamkit_tts/services/language_detection_service.dart';
@@ -33,6 +35,7 @@ import 'package:streamkit_tts/services/middlewares/skip_exclamation_middleware.d
 import 'package:streamkit_tts/services/middlewares/user_filter_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/word_fix_middleware.dart';
 import 'package:streamkit_tts/services/outputs/google_tts_output.dart';
+import 'package:streamkit_tts/services/server_service.dart';
 import 'package:streamkit_tts/services/sources/twitch_chat_source.dart';
 import 'package:streamkit_tts/services/version_check_service.dart';
 import 'package:streamkit_tts/utils/external_config_util.dart';
@@ -56,6 +59,8 @@ void main() async {
       AppLanguageDetectionService();
 
   final versionCheckService = VersionCheckService();
+
+  final serverService = ServerService(baseUrl: "https://streamkit-api.nnt.gg");
 
   final ComposerService composerService = AppComposerService(
     config: config,
@@ -109,6 +114,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => config),
         ChangeNotifierProvider(create: (_) => versionCheckService),
         Provider(create: (_) => composerService),
+        Provider(create: (_) => serverService),
       ],
       child: const MyApp(),
     ),
@@ -137,38 +143,8 @@ Future<Config> loadConfigurations(
     return Config(chatToSpeechConfiguration: config);
   }
 
-  try {
-    final oldConfigFile = File('$appPath\\streamkit_configurations.json');
-    if (oldConfigFile.existsSync()) {
-      final config = ChatToSpeechConfiguration.fromOldJson(
-          oldConfigFile.readAsStringSync());
-      saveConfigurations(Config(chatToSpeechConfiguration: config),
-          configPath: configPath);
-
-      oldConfigFile.deleteSync();
-
-      return Config(chatToSpeechConfiguration: config);
-    }
-  } catch (_) {}
-
   return Config(
-    chatToSpeechConfiguration: ChatToSpeechConfiguration(
-      channels: {},
-      enabled: false,
-      ignoreExclamationMark: true,
-      languages: {Language.english, Language.indonesian, Language.japanese},
-      readBsr: false,
-      readUsername: true,
-      volume: 100.0,
-      ignoreEmotes: true,
-      readBsrSafely: false,
-      ttsSource: TtsSource.google,
-      filteredUsernames: {},
-      isWhitelistingFilter: false,
-      ignoreEmptyMessage: true,
-      ignoreUrls: true,
-      disableAKeongFilter: false,
-    ),
+    chatToSpeechConfiguration: ChatToSpeechConfiguration.defaultConfig(),
   );
 }
 
@@ -193,8 +169,10 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => const HomeScreen(),
+        '/settings/beat_saber': (context) => const BeatSaberSettingsScreen(),
         '/settings': (context) => const SettingsScreen(),
       },
+      debugShowCheckedModeBanner: false,
     );
   }
 }
