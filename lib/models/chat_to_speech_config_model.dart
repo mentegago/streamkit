@@ -92,6 +92,7 @@ class ChatToSpeechConfiguration {
     result.addAll({'isWhitelistingFilter': isWhitelistingFilter});
     result.addAll({'ignoreEmptyMessage': ignoreEmptyMessage});
     result.addAll({'ignoreUrls': ignoreUrls});
+    result.addAll({'disableAKeongFilter': disableAKeongFilter});
 
     return result;
   }

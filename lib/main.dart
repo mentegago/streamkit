@@ -82,7 +82,7 @@ void main() async {
       ReadUsernameMiddleware(config: config),
       NameFixMiddleware(externalConfig: externalConfigUtil),
       WordFixMiddleware(externalConfig: externalConfigUtil),
-      MessageCleanupMiddleware(),
+      MessageCleanupMiddleware(config: config),
     ],
     outputService: GoogleTtsOutput(config: config),
   );
