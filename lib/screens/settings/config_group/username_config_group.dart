@@ -52,27 +52,30 @@ class _ReadUsernameEmptyMessageConfig extends StatelessWidget {
       (Config config) => config.chatToSpeechConfiguration.ignoreEmptyMessage,
     );
 
-    return isReadUsernameChecked
-        ? Column(
-            children: [
-              const Divider(
-                height: 1,
-                indent: 50,
-              ),
-              SwitchSettings(
-                isChecked: !isChecked,
-                title: "Read even when there is no readable message",
-                description:
-                    "If this option is turned on, StreamKit will read the chat sender's name even when the chat has no readable content (such as when it only contain emotes, and \"Remove emotes from message\" option is turned on).\n\nIf this option is off, StreamKit will skip the chat.",
-                onChanged: (value) {
-                  context
-                      .read<Config>()
-                      .setTtsConfig(ignoreEmptyMessage: !value);
-                },
-                left: const Icon(Icons.chat_bubble),
-              ),
-            ],
-          )
-        : const SizedBox();
+    return AnimatedSize(
+      duration: Durations.short4,
+      child: isReadUsernameChecked
+          ? Column(
+              children: [
+                const Divider(
+                  height: 1,
+                  indent: 50,
+                ),
+                SwitchSettings(
+                  isChecked: !isChecked,
+                  title: "Read even when there is no readable message",
+                  description:
+                      "If this option is turned on, StreamKit will read the chat sender's name even when the chat has no readable content (such as when it only contain emotes, and \"Remove emotes from message\" option is turned on).\n\nIf this option is off, StreamKit will skip the chat.",
+                  onChanged: (value) {
+                    context
+                        .read<Config>()
+                        .setTtsConfig(ignoreEmptyMessage: !value);
+                  },
+                  left: const Icon(Icons.chat_bubble),
+                ),
+              ],
+            )
+          : Container(),
+    );
   }
 }

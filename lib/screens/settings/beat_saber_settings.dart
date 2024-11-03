@@ -64,24 +64,27 @@ class _ReadBsrRequestsSafely extends StatelessWidget {
       (Config config) => config.chatToSpeechConfiguration.readBsrSafely,
     );
 
-    return isBsrChecked
-        ? Column(
-            children: [
-              const Divider(
-                height: 1,
-                indent: 28,
-              ),
-              SwitchSettings(
-                isChecked: !isChecked,
-                title: "Read song request name",
-                onChanged: (value) {
-                  context
-                      .read<Config>()
-                      .setBsrSpecificConfig(readBsrSafely: !value);
-                },
-              ),
-            ],
-          )
-        : const SizedBox();
+    return AnimatedSize(
+      duration: Durations.short4,
+      child: isBsrChecked
+          ? Column(
+              children: [
+                const Divider(
+                  height: 1,
+                  indent: 28,
+                ),
+                SwitchSettings(
+                  isChecked: !isChecked,
+                  title: "Read song request name",
+                  onChanged: (value) {
+                    context
+                        .read<Config>()
+                        .setBsrSpecificConfig(readBsrSafely: !value);
+                  },
+                ),
+              ],
+            )
+          : Container(),
+    );
   }
 }
