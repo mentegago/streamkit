@@ -1,4 +1,4 @@
-package com.example.streamkittmp
+package com.mentegagoreng.streamkit
 
 import io.flutter.embedding.android.FlutterActivity
 

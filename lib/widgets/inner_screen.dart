@@ -23,6 +23,7 @@ class InnerScreen extends HookWidget {
               child: Center(
                 child: Container(
                   constraints: const BoxConstraints(maxWidth: 600),
+                  margin: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Wrap(
                     runSpacing: 24.0,
                     children: [
@@ -49,6 +50,7 @@ class InnerScreen extends HookWidget {
               child: Container(
                 constraints: const BoxConstraints(maxWidth: 700),
                 padding: const EdgeInsets.only(top: 48.0),
+                margin: const EdgeInsets.only(right: 16.0),
                 child: Align(
                   alignment: Alignment.topRight,
                   child: IconButton.filledTonal(

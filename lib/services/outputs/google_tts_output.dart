@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:math';
+import 'package:audio_service/audio_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:just_audio/just_audio.dart';
@@ -123,7 +124,14 @@ class GoogleTtsOutput implements OutputService {
       await _audioPlayer.stop();
 
       // Set the audio source
-      await _audioPlayer.setFilePath(file.path);
+      await _audioPlayer.setFilePath(
+        file.path,
+        tag: MediaItem(
+          // Specify a unique ID for each media item:
+          id: preparedMessage.message.id,
+          title: "StreamKit Message",
+        ),
+      );
 
       // Play the audio
       await _audioPlayer.play();
@@ -136,7 +144,7 @@ class GoogleTtsOutput implements OutputService {
           .timeout(_audioPlayTimeout);
 
       // Making sure that if audio player timed out, stop the audio.
-      await _audioPlayer.stop();
+      // await _audioPlayer.stop();
 
       // Delete the audio file after playback
       await cancelPreparedMessage(preparedMessage);

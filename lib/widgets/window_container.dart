@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -24,37 +26,38 @@ class WindowContainer extends HookWidget {
     return Stack(
       children: [
         child,
-        WindowTitleBarBox(
-          child: MouseRegion(
-            onEnter: (event) => isHovered.value = true,
-            onExit: (event) => isHovered.value = false,
-            onHover: (event) => isHovered.value = true,
-            child: Stack(
-              children: [
-                Center(
-                  child: AnimatedOpacity(
-                    duration: Durations.short1,
-                    opacity: isHovered.value && showWindowButtons ? 0.6 : 0.0,
-                    child: Text(
-                      version == null ? "StreamKit" : "StreamKit $version",
+        if (Platform.isWindows || Platform.isMacOS || Platform.isLinux)
+          WindowTitleBarBox(
+            child: MouseRegion(
+              onEnter: (event) => isHovered.value = true,
+              onExit: (event) => isHovered.value = false,
+              onHover: (event) => isHovered.value = true,
+              child: Stack(
+                children: [
+                  Center(
+                    child: AnimatedOpacity(
+                      duration: Durations.short1,
+                      opacity: isHovered.value && showWindowButtons ? 0.6 : 0.0,
+                      child: Text(
+                        version == null ? "StreamKit" : "StreamKit $version",
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(
-                  child: Row(
-                    children: [
-                      Expanded(child: MoveWindow()),
-                      Visibility(
-                        visible: showWindowButtons,
-                        child: _WindowButtons(),
-                      ),
-                    ],
-                  ),
-                )
-              ],
+                  SizedBox(
+                    child: Row(
+                      children: [
+                        Expanded(child: MoveWindow()),
+                        Visibility(
+                          visible: showWindowButtons,
+                          child: _WindowButtons(),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
-        ),
       ],
     );
   }

@@ -53,9 +53,12 @@ class MenuSettings extends StatelessWidget {
         onPressed();
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
-        child: SizedBox(
-          height: 40.0,
+        padding: const EdgeInsets.symmetric(
+          vertical: 4.0,
+          horizontal: 16.0,
+        ),
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 48),
           child: Row(
             children: [
               if (left != null) left,

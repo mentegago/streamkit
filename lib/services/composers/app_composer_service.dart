@@ -4,6 +4,7 @@ import 'package:rxdart/rxdart.dart';
 import 'package:streamkit_tts/models/config_model.dart';
 import 'package:streamkit_tts/models/messages/message.dart';
 import 'package:streamkit_tts/models/messages/prepared_message.dart';
+import 'package:streamkit_tts/services/app_audio_handler_service.dart';
 import 'package:streamkit_tts/services/composers/composer_service.dart';
 import 'package:streamkit_tts/services/middlewares/middleware.dart';
 import 'package:streamkit_tts/services/outputs/output_service.dart';
@@ -25,6 +26,8 @@ class AppComposerService implements ComposerService {
   final List<Middleware> _middlewares;
   final Config _config;
 
+  final AppAudioHandlerService _audioHandler;
+
   final List<QueueItem> _messageQueue = [];
 
   final _isEnabled = PublishSubject<bool>();
@@ -41,10 +44,12 @@ class AppComposerService implements ComposerService {
     required sourceService,
     required middlewares,
     required outputService,
+    required audioHandler,
   })  : _config = config,
         _sourceService = sourceService,
         _middlewares = middlewares,
-        _outputService = outputService {
+        _outputService = outputService,
+        _audioHandler = audioHandler {
     _sourceService.getMessageStream().listen(_onMessage);
     _config.addListener(_onConfigChanged);
 
@@ -53,6 +58,14 @@ class AppComposerService implements ComposerService {
     getStatusStream()
         .where((status) => status == ComposerStatus.loading)
         .listen(_watchForInfiniteLoading);
+
+    _audioHandler.onStop = () {
+      _config.setEnabled(!_config.chatToSpeechConfiguration.enabled);
+    };
+
+    _audioHandler.onPlay = () {
+      _config.setEnabled(true);
+    };
   }
 
   void _onConfigChanged() {
@@ -66,6 +79,18 @@ class AppComposerService implements ComposerService {
       });
 
       _messageQueue.clear();
+    }
+
+    if (_config.chatToSpeechConfiguration.enabled) {
+      _audioHandler.setNotification(
+        isPlaying: true,
+        username: _config.chatToSpeechConfiguration.channels.firstOrNull,
+      );
+    } else {
+      _audioHandler.setNotification(
+        isPlaying: false,
+        username: _config.chatToSpeechConfiguration.channels.firstOrNull,
+      );
     }
   }
 

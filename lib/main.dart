@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:audio_service/audio_service.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -10,6 +11,7 @@ import 'package:streamkit_tts/models/config_model.dart';
 import 'package:streamkit_tts/screens/home/home.dart';
 import 'package:streamkit_tts/screens/settings/beat_saber_settings.dart';
 import 'package:streamkit_tts/screens/settings/settings.dart';
+import 'package:streamkit_tts/services/app_audio_handler_service.dart';
 import 'package:streamkit_tts/services/composers/app_composer_service.dart';
 import 'package:streamkit_tts/services/composers/composer_service.dart';
 import 'package:streamkit_tts/services/language_detection_service.dart';
@@ -54,8 +56,19 @@ void main() async {
 
   final serverService = ServerService(baseUrl: "https://streamkit-api.nnt.gg");
 
+  final audioHandler = await AudioService.init(
+    builder: () => AppAudioHandlerService(),
+    config: const AudioServiceConfig(
+      androidNotificationChannelId: 'com.mentegagoreng.streamkit.channel',
+      androidNotificationChannelName: 'StreamKit Chat Reader',
+      androidStopForegroundOnPause: false,
+      androidNotificationOngoing: false,
+    ),
+  );
+
   final ComposerService composerService = AppComposerService(
     config: config,
+    audioHandler: audioHandler,
     sourceService: TwitchChatSource(config: config),
     middlewares: [
       // Filter and command handler middlewares
@@ -112,13 +125,15 @@ void main() async {
     ),
   );
 
-  doWhenWindowReady(() {
-    const initialSize = Size(800, 600);
-    appWindow.minSize = initialSize;
-    appWindow.size = initialSize;
-    appWindow.alignment = Alignment.center;
-    appWindow.show();
-  });
+  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    doWhenWindowReady(() {
+      const initialSize = Size(800, 600);
+      appWindow.minSize = initialSize;
+      appWindow.size = initialSize;
+      appWindow.alignment = Alignment.center;
+      appWindow.show();
+    });
+  }
 }
 
 void saveConfigurations(Config config, {required String configPath}) {

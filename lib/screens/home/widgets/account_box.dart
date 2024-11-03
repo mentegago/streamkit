@@ -13,7 +13,8 @@ class AccountBox extends HookWidget {
   Widget build(BuildContext context) {
     final serverService = context.read<ServerService>();
     final channel = context.select(
-      (Config config) => config.chatToSpeechConfiguration.channels.first,
+      (Config config) =>
+          config.chatToSpeechConfiguration.channels.firstOrNull ?? "",
     );
 
     final userState = useState<TwitchUser?>(null);
@@ -138,7 +139,12 @@ class _ChannelSelectionDialog extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final textController = useTextEditingController(
-      text: context.read<Config>().chatToSpeechConfiguration.channels.first,
+      text: context
+              .read<Config>()
+              .chatToSpeechConfiguration
+              .channels
+              .firstOrNull ??
+          "",
     );
 
     final errorMessage = useState("");
