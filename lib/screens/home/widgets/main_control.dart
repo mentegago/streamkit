@@ -15,14 +15,18 @@ class MainControl extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceBright,
-            borderRadius: BorderRadius.circular(20),
+        Material(
+          borderRadius: BorderRadius.circular(20),
+          elevation: 1.0,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            width: 600,
+            padding: const EdgeInsets.all(12),
+            child: const AccountBox(),
           ),
-          width: 600,
-          padding: const EdgeInsets.all(12),
-          child: const AccountBox(),
         ),
         const SizedBox(height: 12),
         const _StartButton(),

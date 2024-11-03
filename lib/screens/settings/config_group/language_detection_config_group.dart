@@ -45,9 +45,11 @@ class LanguageDetectionConfigGroup extends StatelessWidget {
 
 class _LanguageSwitch extends StatelessWidget {
   final Language language;
+  final String? description;
 
   const _LanguageSwitch({
     required this.language,
+    this.description,
   });
 
   @override
@@ -60,6 +62,7 @@ class _LanguageSwitch extends StatelessWidget {
     return SwitchSettings(
       isChecked: isChecked,
       title: language.displayName,
+      description: description,
       onChanged: (value) {
         context.read<Config>().setLanguage(language, enabled: value);
       },

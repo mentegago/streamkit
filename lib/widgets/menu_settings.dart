@@ -64,7 +64,7 @@ class MenuSettings extends StatelessWidget {
                 child: Wrap(
                   direction: Axis.horizontal,
                   crossAxisAlignment: WrapCrossAlignment.center,
-                  spacing: 8.0,
+                  spacing: 6.0,
                   children: [
                     Text(title),
                     if (description != null)

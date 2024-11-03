@@ -65,7 +65,7 @@ class _ReadUsernameEmptyMessageConfig extends StatelessWidget {
                   isChecked: !isChecked,
                   title: "Read even when there is no readable message",
                   description:
-                      "If this option is turned on, StreamKit will read the chat sender's name even when the chat has no readable content (such as when it only contain emotes, and \"Remove emotes from message\" option is turned on).\n\nIf this option is off, StreamKit will skip the chat.",
+                      "If this option is turned on, StreamKit will read the chat sender's name even when the chat has no readable content (such as when it only contain emotes, and \"Remove emotes\" option is turned on).\n\nIf this option is off, StreamKit will skip the chat.",
                   onChanged: (value) {
                     context
                         .read<Config>()

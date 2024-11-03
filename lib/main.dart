@@ -113,7 +113,7 @@ void main() async {
   );
 
   doWhenWindowReady(() {
-    const initialSize = Size(800, 550);
+    const initialSize = Size(800, 600);
     appWindow.minSize = initialSize;
     appWindow.size = initialSize;
     appWindow.alignment = Alignment.center;
@@ -149,22 +149,40 @@ class MyApp extends StatelessWidget {
     final baseTheme = ThemeData(
       colorScheme: ColorScheme.fromSeed(
         seedColor: const Color.fromARGB(255, 170, 42, 255),
+        brightness: Brightness.light,
+        surfaceContainerHighest: Colors.white,
+        surfaceContainerLow: Colors.white,
+      ),
+      useMaterial3: true,
+    );
+
+    final darkTheme = ThemeData(
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: const Color.fromARGB(255, 170, 42, 255),
         brightness: Brightness.dark,
       ),
       useMaterial3: true,
     );
-    return MaterialApp(
-      title: 'StreamKit Chat Reader',
-      theme: baseTheme.copyWith(
-        textTheme: GoogleFonts.plusJakartaSansTextTheme(baseTheme.textTheme),
+
+    return WindowBorder(
+      color: baseTheme.primaryColor,
+      child: MaterialApp(
+        title: 'StreamKit Chat Reader',
+        theme: baseTheme.copyWith(
+          textTheme: GoogleFonts.plusJakartaSansTextTheme(baseTheme.textTheme),
+        ),
+        darkTheme: darkTheme.copyWith(
+          textTheme: GoogleFonts.plusJakartaSansTextTheme(darkTheme.textTheme),
+        ),
+        themeMode: ThemeMode.dark,
+        initialRoute: '/',
+        routes: {
+          '/': (context) => const HomeScreen(),
+          '/settings/beat_saber': (context) => const BeatSaberSettingsScreen(),
+          '/settings': (context) => const SettingsScreen(),
+        },
+        debugShowCheckedModeBanner: false,
       ),
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const HomeScreen(),
-        '/settings/beat_saber': (context) => const BeatSaberSettingsScreen(),
-        '/settings': (context) => const SettingsScreen(),
-      },
-      debugShowCheckedModeBanner: false,
     );
   }
 }

@@ -29,7 +29,9 @@ class AccountBox extends HookWidget {
 
         try {
           final user = await serverService.fetchTwitchUser(channel);
-          userState.value = user;
+          if (channel.toLowerCase() == user.login.toLowerCase()) {
+            userState.value = user;
+          }
         } on UserNotFoundException catch (_) {
           print("User not found");
         } on ServerException catch (_) {
@@ -142,17 +144,39 @@ class _ChannelSelectionDialog extends HookWidget {
     final errorMessage = useState("");
     final focusNode = useFocusNode();
 
-    useEffect(() {
+    focus() {
       focusNode.requestFocus();
       textController.selection = TextSelection(
         baseOffset: 0,
         extentOffset: textController.text.length,
       );
+    }
+
+    onSubmitted() {
+      if (textController.text.isEmpty) {
+        errorMessage.value = "Enter a valid channel name";
+        focus();
+        return;
+      }
+
+      context.read<Config>().setChannelUsernames({
+        textController.text,
+      });
+
+      Navigator.of(context).pop();
+    }
+
+    useEffect(() {
+      focus();
+      return null;
     }, []);
 
-    return AlertDialog.adaptive(
+    return AlertDialog(
       title: const Text("Change Channel"),
       content: TextField(
+        onSubmitted: (_) {
+          onSubmitted();
+        },
         decoration: InputDecoration(
           error:
               errorMessage.value.isNotEmpty ? Text(errorMessage.value) : null,
@@ -169,18 +193,8 @@ class _ChannelSelectionDialog extends HookWidget {
           },
         ),
         TextButton(
+          onPressed: onSubmitted,
           child: const Text('Save'),
-          onPressed: () {
-            if (textController.text.isEmpty) {
-              errorMessage.value = "Enter a valid channel name";
-              return;
-            }
-
-            context.read<Config>().setChannelUsernames({
-              textController.text,
-            });
-            Navigator.of(context).pop();
-          },
         ),
       ],
     );
