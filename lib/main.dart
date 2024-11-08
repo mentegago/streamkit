@@ -61,7 +61,7 @@ void main() async {
     config: const AudioServiceConfig(
       androidNotificationChannelId: 'com.mentegagoreng.streamkit.channel',
       androidNotificationChannelName: 'StreamKit Chat Reader',
-      androidStopForegroundOnPause: false,
+      androidStopForegroundOnPause: true,
       androidNotificationOngoing: false,
     ),
   );

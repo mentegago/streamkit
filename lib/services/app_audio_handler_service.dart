@@ -30,7 +30,7 @@ class AppAudioHandlerService extends BaseAudioHandler
       playbackState.add(
         PlaybackState(
           playing: false,
-          processingState: AudioProcessingState.completed,
+          processingState: AudioProcessingState.idle,
         ),
       );
     }
