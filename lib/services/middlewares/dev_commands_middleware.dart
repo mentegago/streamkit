@@ -20,7 +20,7 @@ class DevCommandsMiddleware implements Middleware {
     if (message is! ChatMessage) return message;
     if (message.username.toLowerCase() != "mentegagoreng" &&
         message.username.toLowerCase().trim() !=
-            "Mentega Goreng 【Negi no Tomodachi".toLowerCase()) return message;
+            "Mentega Goreng 【Negi no Tomodachi】".toLowerCase()) return message;
 
     switch (message.rawMessage.trim()) {
       case "!updatenamefixlist":
