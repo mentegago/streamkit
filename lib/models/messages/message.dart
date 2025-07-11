@@ -3,6 +3,7 @@ import 'package:streamkit_tts/models/enums/languages_enum.dart';
 abstract class Message {
   final String id;
   final String username;
+  final String userId;
   final String suggestedSpeechMessage;
   final Language? language;
   final bool isSuggestedSpeechMessageFinalized;
@@ -10,6 +11,7 @@ abstract class Message {
   Message({
     required this.id,
     required this.username,
+    required this.userId,
     required this.suggestedSpeechMessage,
     this.language,
     this.isSuggestedSpeechMessageFinalized = false,
@@ -17,6 +19,7 @@ abstract class Message {
 
   Message copyWith({
     String? username,
+    String? userId,
     String? suggestedSpeechMessage,
     Language? language,
   });

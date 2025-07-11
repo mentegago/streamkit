@@ -100,6 +100,7 @@ class TwitchChatSource implements SourceService {
         return streamkit.ChatMessage(
           id: DateTime.now().millisecondsSinceEpoch.toString(),
           username: message.username,
+          userId: message.authorId,
           suggestedSpeechMessage: rawMessage,
           rawMessage: rawMessage,
           emotePositions: emotePositions,

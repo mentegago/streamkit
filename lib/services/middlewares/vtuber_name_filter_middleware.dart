@@ -18,8 +18,9 @@ class VtuberNameFilterMiddleware implements Middleware {
     final username = message.username
         .replaceAll(RegExp(r' ch\..*', caseSensitive: false), "")
         .replaceAll(RegExp(r'\s*【[^】]*】'), "")
-        .replaceAll(RegExp(r'\s*[[^\]]*]'), "")
-        .replaceAll(RegExp(r'\s*「[^」]*」'), "");
+        .replaceAll(RegExp(r'\s*\[[^\]]*\]'), "")
+        .replaceAll(RegExp(r'\s*「[^」]*」'), "")
+        .replaceAll(RegExp(r'\s*\([^\)]*\)'), "");
 
     return message.copyWith(
       username: username,

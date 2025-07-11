@@ -179,6 +179,7 @@ class YouTubeChatSource implements SourceService {
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
+      print(data);
 
       // Extract messages
       if (data['continuationContents'] != null &&
@@ -257,6 +258,10 @@ class YouTubeChatSource implements SourceService {
   Message? _parseChatMessage(dynamic renderer) {
     try {
       final authorName = renderer['authorName']['simpleText'];
+      final authorExternalChannelId =
+          renderer['authorExternalChannelId'] is String
+              ? renderer['authorExternalChannelId']
+              : '';
       final messageRuns = renderer['message']['runs'] as List<dynamic>;
 
       String rawMessage = '';
@@ -276,6 +281,7 @@ class YouTubeChatSource implements SourceService {
       return streamkit.ChatMessage(
         id: renderer['id'],
         username: authorName,
+        userId: authorExternalChannelId,
         suggestedSpeechMessage: rawMessage,
         rawMessage: rawMessage,
         emotePositions: [], // Add emote positions if needed
