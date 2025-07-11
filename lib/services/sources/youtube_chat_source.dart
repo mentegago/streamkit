@@ -18,6 +18,7 @@ class YouTubeChatSource implements SourceService {
   String? _apiKey;
   Map<String, dynamic>? _context;
   bool _isConnected = false;
+  bool _isFirstFetch = true;
 
   YouTubeChatSource({required Config config}) : _config = config {
     _config.addListener(_onConfigChange);
@@ -50,6 +51,7 @@ class YouTubeChatSource implements SourceService {
     if (extractedVideoId == null) return;
 
     _isConnected = true;
+    _isFirstFetch = true; // Reset flag for new connection
     _statusSubject.add(SourceStatus.active);
 
     // Get the initial continuation token, API key, and context
@@ -187,17 +189,20 @@ class YouTubeChatSource implements SourceService {
         final liveChatContinuation =
             data['continuationContents']['liveChatContinuation'];
 
-        // Process actions
-        final actions = liveChatContinuation['actions'] as List<dynamic>? ?? [];
+        // Process actions (skip messages on first fetch to avoid historical messages)
+        if (!_isFirstFetch) {
+          final actions =
+              liveChatContinuation['actions'] as List<dynamic>? ?? [];
 
-        for (var action in actions) {
-          if (action['addChatItemAction'] != null) {
-            final item = action['addChatItemAction']['item'];
-            if (item['liveChatTextMessageRenderer'] != null) {
-              final messageRenderer = item['liveChatTextMessageRenderer'];
-              final message = _parseChatMessage(messageRenderer);
-              if (message != null) {
-                _messageSubject.add(message);
+          for (var action in actions) {
+            if (action['addChatItemAction'] != null) {
+              final item = action['addChatItemAction']['item'];
+              if (item['liveChatTextMessageRenderer'] != null) {
+                final messageRenderer = item['liveChatTextMessageRenderer'];
+                final message = _parseChatMessage(messageRenderer);
+                if (message != null) {
+                  _messageSubject.add(message);
+                }
               }
             }
           }
@@ -234,6 +239,9 @@ class YouTubeChatSource implements SourceService {
             disconnect();
             return;
           }
+
+          // Mark first fetch as complete
+          _isFirstFetch = false;
 
           // Schedule the next fetch
           Future.delayed(Duration(milliseconds: timeoutMs), () {
@@ -295,6 +303,7 @@ class YouTubeChatSource implements SourceService {
 
   void disconnect() {
     _isConnected = false;
+    _isFirstFetch = true; // Reset flag for next connection
     _statusSubject.add(SourceStatus.inactive);
   }
 }
