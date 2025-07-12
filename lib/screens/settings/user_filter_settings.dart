@@ -92,7 +92,7 @@ class _FilterListConfigGroup extends StatelessWidget {
               color: isWhitelistingFilter
                   ? context.customColors.success
                   : context.customColors.failure,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w800,
             ),
           ),
         ],
@@ -168,6 +168,10 @@ class _AddUserButton extends StatelessWidget {
       label: Text(isWhitelistingFilter ? "Allow User" : "Block User"),
       style: FilledButton.styleFrom(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        backgroundColor: isWhitelistingFilter
+            ? context.customColors.success
+            : context.customColors.failure,
+        foregroundColor: Theme.of(context).colorScheme.onSurface,
       ),
     );
   }

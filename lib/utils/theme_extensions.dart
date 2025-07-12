@@ -40,8 +40,10 @@ class CustomColors extends ThemeExtension<CustomColors> {
 
   // Dark theme colors
   static const CustomColors dark = CustomColors(
-    success: Color(0xFF69F0AE), // Lighter bright green for dark theme
-    failure: Color(0xFFFF6B6B), // Lighter bright red for dark theme
+    success:
+        Color.fromARGB(255, 23, 146, 54), // Lighter bright green for dark theme
+    failure:
+        Color.fromARGB(255, 243, 29, 29), // Lighter bright red for dark theme
   );
 }
 
