@@ -41,7 +41,6 @@ class LanguagesConfigGroup extends StatelessWidget {
 
 class _LanguageCheckbox extends StatelessWidget {
   const _LanguageCheckbox({
-    super.key,
     required this.language,
   });
 

@@ -10,6 +10,7 @@ import 'package:streamkit_tts/models/config_model.dart';
 import 'package:streamkit_tts/screens/home/home.dart';
 import 'package:streamkit_tts/screens/settings/beat_saber_settings.dart';
 import 'package:streamkit_tts/screens/settings/settings.dart';
+import 'package:streamkit_tts/screens/settings/user_filter_settings.dart';
 import 'package:streamkit_tts/services/composers/app_composer_service.dart';
 import 'package:streamkit_tts/services/composers/composer_service.dart';
 import 'package:streamkit_tts/services/language_detection_service.dart';
@@ -33,6 +34,7 @@ import 'package:streamkit_tts/services/sources/twitch_chat_source.dart';
 import 'package:streamkit_tts/services/version_check_service.dart';
 import 'package:streamkit_tts/utils/external_config_util.dart';
 import 'package:streamkit_tts/utils/misc_tts_util.dart';
+import 'package:streamkit_tts/utils/theme_extensions.dart';
 
 Timer? _saveConfigTimer;
 bool trakteerFeatureFlag = false;
@@ -154,6 +156,9 @@ class MyApp extends StatelessWidget {
         surfaceContainerLow: Colors.white,
       ),
       useMaterial3: true,
+      extensions: const [
+        CustomColors.light,
+      ],
     );
 
     final darkTheme = ThemeData(
@@ -162,6 +167,9 @@ class MyApp extends StatelessWidget {
         brightness: Brightness.dark,
       ),
       useMaterial3: true,
+      extensions: const [
+        CustomColors.dark,
+      ],
     );
 
     return WindowBorder(
@@ -180,6 +188,8 @@ class MyApp extends StatelessWidget {
           '/': (context) => const HomeScreen(),
           '/settings/beat_saber': (context) => const BeatSaberSettingsScreen(),
           '/settings': (context) => const SettingsScreen(),
+          '/settings/user_filter': (context) =>
+              const UserFilterSettingsScreen(),
         },
         debugShowCheckedModeBanner: false,
       ),

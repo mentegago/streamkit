@@ -20,7 +20,12 @@ class FilterConfig extends StatelessWidget {
         ),
         MenuSettings.submenu(
           title: "User Filter",
-          onPressed: () {},
+          onPressed: () {
+            Navigator.pushNamed(
+              context,
+              '/settings/user_filter',
+            );
+          },
           left: const Icon(Icons.people_alt_outlined),
         ),
       ],
