@@ -67,17 +67,24 @@ class Config extends ChangeNotifier {
 
   void setTtsConfig({
     bool? readUsername,
+    bool? ignoreEmptyMessage,
     bool? ignoreExclamationMark,
     bool? ignoreEmotes,
+    bool? ignoreBttvEmotes,
+    bool? ignoreFfzEmotes,
     bool? ignoreUrls,
     bool? ignoreVtuberGroupName,
   }) {
     setChatToSpeechConfiguration(
       chatToSpeechConfiguration.copyWith(
         readUsername: readUsername ?? chatToSpeechConfiguration.readUsername,
+        ignoreEmptyMessage:
+            ignoreEmptyMessage ?? chatToSpeechConfiguration.ignoreEmptyMessage,
         ignoreExclamationMark: ignoreExclamationMark ??
             chatToSpeechConfiguration.ignoreExclamationMark,
         ignoreEmotes: ignoreEmotes ?? chatToSpeechConfiguration.ignoreEmotes,
+        ignoreBttvEmotes:
+            ignoreBttvEmotes ?? chatToSpeechConfiguration.ignoreBttvEmotes,
         ignoreUrls: ignoreUrls ?? chatToSpeechConfiguration.ignoreUrls,
         ignoreVtuberGroupName: ignoreVtuberGroupName ??
             chatToSpeechConfiguration.ignoreVtuberGroupName,

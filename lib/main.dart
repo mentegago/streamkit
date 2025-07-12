@@ -2,15 +2,17 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:bitsdojo_window/bitsdojo_window.dart';
-import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:streamkit_tts/models/chat_to_speech_config_model.dart';
 import 'package:streamkit_tts/models/config_model.dart';
 import 'package:streamkit_tts/models/enums/languages_enum.dart';
 import 'package:streamkit_tts/models/enums/tts_source.dart';
 import 'package:streamkit_tts/screens/home/home.dart';
+import 'package:streamkit_tts/screens/settings/beat_saber_settings.dart';
+import 'package:streamkit_tts/screens/settings/settings.dart';
+import 'package:streamkit_tts/screens/settings/user_filter_settings.dart';
 import 'package:streamkit_tts/services/composers/app_composer_service.dart';
 import 'package:streamkit_tts/services/composers/composer_service.dart';
 import 'package:streamkit_tts/services/language_detection_service.dart';
@@ -31,16 +33,18 @@ import 'package:streamkit_tts/services/middlewares/vtuber_name_filter_middleware
 import 'package:streamkit_tts/services/middlewares/word_fix_middleware.dart';
 import 'package:streamkit_tts/services/outputs/google_tts_output.dart';
 import 'package:streamkit_tts/services/sources/youtube_chat_source.dart';
+import 'package:streamkit_tts/services/server_service.dart';
 import 'package:streamkit_tts/services/version_check_service.dart';
 import 'package:streamkit_tts/utils/external_config_util.dart';
 import 'package:streamkit_tts/utils/misc_tts_util.dart';
-import 'package:version/version.dart';
+import 'package:streamkit_tts/utils/theme_extensions.dart';
 
 Timer? _saveConfigTimer;
 bool trakteerFeatureFlag = false;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   final externalConfigUtil = ExternalConfig();
   await externalConfigUtil.loadConfigPath();
 
@@ -52,6 +56,8 @@ void main() async {
       AppLanguageDetectionService();
 
   final versionCheckService = VersionCheckService();
+
+  final serverService = ServerService(baseUrl: "https://streamkit-api.nnt.gg");
 
   final ComposerService composerService = AppComposerService(
     config: config,
@@ -106,13 +112,14 @@ void main() async {
         ChangeNotifierProvider(create: (_) => config),
         ChangeNotifierProvider(create: (_) => versionCheckService),
         Provider(create: (_) => composerService),
+        Provider(create: (_) => serverService),
       ],
       child: const MyApp(),
     ),
   );
 
   doWhenWindowReady(() {
-    const initialSize = Size(800, 550);
+    const initialSize = Size(800, 600);
     appWindow.minSize = initialSize;
     appWindow.size = initialSize;
     appWindow.alignment = Alignment.center;
@@ -160,6 +167,7 @@ Future<Config> loadConfigurations(
       readUsername: true,
       volume: 100.0,
       ignoreEmotes: true,
+      ignoreBttvEmotes: true,
       readBsrSafely: false,
       ttsSource: TtsSource.google,
       filteredUserIds: {},
@@ -172,122 +180,109 @@ Future<Config> loadConfigurations(
   );
 }
 
-class MyApp extends HookWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    final paneIndex = useState(0);
+    final baseTheme = ThemeData(
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: const Color.fromARGB(255, 170, 42, 255),
+        brightness: Brightness.light,
+        surfaceContainerHighest: Colors.white,
+        surfaceContainerLow: Colors.white,
+      ),
+      useMaterial3: true,
+      extensions: const [
+        CustomColors.light,
+      ],
+    );
 
-    return FluentApp(
-      title: "StreamKit Chat Reader",
-      debugShowCheckedModeBanner: false,
-      theme: FluentThemeData(
+    final darkTheme = ThemeData(
+      colorScheme: const ColorScheme(
         brightness: Brightness.dark,
-        accentColor: const Color.fromARGB(255, 255, 0, 0).toAccentColor(),
+        primary: Color(0xFFDC2626),
+        onPrimary: Color(0xFFFFFFFF),
+        primaryContainer: Color(0xFFDC2626),
+        onPrimaryContainer: Color(0xFFFFFFFF),
+        primaryFixed: Color(0xFFF7D0D0),
+        primaryFixedDim: Color(0xFFEEA1A1),
+        onPrimaryFixed: Color(0xFF610F0F),
+        onPrimaryFixedVariant: Color(0xFF711212),
+        secondary: Color(0xFF262626),
+        onSecondary: Color(0xFFFFFFFF),
+        secondaryContainer: Color(0xFF262626),
+        onSecondaryContainer: Color(0xFFFFFFFF),
+        secondaryFixed: Color(0xFFFBFBFB),
+        secondaryFixedDim: Color(0xFFF1F1F1),
+        onSecondaryFixed: Color(0xFF4A4A4A),
+        onSecondaryFixedVariant: Color(0xFF6A6A6A),
+        tertiary: Color(0xFF262626),
+        onTertiary: Color(0xFFFFFFFF),
+        tertiaryContainer: Color(0xFF262626),
+        onTertiaryContainer: Color(0xFFFFFFFF),
+        tertiaryFixed: Color(0xFFFBFBFB),
+        tertiaryFixedDim: Color(0xFFF1F1F1),
+        onTertiaryFixed: Color(0xFF4A4A4A),
+        onTertiaryFixedVariant: Color(0xFF6A6A6A),
+        error: Color(0xFF7F1D1D),
+        onError: Color(0xFFFFFFFF),
+        errorContainer: Color(0xFF410F0F),
+        onErrorContainer: Color(0xFFFFFFFF),
+        surface: Color(0xFF080808),
+        onSurface: Color(0xFFF1F1F1),
+        surfaceDim: Color(0xFF060606),
+        surfaceBright: Color(0xFF2C2C2C),
+        surfaceContainerLowest: Color(0xFF010101),
+        surfaceContainerLow: Color(0xFF0E0E0E),
+        surfaceContainer: Color(0xFF151515),
+        surfaceContainerHigh: Color(0xFF1D1D1D),
+        surfaceContainerHighest: Color(0xFF282828),
+        onSurfaceVariant: Color(0xFFCACACA),
+        outline: Color(0xFF777777),
+        outlineVariant: Color(0xFF414141),
+        shadow: Color(0xFF000000),
+        scrim: Color(0xFF000000),
+        inverseSurface: Color(0xFFE8E8E8),
+        onInverseSurface: Color(0xFF2A2A2A),
+        inversePrimary: Color(0xFF621919),
+        surfaceTint: Color(0xFFDC2626),
       ),
-      home: NavigationView(
-        appBar: Platform.isWindows ? streamKitAppBar(context) : null,
-        pane: trakteerFeatureFlag
-            ? NavigationPane(
-                selected: paneIndex.value,
-                onChanged: (value) {
-                  paneIndex.value = value;
-                },
-                displayMode: PaneDisplayMode.compact,
-                items: [
-                  PaneItem(
-                    icon: SvgPicture.asset("assets/images/twitch_icon.svg"),
-                    title: const Text("Twitch"),
-                    body: const Home(),
-                  ),
-                ],
-              )
-            : null,
-        content: trakteerFeatureFlag ? null : const Home(),
-      ),
+      useMaterial3: true,
+      extensions: const [
+        CustomColors.dark,
+      ],
     );
-  }
 
-  NavigationAppBar streamKitAppBar(BuildContext context) {
-    return NavigationAppBar(
-      actions: Row(
-        children: [
-          Expanded(
-            child: MoveWindow(
-              child: const StreamKitTitleBar(),
-            ),
+    return WindowBorder(
+      color: baseTheme.primaryColor,
+      child: MaterialApp(
+        title: 'StreamKit Chat Reader',
+        theme: baseTheme.copyWith(
+          textTheme: GoogleFonts.plusJakartaSansTextTheme(baseTheme.textTheme),
+          iconTheme: baseTheme.iconTheme.copyWith(
+            size: 24,
+            color: baseTheme.colorScheme.onSurface,
           ),
-          MinimizeWindowButton(
-              colors: WindowButtonColors(iconNormal: Colors.white)),
-          MaximizeWindowButton(
-              colors: WindowButtonColors(iconNormal: Colors.white)),
-          CloseWindowButton(
-              colors: WindowButtonColors(
-                  iconNormal: Colors.white, mouseOver: Colors.red)),
-        ],
-      ),
-      automaticallyImplyLeading: false,
-      height: 36.0,
-      leading: const Padding(
-        padding: EdgeInsets.only(bottom: 8.0, left: 12.0),
-        child: Text(
-          "🧈",
-          style: TextStyle(fontSize: 24),
         ),
-      ),
-    );
-  }
-}
-
-class StreamKitTitleBar extends HookWidget {
-  const StreamKitTitleBar({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final visible = useState(false);
-    final versionCheckService = context.watch<VersionCheckService>();
-
-    final version = versionCheckService.currentVersion;
-    final versionInfo = versionCheckService.status.state == VersionState.beta
-        ? "prerelease"
-        : versionCheckService.status.state == VersionState.outdated
-            ? "outdated"
-            : "";
-
-    String titleBarText = "StreamKit";
-
-    if (version != null) {
-      final versionParsed = Version.parse(version);
-      titleBarText += " ${versionParsed.major}";
-      if (versionParsed.minor != 0 || versionParsed.patch != 0) {
-        titleBarText += ".${versionParsed.minor}";
-      }
-      if (versionParsed.patch != 0) {
-        titleBarText += ".${versionParsed.patch}";
-      }
-    }
-
-    if (versionInfo.isNotEmpty) {
-      titleBarText += " ($versionInfo)";
-    }
-
-    return MouseRegion(
-      onEnter: (event) {
-        visible.value = true;
-      },
-      onExit: (event) {
-        visible.value = false;
-      },
-      child: AnimatedOpacity(
-        opacity: visible.value ? 0.5 : 0.0,
-        duration: const Duration(milliseconds: 100),
-        child: Container(
-          margin: const EdgeInsets.only(left: 96),
-          alignment: Alignment.center,
-          child: Text(titleBarText),
+        darkTheme: darkTheme.copyWith(
+          textTheme: GoogleFonts.plusJakartaSansTextTheme(darkTheme.textTheme),
+          iconTheme: darkTheme.iconTheme.copyWith(
+            size: 24,
+            color: darkTheme.colorScheme.onSurface,
+          ),
         ),
+        themeMode: ThemeMode.dark,
+        initialRoute: '/',
+        routes: {
+          '/': (context) => const HomeScreen(),
+          '/settings/beat_saber': (context) => const BeatSaberSettingsScreen(),
+          '/settings': (context) => const SettingsScreen(),
+          '/settings/user_filter': (context) =>
+              const UserFilterSettingsScreen(),
+        },
+        debugShowCheckedModeBanner: false,
       ),
     );
   }

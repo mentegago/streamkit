@@ -9,6 +9,7 @@ class ChatToSpeechConfiguration {
   final bool readUsername;
   final bool ignoreExclamationMark;
   final bool ignoreEmotes;
+  final bool ignoreBttvEmotes;
   final Set<Language> languages;
   final bool enabled;
   final double volume;
@@ -28,6 +29,7 @@ class ChatToSpeechConfiguration {
     required this.readUsername,
     required this.ignoreExclamationMark,
     required this.ignoreEmotes,
+    required this.ignoreBttvEmotes,
     required this.languages,
     required this.enabled,
     required this.volume,
@@ -46,8 +48,10 @@ class ChatToSpeechConfiguration {
     Set<String>? channels,
     String? youtubeVideoId,
     bool? readUsername,
+    bool? readUsernameOnEmptyMessage,
     bool? ignoreExclamationMark,
     bool? ignoreEmotes,
+    bool? ignoreBttvEmotes,
     Set<Language>? languages,
     bool? enabled,
     double? volume,
@@ -68,6 +72,7 @@ class ChatToSpeechConfiguration {
       ignoreExclamationMark:
           ignoreExclamationMark ?? this.ignoreExclamationMark,
       ignoreEmotes: ignoreEmotes ?? this.ignoreEmotes,
+      ignoreBttvEmotes: ignoreBttvEmotes ?? this.ignoreBttvEmotes,
       languages: languages ?? this.languages,
       enabled: enabled ?? this.enabled,
       volume: volume ?? this.volume,
@@ -92,6 +97,7 @@ class ChatToSpeechConfiguration {
     result.addAll({'readUsername': readUsername});
     result.addAll({'ignoreExclamationMark': ignoreExclamationMark});
     result.addAll({'ignoreEmotes': ignoreEmotes});
+    result.addAll({'ignoreBttvEmotes': ignoreBttvEmotes});
     result.addAll({'languages': languages.map((x) => x.google).toList()});
     result.addAll({'enabled': enabled});
     result.addAll({'volume': volume});
@@ -115,6 +121,7 @@ class ChatToSpeechConfiguration {
       readUsername: map['readUsername'] ?? true,
       ignoreExclamationMark: map['ignoreExclamationMark'] ?? true,
       ignoreEmotes: map['ignoreEmotes'] ?? true,
+      ignoreBttvEmotes: map['ignoreBttvEmotes'] ?? true,
       languages: Set<Language>.from(
           map['languages']?.map((x) => LanguageParser.fromGoogle(x)) ??
               [Language.english, Language.indonesian, Language.japanese]),
@@ -133,6 +140,28 @@ class ChatToSpeechConfiguration {
       disableAKeongFilter: map['disableAKeongFilter'] ?? false,
     );
   }
+
+  factory ChatToSpeechConfiguration.defaultConfig() =>
+      ChatToSpeechConfiguration(
+        channels: {},
+        youtubeVideoId: "",
+        enabled: false,
+        ignoreExclamationMark: true,
+        languages: {Language.english, Language.indonesian, Language.japanese},
+        readBsr: false,
+        readUsername: true,
+        volume: 100.0,
+        ignoreEmotes: true,
+        ignoreBttvEmotes: true,
+        readBsrSafely: false,
+        ttsSource: TtsSource.google,
+        filteredUserIds: {},
+        isWhitelistingFilter: false,
+        ignoreEmptyMessage: true,
+        ignoreUrls: true,
+        ignoreVtuberGroupName: true,
+        disableAKeongFilter: false,
+      );
 
   String toJson() => _prettyJson(toMap());
 
@@ -163,6 +192,7 @@ class ChatToSpeechConfiguration {
       readUsername: config?["readUsername"] ?? true,
       ignoreExclamationMark: config?["ignoreExclamationMark"] ?? true,
       ignoreEmotes: true,
+      ignoreBttvEmotes: true,
       languages: languages,
       enabled: config?["enabled"] ?? false,
       volume: volume,
@@ -177,7 +207,6 @@ class ChatToSpeechConfiguration {
       disableAKeongFilter: false,
     );
   }
-
   String _prettyJson(dynamic json) {
     var spaces = ' ' * 4;
     var encoder = JsonEncoder.withIndent(spaces);

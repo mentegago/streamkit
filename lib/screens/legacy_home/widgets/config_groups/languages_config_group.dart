@@ -1,9 +1,9 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:streamkit_tts/models/config_model.dart';
 import 'package:streamkit_tts/models/enums/languages_enum.dart';
-import 'package:streamkit_tts/screens/home/widgets/config_group.dart';
+import 'package:streamkit_tts/screens/legacy_home/widgets/config_group.dart';
 import 'package:provider/provider.dart';
-import 'package:streamkit_tts/screens/home/widgets/text_with_flag.dart';
+import 'package:streamkit_tts/screens/legacy_home/widgets/text_with_flag.dart';
 
 class LanguagesConfigGroup extends StatelessWidget {
   const LanguagesConfigGroup({
@@ -41,7 +41,6 @@ class LanguagesConfigGroup extends StatelessWidget {
 
 class _LanguageCheckbox extends StatelessWidget {
   const _LanguageCheckbox({
-    super.key,
     required this.language,
   });
 

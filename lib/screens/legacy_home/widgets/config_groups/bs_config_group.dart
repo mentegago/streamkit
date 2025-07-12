@@ -1,6 +1,6 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:streamkit_tts/models/config_model.dart';
-import 'package:streamkit_tts/screens/home/widgets/config_group.dart';
+import 'package:streamkit_tts/screens/legacy_home/widgets/config_group.dart';
 import 'package:provider/provider.dart';
 
 class BeatSaberConfigGroup extends StatelessWidget {
@@ -26,7 +26,7 @@ class BeatSaberConfigGroup extends StatelessWidget {
 }
 
 class _ReadBsrCheckbox extends StatelessWidget {
-  const _ReadBsrCheckbox({super.key});
+  const _ReadBsrCheckbox();
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +45,7 @@ class _ReadBsrCheckbox extends StatelessWidget {
 }
 
 class _ReadBsrSafelyCheckbox extends StatelessWidget {
-  const _ReadBsrSafelyCheckbox({super.key});
+  const _ReadBsrSafelyCheckbox();
 
   @override
   Widget build(BuildContext context) {
