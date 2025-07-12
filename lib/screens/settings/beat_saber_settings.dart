@@ -76,6 +76,9 @@ class _ReadBsrRequestsSafely extends StatelessWidget {
                 SwitchSettings(
                   isChecked: !isChecked,
                   title: "Read song request name",
+                  subtitle: isChecked
+                      ? "StreamKit will only say that a song request has been made"
+                      : "StreamKit will read the requested song's name",
                   onChanged: (value) {
                     context
                         .read<Config>()

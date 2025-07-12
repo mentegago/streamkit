@@ -63,6 +63,8 @@ class Config extends ChangeNotifier {
     bool? ignoreEmptyMessage,
     bool? ignoreExclamationMark,
     bool? ignoreEmotes,
+    bool? ignoreBttvEmotes,
+    bool? ignoreFfzEmotes,
     bool? ignoreUrls,
   }) {
     setChatToSpeechConfiguration(
@@ -73,6 +75,8 @@ class Config extends ChangeNotifier {
         ignoreExclamationMark: ignoreExclamationMark ??
             chatToSpeechConfiguration.ignoreExclamationMark,
         ignoreEmotes: ignoreEmotes ?? chatToSpeechConfiguration.ignoreEmotes,
+        ignoreBttvEmotes:
+            ignoreBttvEmotes ?? chatToSpeechConfiguration.ignoreBttvEmotes,
         ignoreUrls: ignoreUrls ?? chatToSpeechConfiguration.ignoreUrls,
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:streamkit_tts/models/config_model.dart';
 import 'package:streamkit_tts/widgets/config_container.dart';
@@ -17,6 +18,7 @@ class MessageCleanUpConfig extends StatelessWidget {
           height: 1,
           indent: 50,
         ),
+        _RemoveBttvEmotesConfig(),
         _RemoveUrlsConfig(),
       ],
     );
@@ -39,6 +41,58 @@ class _RemoveEmotesConfig extends StatelessWidget {
         context.read<Config>().setTtsConfig(ignoreEmotes: value);
       },
       left: const Icon(Icons.emoji_emotions),
+    );
+  }
+}
+
+class _RemoveBttvEmotesConfig extends StatelessWidget {
+  const _RemoveBttvEmotesConfig();
+
+  @override
+  Widget build(BuildContext context) {
+    final isIgnoringEmotes = context.select(
+      (Config config) => config.chatToSpeechConfiguration.ignoreEmotes,
+    );
+
+    final isIgnoringBttvEmotes = context.select(
+      (Config config) => config.chatToSpeechConfiguration.ignoreBttvEmotes,
+    );
+
+    final iconThemeData = Theme.of(context).iconTheme;
+
+    return AnimatedSize(
+      duration: Durations.short4,
+      child: isIgnoringEmotes
+          ? Column(
+              children: [
+                SwitchSettings(
+                  isChecked: isIgnoringBttvEmotes,
+                  title: "Remove BetterTTV emotes",
+                  onChanged: (value) {
+                    context
+                        .read<Config>()
+                        .setTtsConfig(ignoreBttvEmotes: value);
+                  },
+                  left: Container(
+                    width: iconThemeData.size,
+                    height: iconThemeData.size,
+                    padding: const EdgeInsets.all(2),
+                    child: SvgPicture.asset(
+                      "assets/images/betterttv_icon.svg",
+                      colorFilter: ColorFilter.mode(
+                        iconThemeData.color ?? Colors.white,
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                  ),
+                ),
+                const Divider(
+                  height: 1,
+                  indent: 50,
+                ),
+              ],
+            )
+          : Container(),
     );
   }
 }

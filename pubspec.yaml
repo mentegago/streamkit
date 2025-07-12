@@ -82,11 +82,8 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/images/twitch_icon.svg
-    - assets/images/trakteer_icon.png
-    - assets/en_ngram_model.json
-    - assets/id_ngram_model.json
-    - assets/fr_ngram_model.json
+    - assets/
+    - assets/images/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

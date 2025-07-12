@@ -17,6 +17,10 @@ class RemoveEmotesMiddleware implements Middleware {
     if (message is! ChatMessage) return message;
     if (!_config.chatToSpeechConfiguration.ignoreEmotes) return message;
 
+    final emoteList = _config.chatToSpeechConfiguration.ignoreBttvEmotes
+        ? message.emoteList
+        : <String>[];
+
     final emotelessMessage = message.emotePositions
         .sorted((a, b) => b.startPosition - a.startPosition)
         .fold(
@@ -30,7 +34,7 @@ class RemoveEmotesMiddleware implements Middleware {
           '',
         );
       },
-    ).replaceWords(message.emoteList);
+    ).replaceWords(emoteList);
 
     return message.copyWith(suggestedSpeechMessage: emotelessMessage);
   }
