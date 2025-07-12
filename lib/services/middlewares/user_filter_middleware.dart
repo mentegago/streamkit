@@ -13,10 +13,10 @@ class UserFilterMiddleware implements Middleware {
     if (message is! ChatMessage) return message;
     if (_config.chatToSpeechConfiguration.isWhitelistingFilter) {
       if (_config.chatToSpeechConfiguration.filteredUserIds
-          .contains(message.userId)) return message;
+          .contains(message.userId.toLowerCase())) return message;
     } else {
       if (!_config.chatToSpeechConfiguration.filteredUserIds
-          .contains(message.userId)) return message;
+          .contains(message.userId.toLowerCase())) return message;
     }
 
     return null;
