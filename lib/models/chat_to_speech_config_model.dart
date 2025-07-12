@@ -15,7 +15,7 @@ class ChatToSpeechConfiguration {
   final bool readBsr;
   final bool readBsrSafely;
   final TtsSource ttsSource;
-  final Set<String> filteredUsernames;
+  final Set<String> filteredUserIds;
   final bool isWhitelistingFilter;
   final bool ignoreEmptyMessage;
   final bool ignoreUrls;
@@ -34,7 +34,7 @@ class ChatToSpeechConfiguration {
     required this.readBsr,
     required this.readBsrSafely,
     required this.ttsSource,
-    required this.filteredUsernames,
+    required this.filteredUserIds,
     required this.isWhitelistingFilter,
     required this.ignoreEmptyMessage,
     required this.ignoreUrls,
@@ -54,7 +54,7 @@ class ChatToSpeechConfiguration {
     bool? readBsr,
     bool? readBsrSafely,
     TtsSource? ttsSource,
-    Set<String>? filteredUsernames,
+    Set<String>? filteredUserIds,
     bool? isWhitelistingFilter,
     bool? ignoreEmptyMessage,
     bool? ignoreUrls,
@@ -74,7 +74,7 @@ class ChatToSpeechConfiguration {
       readBsr: readBsr ?? this.readBsr,
       readBsrSafely: readBsrSafely ?? this.readBsrSafely,
       ttsSource: ttsSource ?? this.ttsSource,
-      filteredUsernames: filteredUsernames ?? this.filteredUsernames,
+      filteredUserIds: filteredUserIds ?? this.filteredUserIds,
       isWhitelistingFilter: isWhitelistingFilter ?? this.isWhitelistingFilter,
       ignoreEmptyMessage: ignoreEmptyMessage ?? this.ignoreEmptyMessage,
       ignoreUrls: ignoreUrls ?? this.ignoreUrls,
@@ -98,7 +98,7 @@ class ChatToSpeechConfiguration {
     result.addAll({'readBsr': readBsr});
     result.addAll({'readBsrSafely': readBsrSafely});
     result.addAll({'ttsSource': ttsSource.string});
-    result.addAll({'filteredUsernames': filteredUsernames.toList()});
+    result.addAll({'filteredUsernames': filteredUserIds.toList()});
     result.addAll({'isWhitelistingFilter': isWhitelistingFilter});
     result.addAll({'ignoreEmptyMessage': ignoreEmptyMessage});
     result.addAll({'ignoreUrls': ignoreUrls});
@@ -125,7 +125,7 @@ class ChatToSpeechConfiguration {
       readBsrSafely: map['readBsrSafely'] ?? false,
       ttsSource: TtsSourceParser.fromString(map['ttsSource'] ?? '') ??
           TtsSource.google,
-      filteredUsernames: Set<String>.from(map['filteredUsernames'] ?? []),
+      filteredUserIds: Set<String>.from(map['filteredUsernames'] ?? []),
       isWhitelistingFilter: map['isWhitelistingFilter'] ?? false,
       ignoreEmptyMessage: map['ignoreEmptyMessage'] ?? true,
       ignoreUrls: map['ignoreUrls'] ?? true,
@@ -169,7 +169,7 @@ class ChatToSpeechConfiguration {
       readBsr: config?["readBsr"] ?? false,
       readBsrSafely: false,
       ttsSource: TtsSource.google,
-      filteredUsernames: Set<String>.from(config?["filteredUsernames"] ?? []),
+      filteredUserIds: Set<String>.from(config?["filteredUsernames"] ?? []),
       isWhitelistingFilter: config?["isWhitelistingFilter"] ?? false,
       ignoreEmptyMessage: true,
       ignoreUrls: true,

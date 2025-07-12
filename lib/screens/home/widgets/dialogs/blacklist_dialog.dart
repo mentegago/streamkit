@@ -10,7 +10,7 @@ class BlacklistDialog extends HookWidget {
   Widget build(BuildContext context) {
     final config = context.read<Config>();
     final defaultValue =
-        config.chatToSpeechConfiguration.filteredUsernames.join(',');
+        config.chatToSpeechConfiguration.filteredUserIds.join(',');
     final usernameController = useTextEditingController(text: defaultValue);
     final usernameFocusNode = useFocusNode();
 

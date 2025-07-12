@@ -25,6 +25,31 @@ class YouTubeChatSource implements SourceService {
     _onConfigChange();
   }
 
+  List<streamkit.EmotePosition> _generateEmotePositions(
+      String rawMessage, Set<String> emoteSet) {
+    List<streamkit.EmotePosition> positions = [];
+
+    for (String emote in emoteSet) {
+      int startIndex = 0;
+      while (true) {
+        int index = rawMessage.indexOf(emote, startIndex);
+        if (index == -1) break;
+
+        positions.add(streamkit.EmotePosition(
+          startPosition: index,
+          endPosition: index + emote.length - 1,
+        ));
+
+        startIndex = index + emote.length;
+      }
+    }
+
+    // Sort by start position to ensure consistent ordering
+    positions.sort((a, b) => a.startPosition.compareTo(b.startPosition));
+
+    return positions;
+  }
+
   @override
   Stream<Message> getMessageStream() {
     return _messageSubject.stream;
@@ -181,7 +206,6 @@ class YouTubeChatSource implements SourceService {
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      print(data);
 
       // Extract messages
       if (data['continuationContents'] != null &&
@@ -273,16 +297,35 @@ class YouTubeChatSource implements SourceService {
       final messageRuns = renderer['message']['runs'] as List<dynamic>;
 
       String rawMessage = '';
+      Set<String> emoteSet = {};
+
       for (var run in messageRuns) {
         if (run['text'] != null) {
           rawMessage += run['text'];
         } else if (run['emoji'] != null) {
-          final emojiShortcuts = run['emoji']['shortcuts'] as List<dynamic>?;
+          final emoji = run['emoji'];
+          final emojiShortcuts = emoji['shortcuts'] as List<dynamic>?;
+
+          String emoteText;
+          String emoteName;
+
           if (emojiShortcuts != null && emojiShortcuts.isNotEmpty) {
-            rawMessage += emojiShortcuts.first;
+            emoteName = emojiShortcuts.first;
+            emoteText = emoteName;
           } else {
-            rawMessage += run['emoji']['searchTerms'][0];
+            final searchTerms = emoji['searchTerms'] as List<dynamic>?;
+            if (searchTerms != null && searchTerms.isNotEmpty) {
+              emoteName = searchTerms.first;
+              emoteText = emoteName;
+            } else {
+              // Fallback to emoji ID if available
+              emoteName = emoji['emojiId'] ?? 'unknown_emoji';
+              emoteText = emoteName;
+            }
           }
+
+          rawMessage += emoteText;
+          emoteSet.add(emoteName);
         }
       }
 
@@ -292,8 +335,8 @@ class YouTubeChatSource implements SourceService {
         userId: authorExternalChannelId,
         suggestedSpeechMessage: rawMessage,
         rawMessage: rawMessage,
-        emotePositions: [], // Add emote positions if needed
-        emoteList: [], // Add emote list if needed
+        emotePositions: _generateEmotePositions(rawMessage, emoteSet),
+        emoteList: emoteSet.toList(),
       );
     } catch (e) {
       // Handle exception

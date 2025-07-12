@@ -114,14 +114,18 @@ class _RemoveVtuberGroupName extends StatelessWidget {
     final config = context.read<Config>();
     final ignoreVtuberGroupName = context.select((Config config) =>
         config.chatToSpeechConfiguration.ignoreVtuberGroupName);
+    final readUsername = context.select(
+        (Config config) => config.chatToSpeechConfiguration.readUsername);
 
-    return Checkbox(
-      checked: ignoreVtuberGroupName,
-      onChanged: (isChecked) {
-        config.setTtsConfig(ignoreVtuberGroupName: isChecked);
-      },
-      content: const Text("Remove Vtuber Group Name"),
-    );
+    return readUsername
+        ? Checkbox(
+            checked: ignoreVtuberGroupName,
+            onChanged: (isChecked) {
+              config.setTtsConfig(ignoreVtuberGroupName: isChecked);
+            },
+            content: const Text("Don't read group name"),
+          )
+        : const SizedBox();
   }
 }
 

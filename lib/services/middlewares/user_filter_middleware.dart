@@ -12,11 +12,11 @@ class UserFilterMiddleware implements Middleware {
   Future<Message?> process(Message message) async {
     if (message is! ChatMessage) return message;
     if (_config.chatToSpeechConfiguration.isWhitelistingFilter) {
-      if (_config.chatToSpeechConfiguration.filteredUsernames
-          .contains(message.username)) return message;
+      if (_config.chatToSpeechConfiguration.filteredUserIds
+          .contains(message.userId)) return message;
     } else {
-      if (!_config.chatToSpeechConfiguration.filteredUsernames
-          .contains(message.username)) return message;
+      if (!_config.chatToSpeechConfiguration.filteredUserIds
+          .contains(message.userId)) return message;
     }
 
     return null;

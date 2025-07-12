@@ -106,7 +106,7 @@ class Config extends ChangeNotifier {
     setChatToSpeechConfiguration(
       chatToSpeechConfiguration.copyWith(
         isWhitelistingFilter: isWhitelistingFilter,
-        filteredUsernames: usernames,
+        filteredUserIds: usernames,
       ),
     );
   }
