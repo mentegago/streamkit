@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class MenuSettings extends StatelessWidget {
   final String title;
   final String? description;
+  final String? subtitle;
   final Widget? left;
   final Widget? right;
   final Function() onPressed;
@@ -11,6 +12,7 @@ class MenuSettings extends StatelessWidget {
     super.key,
     required this.title,
     this.description,
+    this.subtitle,
     required this.onPressed,
     this.left,
     this.right,
@@ -37,7 +39,7 @@ class MenuSettings extends StatelessWidget {
     final left = this.left;
     final right = this.right;
     final description = this.description;
-
+    final subtitle = this.subtitle;
     final theme = Theme.of(context);
 
     return TextButton(
@@ -54,22 +56,42 @@ class MenuSettings extends StatelessWidget {
       },
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
-        child: SizedBox(
-          height: 40.0,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            minHeight: 40,
+          ),
           child: Row(
             children: [
               if (left != null) left,
               const SizedBox(width: 12.0),
               Expanded(
-                child: Wrap(
-                  direction: Axis.horizontal,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  spacing: 6.0,
-                  children: [
-                    Text(title),
-                    if (description != null)
-                      _DescriptionButton(description: description)
-                  ],
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Wrap(
+                        direction: Axis.horizontal,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 6.0,
+                        children: [
+                          Text(title),
+                          if (description != null)
+                            _DescriptionButton(description: description)
+                        ],
+                      ),
+                      if (subtitle != null) const SizedBox(height: 2),
+                      if (subtitle != null)
+                        Text(
+                          subtitle,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.textTheme.bodySmall?.color
+                                ?.withOpacity(0.7),
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
               ),
               if (right != null) right,
