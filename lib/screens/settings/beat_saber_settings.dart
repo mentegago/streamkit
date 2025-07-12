@@ -61,7 +61,7 @@ class _ReadBsrRequestsSafely extends StatelessWidget {
     );
 
     final isChecked = context.select(
-      (Config config) => config.chatToSpeechConfiguration.readBsrSafely,
+      (Config config) => !config.chatToSpeechConfiguration.readBsrSafely,
     );
 
     return AnimatedSize(
@@ -74,11 +74,11 @@ class _ReadBsrRequestsSafely extends StatelessWidget {
                   indent: 28,
                 ),
                 SwitchSettings(
-                  isChecked: !isChecked,
+                  isChecked: isChecked,
                   title: "Read song request name",
                   subtitle: isChecked
-                      ? "StreamKit will only say that a song request has been made"
-                      : "StreamKit will read the requested song's name",
+                      ? "StreamKit will read the requested song's name"
+                      : "StreamKit will only say that a song request has been made",
                   onChanged: (value) {
                     context
                         .read<Config>()

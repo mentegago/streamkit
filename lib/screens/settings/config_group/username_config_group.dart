@@ -49,7 +49,7 @@ class _ReadUsernameEmptyMessageConfig extends StatelessWidget {
     );
 
     final isChecked = context.select(
-      (Config config) => config.chatToSpeechConfiguration.ignoreEmptyMessage,
+      (Config config) => !config.chatToSpeechConfiguration.ignoreEmptyMessage,
     );
 
     return AnimatedSize(
@@ -62,11 +62,11 @@ class _ReadUsernameEmptyMessageConfig extends StatelessWidget {
                   indent: 50,
                 ),
                 SwitchSettings(
-                  isChecked: !isChecked,
+                  isChecked: isChecked,
                   title: "Read name even when there is no readable message",
                   subtitle: isChecked
-                      ? "StreamKit will not read the sender's name if it has no readable content"
-                      : "StreamKit will always read the sender's name",
+                      ? "StreamKit will always read the sender's name"
+                      : "StreamKit will not read the sender's name if it has no readable content",
                   onChanged: (value) {
                     context
                         .read<Config>()
