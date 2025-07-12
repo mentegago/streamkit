@@ -20,7 +20,10 @@ class Footer extends StatelessWidget {
                 '/settings',
               );
             },
-            style: TextButton.styleFrom(padding: const EdgeInsets.all(18)),
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.all(18),
+              foregroundColor: Theme.of(context).colorScheme.onSurface,
+            ),
             child: const Row(
               mainAxisSize: MainAxisSize.min,
               children: [
