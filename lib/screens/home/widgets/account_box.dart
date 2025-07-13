@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:streamkit_tts/models/config_model.dart';
 import 'package:streamkit_tts/models/server/twitch_user.dart';
+import 'package:streamkit_tts/screens/home/widgets/dialogs/channel_selection_dialog.dart';
 import 'package:streamkit_tts/services/server_service.dart';
 
 class AccountBox extends HookWidget {
@@ -13,7 +14,7 @@ class AccountBox extends HookWidget {
   Widget build(BuildContext context) {
     final serverService = context.read<ServerService>();
     final channel = context.select(
-      (Config config) => config.chatToSpeechConfiguration.channels.first,
+      (Config config) => config.chatToSpeechConfiguration.channels.firstOrNull,
     );
 
     final userState = useState<TwitchUser?>(null);
@@ -23,7 +24,7 @@ class AccountBox extends HookWidget {
       Future<void> fetchUser() async {
         userState.value = null;
 
-        if (channel.isEmpty) return;
+        if (channel == null) return;
 
         isLoading.value = true;
 
@@ -62,11 +63,17 @@ class AccountBox extends HookWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(userState.value?.displayName ?? channel),
-              const Opacity(
-                opacity: 0.5,
-                child: Text("Twitch Account"),
+              Text(
+                userState.value?.displayName ??
+                    channel ??
+                    "No channel selected",
               ),
+              channel != null
+                  ? const Opacity(
+                      opacity: 0.5,
+                      child: Text("Twitch Account"),
+                    )
+                  : const SizedBox.shrink(),
             ],
           ),
         ),
@@ -77,7 +84,7 @@ class AccountBox extends HookWidget {
           onPressed: () {
             showDialog(
               context: context,
-              builder: (context) => const _ChannelSelectionDialog(),
+              builder: (context) => const ChannelSelectionDialog(),
             );
           },
           style: TextButton.styleFrom(
@@ -85,7 +92,9 @@ class AccountBox extends HookWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
               fixedSize: const Size.fromHeight(38)),
-          child: const Text("Change Channel"),
+          child: Text(
+            channel == null ? "Select Channel" : "Change Channel",
+          ),
         ),
       ],
     );
@@ -129,74 +138,5 @@ class _ProfilePicture extends StatelessWidget {
                       )
                     : SvgPicture.asset("assets/images/twitch_icon.svg"),
           );
-  }
-}
-
-class _ChannelSelectionDialog extends HookWidget {
-  const _ChannelSelectionDialog();
-
-  @override
-  Widget build(BuildContext context) {
-    final textController = useTextEditingController(
-      text: context.read<Config>().chatToSpeechConfiguration.channels.first,
-    );
-
-    final errorMessage = useState("");
-    final focusNode = useFocusNode();
-
-    focus() {
-      focusNode.requestFocus();
-      textController.selection = TextSelection(
-        baseOffset: 0,
-        extentOffset: textController.text.length,
-      );
-    }
-
-    onSubmitted() {
-      if (textController.text.isEmpty) {
-        errorMessage.value = "Enter a valid channel name";
-        focus();
-        return;
-      }
-
-      context.read<Config>().setChannelUsernames({
-        textController.text,
-      });
-
-      Navigator.of(context).pop();
-    }
-
-    useEffect(() {
-      focus();
-      return null;
-    }, []);
-
-    return AlertDialog(
-      title: const Text("Change Channel"),
-      content: TextField(
-        onSubmitted: (_) {
-          onSubmitted();
-        },
-        decoration: InputDecoration(
-          error:
-              errorMessage.value.isNotEmpty ? Text(errorMessage.value) : null,
-          labelText: "Twitch channel name",
-        ),
-        controller: textController,
-        focusNode: focusNode,
-      ),
-      actions: [
-        TextButton(
-          child: const Text('Cancel'),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
-        TextButton(
-          onPressed: onSubmitted,
-          child: const Text('Save'),
-        ),
-      ],
-    );
   }
 }

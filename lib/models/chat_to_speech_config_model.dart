@@ -109,7 +109,7 @@ class ChatToSpeechConfiguration {
       readUsername: map['readUsername'] ?? true,
       ignoreExclamationMark: map['ignoreExclamationMark'] ?? true,
       ignoreEmotes: map['ignoreEmotes'] ?? true,
-      ignoreBttvEmotes: map['ignoreBttvEmotes'] ?? true,
+      ignoreBttvEmotes: map['ignoreBttvEmotes'] ?? false,
       languages: Set<Language>.from(
           map['languages']?.map((x) => LanguageParser.fromGoogle(x)) ??
               [Language.english, Language.indonesian, Language.japanese]),
@@ -137,7 +137,7 @@ class ChatToSpeechConfiguration {
         readUsername: true,
         volume: 100.0,
         ignoreEmotes: true,
-        ignoreBttvEmotes: true,
+        ignoreBttvEmotes: false,
         readBsrSafely: false,
         ttsSource: TtsSource.google,
         filteredUsernames: {},
