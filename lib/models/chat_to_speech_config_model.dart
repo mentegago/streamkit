@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:streamkit_tts/models/enums/languages_enum.dart';
+import 'package:streamkit_tts/models/enums/app_theme_mode.dart';
 import 'package:streamkit_tts/models/enums/tts_source.dart';
 
 class ChatToSpeechConfiguration {
@@ -20,6 +21,7 @@ class ChatToSpeechConfiguration {
   final bool ignoreEmptyMessage;
   final bool ignoreUrls;
   final bool disableAKeongFilter;
+  final AppThemeMode themeMode;
 
   ChatToSpeechConfiguration({
     required this.channels,
@@ -38,6 +40,7 @@ class ChatToSpeechConfiguration {
     required this.ignoreEmptyMessage,
     required this.ignoreUrls,
     required this.disableAKeongFilter,
+    required this.themeMode,
   });
 
   ChatToSpeechConfiguration copyWith({
@@ -58,6 +61,7 @@ class ChatToSpeechConfiguration {
     bool? ignoreEmptyMessage,
     bool? ignoreUrls,
     bool? disableAKeongFilter,
+    AppThemeMode? themeMode,
   }) {
     return ChatToSpeechConfiguration(
       channels: channels ?? this.channels,
@@ -77,6 +81,7 @@ class ChatToSpeechConfiguration {
       ignoreEmptyMessage: ignoreEmptyMessage ?? this.ignoreEmptyMessage,
       ignoreUrls: ignoreUrls ?? this.ignoreUrls,
       disableAKeongFilter: disableAKeongFilter ?? this.disableAKeongFilter,
+      themeMode: themeMode ?? this.themeMode,
     );
   }
 
@@ -99,7 +104,7 @@ class ChatToSpeechConfiguration {
     result.addAll({'ignoreEmptyMessage': ignoreEmptyMessage});
     result.addAll({'ignoreUrls': ignoreUrls});
     result.addAll({'disableAKeongFilter': disableAKeongFilter});
-
+    result.addAll({'themeMode': themeMode.name});
     return result;
   }
 
@@ -124,6 +129,7 @@ class ChatToSpeechConfiguration {
       ignoreEmptyMessage: map['ignoreEmptyMessage'] ?? true,
       ignoreUrls: map['ignoreUrls'] ?? true,
       disableAKeongFilter: map['disableAKeongFilter'] ?? false,
+      themeMode: AppThemeMode.values.byName(map['themeMode'] ?? 'dark'),
     );
   }
 
@@ -145,6 +151,7 @@ class ChatToSpeechConfiguration {
         ignoreEmptyMessage: true,
         ignoreUrls: true,
         disableAKeongFilter: false,
+        themeMode: AppThemeMode.dark,
       );
 
   String toJson() => _prettyJson(toMap());

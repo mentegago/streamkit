@@ -136,7 +136,13 @@ class _ProfilePicture extends StatelessWidget {
                           profileImageUrl,
                         ),
                       )
-                    : SvgPicture.asset("assets/images/twitch_icon.svg"),
+                    : SvgPicture.asset(
+                        "assets/images/twitch_icon.svg",
+                        colorFilter: ColorFilter.mode(
+                          Theme.of(context).colorScheme.onSurface,
+                          BlendMode.srcIn,
+                        ),
+                      ),
           );
   }
 }

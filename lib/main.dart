@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:streamkit_tts/models/chat_to_speech_config_model.dart';
 import 'package:streamkit_tts/models/config_model.dart';
+import 'package:streamkit_tts/models/enums/app_theme_mode.dart';
 import 'package:streamkit_tts/screens/home/home.dart';
 import 'package:streamkit_tts/screens/settings/beat_saber_settings.dart';
 import 'package:streamkit_tts/screens/settings/settings.dart';
@@ -148,6 +149,10 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    final themeMode = context.select(
+      (Config config) => config.chatToSpeechConfiguration.themeMode,
+    );
+
     final baseTheme = ThemeData(
       colorScheme: ColorScheme.fromSeed(
         seedColor: const Color.fromARGB(255, 170, 42, 255),
@@ -190,7 +195,8 @@ class MyApp extends StatelessWidget {
             color: darkTheme.colorScheme.onSurface,
           ),
         ),
-        themeMode: ThemeMode.dark,
+        themeMode:
+            themeMode == AppThemeMode.dark ? ThemeMode.dark : ThemeMode.light,
         initialRoute: '/',
         routes: {
           '/': (context) => const HomeScreen(),

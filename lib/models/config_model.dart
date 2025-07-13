@@ -1,6 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:streamkit_tts/models/chat_to_speech_config_model.dart';
 import 'package:streamkit_tts/models/enums/languages_enum.dart';
+import 'package:streamkit_tts/models/enums/app_theme_mode.dart';
 import 'package:streamkit_tts/models/enums/tts_source.dart';
 
 class Config extends ChangeNotifier {
@@ -104,6 +105,14 @@ class Config extends ChangeNotifier {
       chatToSpeechConfiguration.copyWith(
         isWhitelistingFilter: isWhitelistingFilter,
         filteredUsernames: usernames,
+      ),
+    );
+  }
+
+  void setThemeMode(AppThemeMode themeMode) {
+    setChatToSpeechConfiguration(
+      chatToSpeechConfiguration.copyWith(
+        themeMode: themeMode,
       ),
     );
   }
