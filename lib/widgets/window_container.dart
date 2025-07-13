@@ -37,6 +37,7 @@ class WindowContainer extends HookWidget {
                     opacity: isHovered.value && showWindowButtons ? 0.6 : 0.0,
                     child: Text(
                       version == null ? "StreamKit" : "StreamKit $version",
+                      style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ),
                 ),
