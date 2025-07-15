@@ -175,46 +175,6 @@ class ChatToSpeechConfiguration {
   factory ChatToSpeechConfiguration.fromJson(String source) =>
       ChatToSpeechConfiguration.fromMap(json.decode(source));
 
-  factory ChatToSpeechConfiguration.fromOldJson(String source) {
-    final json = jsonDecode(source);
-    final config = json["chatToSpeech"];
-    final languages = Set<String>.from(
-            config?["languages"] ?? ["indonesian", "english", "japanese"])
-        .map((e) {
-      switch (e) {
-        case "indonesian":
-          return Language.indonesian;
-        case "japanese":
-          return Language.japanese;
-        case "english":
-        default:
-          return Language.english;
-      }
-    }).toSet();
-    final volume = (config?["volume"]?.toDouble() ?? 0.0) * 100.0;
-
-    return ChatToSpeechConfiguration(
-      channels: Set<String>.from(config?["channels"] ?? []),
-      youtubeVideoId: config?["youtubeVideoId"] ?? "",
-      readUsername: config?["readUsername"] ?? true,
-      ignoreExclamationMark: config?["ignoreExclamationMark"] ?? true,
-      ignoreEmotes: true,
-      ignoreBttvEmotes: true,
-      languages: languages,
-      enabled: config?["enabled"] ?? false,
-      volume: volume,
-      readBsr: config?["readBsr"] ?? false,
-      readBsrSafely: false,
-      ttsSource: TtsSource.google,
-      filteredUserIds: Set<String>.from(config?["filteredUsernames"] ?? []),
-      isWhitelistingFilter: config?["isWhitelistingFilter"] ?? false,
-      ignoreEmptyMessage: true,
-      ignoreUrls: true,
-      ignoreVtuberGroupName: true,
-      disableAKeongFilter: false,
-      themeMode: AppThemeMode.dark,
-    );
-  }
   String _prettyJson(dynamic json) {
     var spaces = ' ' * 4;
     var encoder = JsonEncoder.withIndent(spaces);

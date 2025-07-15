@@ -142,43 +142,8 @@ Future<Config> loadConfigurations(
     return Config(chatToSpeechConfiguration: config);
   }
 
-  try {
-    final oldConfigFile =
-        File('$appPath\\streamkit_configurations_youtube.json');
-    if (oldConfigFile.existsSync()) {
-      final config = ChatToSpeechConfiguration.fromOldJson(
-          oldConfigFile.readAsStringSync());
-      saveConfigurations(Config(chatToSpeechConfiguration: config),
-          configPath: configPath);
-
-      oldConfigFile.deleteSync();
-
-      return Config(chatToSpeechConfiguration: config);
-    }
-  } catch (_) {}
-
   return Config(
-    chatToSpeechConfiguration: ChatToSpeechConfiguration(
-      channels: {},
-      youtubeVideoId: "",
-      enabled: false,
-      ignoreExclamationMark: true,
-      languages: {Language.english, Language.indonesian, Language.japanese},
-      readBsr: false,
-      readUsername: true,
-      volume: 100.0,
-      ignoreEmotes: true,
-      ignoreBttvEmotes: true,
-      readBsrSafely: false,
-      ttsSource: TtsSource.google,
-      filteredUserIds: {},
-      isWhitelistingFilter: false,
-      ignoreEmptyMessage: true,
-      ignoreUrls: true,
-      ignoreVtuberGroupName: true,
-      disableAKeongFilter: false,
-      themeMode: AppThemeMode.light,
-    ),
+    chatToSpeechConfiguration: ChatToSpeechConfiguration.defaultConfig(),
   );
 }
 
