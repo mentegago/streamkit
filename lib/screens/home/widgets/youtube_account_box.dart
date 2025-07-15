@@ -3,6 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:streamkit_tts/models/config_model.dart';
+import 'package:streamkit_tts/screens/home/widgets/dialogs/youtube_video_selection_dialog.dart';
 import 'package:streamkit_tts/utils/youtube_util.dart';
 
 class YoutubeAccountBox extends HookWidget {
@@ -25,11 +26,15 @@ class YoutubeAccountBox extends HookWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(videoId.youtubeVideoId ?? ""),
-              const Opacity(
-                opacity: 0.5,
-                child: Text("YouTube Live Video"),
+              Text(
+                videoId.youtubeVideoId ?? "No video selected",
               ),
+              videoId.isNotEmpty
+                  ? const Opacity(
+                      opacity: 0.5,
+                      child: Text("YouTube Live Video"),
+                    )
+                  : const SizedBox.shrink(),
             ],
           ),
         ),
@@ -40,7 +45,7 @@ class YoutubeAccountBox extends HookWidget {
           onPressed: () {
             showDialog(
               context: context,
-              builder: (context) => const _VideoSelectionDialog(),
+              builder: (context) => const YoutubeVideoSelectionDialog(),
             );
           },
           style: TextButton.styleFrom(
@@ -50,7 +55,9 @@ class YoutubeAccountBox extends HookWidget {
             ),
             fixedSize: const Size.fromHeight(38),
           ),
-          child: const Text("Change Video"),
+          child: Text(
+            videoId.isEmpty ? "Select Video" : "Change Video",
+          ),
         ),
       ],
     );
@@ -72,74 +79,6 @@ class _ProfilePicture extends StatelessWidget {
           BlendMode.srcIn,
         ),
       ),
-    );
-  }
-}
-
-class _VideoSelectionDialog extends HookWidget {
-  const _VideoSelectionDialog();
-
-  @override
-  Widget build(BuildContext context) {
-    final textController = useTextEditingController(
-      text: context.read<Config>().chatToSpeechConfiguration.youtubeVideoId,
-    );
-
-    final errorMessage = useState("");
-    final focusNode = useFocusNode();
-
-    focus() {
-      focusNode.requestFocus();
-      textController.selection = TextSelection(
-        baseOffset: 0,
-        extentOffset: textController.text.length,
-      );
-    }
-
-    onSubmitted() {
-      if (textController.text.isEmpty ||
-          textController.text.youtubeVideoId == null) {
-        errorMessage.value = "Enter a valid YouTube Live Video";
-        focus();
-        return;
-      }
-
-      context.read<Config>().setYouTubeVideoId(textController.text);
-
-      Navigator.of(context).pop();
-    }
-
-    useEffect(() {
-      focus();
-      return null;
-    }, []);
-
-    return AlertDialog(
-      title: const Text("Change Video"),
-      content: TextField(
-        onSubmitted: (_) {
-          onSubmitted();
-        },
-        decoration: InputDecoration(
-          error:
-              errorMessage.value.isNotEmpty ? Text(errorMessage.value) : null,
-          labelText: "YouTube Live Video",
-        ),
-        controller: textController,
-        focusNode: focusNode,
-      ),
-      actions: [
-        TextButton(
-          child: const Text('Cancel'),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
-        TextButton(
-          onPressed: onSubmitted,
-          child: const Text('Save'),
-        ),
-      ],
     );
   }
 }

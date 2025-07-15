@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:streamkit_tts/models/enums/languages_enum.dart';
+import 'package:streamkit_tts/models/enums/app_theme_mode.dart';
 import 'package:streamkit_tts/models/enums/tts_source.dart';
 
 class ChatToSpeechConfiguration {
@@ -22,6 +23,7 @@ class ChatToSpeechConfiguration {
   final bool ignoreUrls;
   final bool ignoreVtuberGroupName;
   final bool disableAKeongFilter;
+  final AppThemeMode themeMode;
 
   ChatToSpeechConfiguration({
     required this.channels,
@@ -42,6 +44,7 @@ class ChatToSpeechConfiguration {
     required this.ignoreUrls,
     required this.ignoreVtuberGroupName,
     required this.disableAKeongFilter,
+    required this.themeMode,
   });
 
   ChatToSpeechConfiguration copyWith({
@@ -64,6 +67,7 @@ class ChatToSpeechConfiguration {
     bool? ignoreUrls,
     bool? ignoreVtuberGroupName,
     bool? disableAKeongFilter,
+    AppThemeMode? themeMode,
   }) {
     return ChatToSpeechConfiguration(
       channels: channels ?? this.channels,
@@ -86,6 +90,7 @@ class ChatToSpeechConfiguration {
       ignoreVtuberGroupName:
           ignoreVtuberGroupName ?? this.ignoreVtuberGroupName,
       disableAKeongFilter: disableAKeongFilter ?? this.disableAKeongFilter,
+      themeMode: themeMode ?? this.themeMode,
     );
   }
 
@@ -110,7 +115,7 @@ class ChatToSpeechConfiguration {
     result.addAll({'ignoreUrls': ignoreUrls});
     result.addAll({'ignoreVtuberGroupName': ignoreVtuberGroupName});
     result.addAll({'disableAKeongFilter': disableAKeongFilter});
-
+    result.addAll({'themeMode': themeMode.name});
     return result;
   }
 
@@ -121,7 +126,7 @@ class ChatToSpeechConfiguration {
       readUsername: map['readUsername'] ?? true,
       ignoreExclamationMark: map['ignoreExclamationMark'] ?? true,
       ignoreEmotes: map['ignoreEmotes'] ?? true,
-      ignoreBttvEmotes: map['ignoreBttvEmotes'] ?? true,
+      ignoreBttvEmotes: map['ignoreBttvEmotes'] ?? false,
       languages: Set<Language>.from(
           map['languages']?.map((x) => LanguageParser.fromGoogle(x)) ??
               [Language.english, Language.indonesian, Language.japanese]),
@@ -138,6 +143,7 @@ class ChatToSpeechConfiguration {
       ignoreUrls: map['ignoreUrls'] ?? true,
       ignoreVtuberGroupName: map['ignoreVtuberGroupName'] ?? true,
       disableAKeongFilter: map['disableAKeongFilter'] ?? false,
+      themeMode: AppThemeMode.values.byName(map['themeMode'] ?? 'dark'),
     );
   }
 
@@ -152,7 +158,7 @@ class ChatToSpeechConfiguration {
         readUsername: true,
         volume: 100.0,
         ignoreEmotes: true,
-        ignoreBttvEmotes: true,
+        ignoreBttvEmotes: false,
         readBsrSafely: false,
         ttsSource: TtsSource.google,
         filteredUserIds: {},
@@ -161,6 +167,7 @@ class ChatToSpeechConfiguration {
         ignoreUrls: true,
         ignoreVtuberGroupName: true,
         disableAKeongFilter: false,
+        themeMode: AppThemeMode.dark,
       );
 
   String toJson() => _prettyJson(toMap());
@@ -205,6 +212,7 @@ class ChatToSpeechConfiguration {
       ignoreUrls: true,
       ignoreVtuberGroupName: true,
       disableAKeongFilter: false,
+      themeMode: AppThemeMode.dark,
     );
   }
   String _prettyJson(dynamic json) {

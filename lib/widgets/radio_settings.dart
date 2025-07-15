@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 class RadioOption<T> {
   final T value;
   final String title;
-  final String subtitle;
+  final String? subtitle;
   final IconData icon;
   final Color? selectedColor;
 
   const RadioOption({
     required this.value,
     required this.title,
-    required this.subtitle,
+    this.subtitle,
     required this.icon,
     this.selectedColor,
   });
@@ -60,6 +60,7 @@ class _RadioOptionWidget<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final selectedColor = option.selectedColor ?? theme.colorScheme.primary;
+    final subtitle = option.subtitle;
 
     return Material(
       color: Colors.transparent,
@@ -93,13 +94,15 @@ class _RadioOptionWidget<T> extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 2),
-                    Text(
-                      option.subtitle,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color:
-                            theme.textTheme.bodySmall?.color?.withOpacity(0.7),
-                      ),
-                    ),
+                    subtitle != null
+                        ? Text(
+                            subtitle,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.textTheme.bodySmall?.color
+                                  ?.withOpacity(0.7),
+                            ),
+                          )
+                        : const SizedBox.shrink(),
                   ],
                 ),
               ),

@@ -13,6 +13,7 @@ class UsernameConfig extends StatelessWidget {
       title: "Name handling",
       children: [
         _ReadUsernameConfig(),
+        _IgnoreVtuberGroupNameConfig(),
         _ReadUsernameEmptyMessageConfig(),
       ],
     );
@@ -35,6 +36,48 @@ class _ReadUsernameConfig extends StatelessWidget {
         context.read<Config>().setTtsConfig(readUsername: value);
       },
       left: const Icon(Icons.speaker_notes_rounded),
+    );
+  }
+}
+
+class _IgnoreVtuberGroupNameConfig extends StatelessWidget {
+  const _IgnoreVtuberGroupNameConfig();
+
+  @override
+  Widget build(BuildContext context) {
+    final isReadUsernameChecked = context.select(
+      (Config config) => config.chatToSpeechConfiguration.readUsername,
+    );
+
+    final isChecked = context.select(
+      (Config config) => config.chatToSpeechConfiguration.ignoreVtuberGroupName,
+    );
+
+    return AnimatedSize(
+      duration: Durations.short4,
+      child: isReadUsernameChecked
+          ? Column(
+              children: [
+                const Divider(
+                  height: 1,
+                  indent: 50,
+                ),
+                SwitchSettings(
+                  isChecked: isChecked,
+                  title: "Remove group name",
+                  subtitle: isChecked
+                      ? "StreamKit will remove common streamer group name patterns"
+                      : "StreamKit will read the sender's full YouTube channel name",
+                  onChanged: (value) {
+                    context
+                        .read<Config>()
+                        .setTtsConfig(ignoreVtuberGroupName: value);
+                  },
+                  left: const Icon(Icons.group),
+                ),
+              ],
+            )
+          : Container(),
     );
   }
 }

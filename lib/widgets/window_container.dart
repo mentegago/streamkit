@@ -37,6 +37,7 @@ class WindowContainer extends HookWidget {
                     opacity: isHovered.value && showWindowButtons ? 0.6 : 0.0,
                     child: Text(
                       version == null ? "StreamKit" : "StreamKit $version",
+                      style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ),
                 ),
@@ -61,30 +62,31 @@ class WindowContainer extends HookWidget {
 }
 
 class _WindowButtons extends StatelessWidget {
-  final _buttonColors = WindowButtonColors(
-    iconNormal: Colors.white,
-    mouseOver: Colors.white.withAlpha(10),
-    mouseDown: Colors.white.withAlpha(5),
-    iconMouseOver: Colors.white,
-    iconMouseDown: Colors.white,
-  );
-
-  final _closeButtonColors = WindowButtonColors(
-    mouseOver: const Color(0xFFD32F2F),
-    mouseDown: const Color(0xFFB71C1C),
-    iconNormal: Colors.white,
-    iconMouseOver: Colors.white,
-  );
-
-  _WindowButtons();
+  const _WindowButtons();
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final buttonColors = WindowButtonColors(
+      iconNormal: theme.colorScheme.onSurface,
+      mouseOver: theme.colorScheme.onSurface.withAlpha(25),
+      mouseDown: theme.colorScheme.onSurface.withAlpha(15),
+      iconMouseOver: theme.colorScheme.onSurface,
+      iconMouseDown: theme.colorScheme.onSurface,
+    );
+
+    final closeButtonColors = WindowButtonColors(
+      mouseOver: const Color(0xFFD32F2F),
+      mouseDown: const Color(0xFFB71C1C),
+      iconNormal: theme.colorScheme.onSurface,
+      iconMouseOver: theme.colorScheme.onSurface,
+    );
+
     return Row(
       children: [
-        MinimizeWindowButton(colors: _buttonColors),
-        MaximizeWindowButton(colors: _buttonColors),
-        CloseWindowButton(colors: _closeButtonColors),
+        MinimizeWindowButton(colors: buttonColors),
+        MaximizeWindowButton(colors: buttonColors),
+        CloseWindowButton(colors: closeButtonColors),
       ],
     );
   }

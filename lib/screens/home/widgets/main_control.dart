@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
 import 'package:streamkit_tts/models/config_model.dart';
+import 'package:streamkit_tts/screens/home/widgets/dialogs/youtube_video_selection_dialog.dart';
 import 'package:streamkit_tts/screens/home/widgets/youtube_account_box.dart';
 import 'package:streamkit_tts/services/composers/composer_service.dart';
 
@@ -56,6 +57,22 @@ class _StartButton extends HookWidget {
       case ComposerStatus.inactive:
         return TextButton(
           onPressed: () {
+            if (context
+                .read<Config>()
+                .chatToSpeechConfiguration
+                .youtubeVideoId
+                .isEmpty) {
+              showDialog(
+                context: context,
+                builder: (context) => YoutubeVideoSelectionDialog(
+                  onSelected: (_) {
+                    context.read<Config>().setEnabled(true);
+                  },
+                ),
+              );
+              return;
+            }
+
             context.read<Config>().setEnabled(true);
           },
           style: TextButton.styleFrom(

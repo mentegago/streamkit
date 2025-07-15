@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:streamkit_tts/screens/settings/config_group/theme_config_group.dart';
 import 'package:streamkit_tts/screens/settings/config_group/filter_config_group.dart';
 import 'package:streamkit_tts/screens/settings/config_group/username_config_group.dart';
 import 'package:streamkit_tts/screens/settings/config_group/integrations_config_group.dart';
@@ -18,6 +19,7 @@ class SettingsScreen extends StatelessWidget {
           UsernameConfig(),
           FilterConfig(),
           IntegrationsConfigGroup(),
+          ThemeConfigGroup(),
         ],
       );
 }

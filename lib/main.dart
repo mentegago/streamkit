@@ -9,6 +9,7 @@ import 'package:streamkit_tts/models/chat_to_speech_config_model.dart';
 import 'package:streamkit_tts/models/config_model.dart';
 import 'package:streamkit_tts/models/enums/languages_enum.dart';
 import 'package:streamkit_tts/models/enums/tts_source.dart';
+import 'package:streamkit_tts/models/enums/app_theme_mode.dart';
 import 'package:streamkit_tts/screens/home/home.dart';
 import 'package:streamkit_tts/screens/settings/beat_saber_settings.dart';
 import 'package:streamkit_tts/screens/settings/settings.dart';
@@ -176,6 +177,7 @@ Future<Config> loadConfigurations(
       ignoreUrls: true,
       ignoreVtuberGroupName: true,
       disableAKeongFilter: false,
+      themeMode: AppThemeMode.light,
     ),
   );
 }
@@ -186,6 +188,10 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    final themeMode = context.select(
+      (Config config) => config.chatToSpeechConfiguration.themeMode,
+    );
+
     final baseTheme = ThemeData(
       colorScheme: const ColorScheme(
         brightness: Brightness.light,
@@ -316,7 +322,8 @@ class MyApp extends StatelessWidget {
             color: darkTheme.colorScheme.onSurface,
           ),
         ),
-        themeMode: ThemeMode.dark,
+        themeMode:
+            themeMode == AppThemeMode.dark ? ThemeMode.dark : ThemeMode.light,
         initialRoute: '/',
         routes: {
           '/': (context) => const HomeScreen(),
