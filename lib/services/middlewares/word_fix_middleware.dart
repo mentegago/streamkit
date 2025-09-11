@@ -33,6 +33,9 @@ class WordFixMiddleware implements Middleware {
 
             case Language.japanese:
               return (name.original, name.jp);
+
+            case Language.thai:
+              return (name.original, name.th);
           }
         })
         .where((name) => name.$2 != null)

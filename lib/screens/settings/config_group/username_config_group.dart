@@ -107,9 +107,7 @@ class _ReadUsernameEmptyMessageConfig extends StatelessWidget {
                 SwitchSettings(
                   isChecked: isChecked,
                   title: "Read name even when there is no readable message",
-                  subtitle: isChecked
-                      ? "StreamKit will always read the sender's name"
-                      : "StreamKit will not read the sender's name if it has no readable content",
+                  subtitle: "Enable to read username even when all the message content is filtered out",
                   onChanged: (value) {
                     context
                         .read<Config>()

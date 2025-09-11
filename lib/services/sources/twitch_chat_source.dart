@@ -129,7 +129,7 @@ class TwitchChatSource implements SourceService {
       );
       final response = await http.get(url);
       if (response.statusCode != 200) return;
-      if (response.body.toLowerCase().contains("unable to retrieve")) return;
+      if (!RegExp(r'^[a-zA-Z0-9 ]+$').hasMatch(response.body)) return;
 
       final emotes = response.body.split(' ');
       _channelBttvEmotes = emotes;

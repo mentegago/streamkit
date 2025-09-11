@@ -43,6 +43,11 @@ class AppLanguageDetectionService implements LanguageDetectionService {
       return Language.japanese;
     }
 
+    if (whitelistedLanguages.contains(Language.thai) &&
+        (whitelistedLanguages.length == 1 || _isThai(text))) {
+      return Language.thai;
+    }
+
     final textProfile = _getLanguageProfile(text);
 
     final enScore = Tuple2(
@@ -77,6 +82,10 @@ class AppLanguageDetectionService implements LanguageDetectionService {
   bool _isJapanese(String text) {
     return text.contains(RegExp(r'[一-龯ぁ-んァ-ン]')) ||
         text.contains("teeeeeccchhhh");
+  }
+
+  bool _isThai(String text) {
+    return text.contains(RegExp(r'[ก-๙]'));
   }
 
   int _languageScore(List<String> profile, Map<String, dynamic> language) {

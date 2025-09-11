@@ -35,7 +35,7 @@ class _RemoveEmotesConfig extends StatelessWidget {
 
     return SwitchSettings(
       isChecked: isChecked,
-      title: "Remove emotes",
+      title: "Don't read emotes",
       onChanged: (value) {
         context.read<Config>().setTtsConfig(ignoreEmotes: value);
       },
@@ -66,16 +66,15 @@ class _RemoveBttvEmotesConfig extends StatelessWidget {
               children: [
                 SwitchSettings(
                   isChecked: isIgnoringBttvEmotes,
-                  title: "Remove BetterTTV emotes",
+                  title: "Don't read BetterTTV emotes",
                   onChanged: (value) {
                     context
                         .read<Config>()
                         .setTtsConfig(ignoreBttvEmotes: value);
                   },
-                  left: Container(
-                    width: iconThemeData.size,
-                    height: iconThemeData.size,
-                    padding: const EdgeInsets.all(2),
+                  left: SizedBox(
+                    width: (iconThemeData.size ?? 1) - 6,
+                    height: (iconThemeData.size ?? 1) - 6,
                     child: SvgPicture.asset(
                       "assets/images/betterttv_icon.svg",
                       colorFilter: ColorFilter.mode(
@@ -107,7 +106,7 @@ class _RemoveUrlsConfig extends StatelessWidget {
 
     return SwitchSettings(
       isChecked: isChecked,
-      title: "Remove links / URLs",
+      title: "Don't read links / URLs",
       onChanged: (value) {
         context.read<Config>().setTtsConfig(ignoreUrls: value);
       },

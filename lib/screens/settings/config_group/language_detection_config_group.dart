@@ -38,6 +38,13 @@ class LanguageDetectionConfigGroup extends StatelessWidget {
         _LanguageSwitch(
           language: Language.french,
         ),
+        Divider(
+          height: 1,
+          indent: 50,
+        ),
+        _LanguageSwitch(
+          language: Language.thai,
+        ),
       ],
     );
   }
