@@ -36,7 +36,7 @@ class _RemoveEmotesConfig extends StatelessWidget {
 
     return SwitchSettings(
       isChecked: isChecked,
-      title: "Remove emotes",
+      title: "Don't read emotes",
       onChanged: (value) {
         context.read<Config>().setTtsConfig(ignoreEmotes: value);
       },
@@ -67,7 +67,7 @@ class _RemoveBttvEmotesConfig extends StatelessWidget {
               children: [
                 SwitchSettings(
                   isChecked: isIgnoringBttvEmotes,
-                  title: "Remove BetterTTV emotes",
+                  title: "Don't read BetterTTV emotes",
                   onChanged: (value) {
                     context
                         .read<Config>()
@@ -107,7 +107,7 @@ class _RemoveUrlsConfig extends StatelessWidget {
 
     return SwitchSettings(
       isChecked: isChecked,
-      title: "Remove links / URLs",
+      title: "Don't read links / URLs",
       onChanged: (value) {
         context.read<Config>().setTtsConfig(ignoreUrls: value);
       },
