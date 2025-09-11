@@ -110,7 +110,7 @@ class ChatToSpeechConfiguration {
 
   factory ChatToSpeechConfiguration.fromMap(Map<String, dynamic> map) {
     return ChatToSpeechConfiguration(
-      channels: Set<String>.from(map['channels']),
+      channels: Set<String>.from(map['channels'] ?? []),
       readUsername: map['readUsername'] ?? true,
       ignoreExclamationMark: map['ignoreExclamationMark'] ?? true,
       ignoreEmotes: map['ignoreEmotes'] ?? true,
