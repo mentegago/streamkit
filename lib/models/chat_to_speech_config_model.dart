@@ -114,7 +114,7 @@ class ChatToSpeechConfiguration {
       readUsername: map['readUsername'] ?? true,
       ignoreExclamationMark: map['ignoreExclamationMark'] ?? true,
       ignoreEmotes: map['ignoreEmotes'] ?? true,
-      ignoreBttvEmotes: map['ignoreBttvEmotes'] ?? false,
+      ignoreBttvEmotes: map['ignoreBttvEmotes'] ?? true,
       languages: Set<Language>.from(
           map['languages']?.map((x) => LanguageParser.fromGoogle(x)) ??
               [Language.english, Language.indonesian, Language.japanese]),
@@ -134,25 +134,7 @@ class ChatToSpeechConfiguration {
   }
 
   factory ChatToSpeechConfiguration.defaultConfig() =>
-      ChatToSpeechConfiguration(
-        channels: {},
-        enabled: false,
-        ignoreExclamationMark: true,
-        languages: {Language.english, Language.indonesian, Language.japanese},
-        readBsr: false,
-        readUsername: true,
-        volume: 100.0,
-        ignoreEmotes: true,
-        ignoreBttvEmotes: false,
-        readBsrSafely: false,
-        ttsSource: TtsSource.google,
-        filteredUsernames: {},
-        isWhitelistingFilter: false,
-        ignoreEmptyMessage: true,
-        ignoreUrls: true,
-        disableAKeongFilter: false,
-        themeMode: AppThemeMode.dark,
-      );
+      ChatToSpeechConfiguration.fromMap({});
 
   String toJson() => _prettyJson(toMap());
 
