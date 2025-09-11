@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flag/flag_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -11,77 +12,70 @@ import 'package:streamkit_tts/widgets/switch_settings.dart';
 class LanguageDetectionConfigGroup extends HookWidget {
   const LanguageDetectionConfigGroup({super.key});
 
+  final priorityLanguages = const {
+    Language.english,
+    Language.indonesian,
+    Language.japanese,
+  };
+
+  final languages = const [
+    Language.english,
+    Language.indonesian,
+    Language.japanese,
+    Language.french,
+    Language.thai,
+    Language.arabic,
+    Language.hindi,
+    Language.russian,
+  ];
+
   @override
   Widget build(BuildContext context) {
     final showAllLanguages = useState<bool>(false);
-        
+
+    final selectedLanguages = useMemoized(() => context.read<Config>().chatToSpeechConfiguration.languages);
+    final sortedLanguages = useMemoized(() {
+      // Priority languages are at the top, followed by selected languages, followed by the rest of the languages.
+      return languages.toList()..sort((a, b) {
+        final aIndex = languages.indexOf(a)
+          + (priorityLanguages.contains(a) ? 0 : selectedLanguages.contains(a) ? 1000 : 10000);
+        final bIndex = languages.indexOf(b)
+          + (priorityLanguages.contains(b) ? 0 : selectedLanguages.contains(b) ? 1000 : 10000);
+
+        return aIndex.compareTo(bIndex);
+      });
+    }, [selectedLanguages]);
+
+    final initialDisplayedLanguages = useMemoized(() {
+      // Only display priority languages and selected languages.
+      return sortedLanguages
+        .asMap()
+        .entries
+        .where(
+          (e) => priorityLanguages.contains(e.value) || selectedLanguages.contains(e.value),
+        )
+        .map((e) => e.value)
+        .toList();
+    }, [sortedLanguages]);
+
+    final languageWidgets = useMemoized(() {
+      return (showAllLanguages.value ? sortedLanguages : initialDisplayedLanguages)
+        .map(
+          (e) => [_LanguageSwitch(language: e), const Divider(height: 1, indent: 50)],
+        )
+        .expand((e) => e)
+        .toList();
+    }, [showAllLanguages.value, sortedLanguages, initialDisplayedLanguages]);
+
     return ConfigContainer(
       title: "Auto Language Detection",
       children: [
-        const _LanguageSwitch(
-          language: Language.english,
-        ),
-        const Divider(
-          height: 1,
-          indent: 50,
-        ),
-        const _LanguageSwitch(
-          language: Language.indonesian,
-        ),
-        const Divider(
-          height: 1,
-          indent: 50,
-        ),
-        const _LanguageSwitch(
-          language: Language.japanese,
-        ),
         AnimatedSize(
           duration: Durations.short4,
-          child: showAllLanguages.value
-              ? const Column(
-                  children: [
-                    Divider(
-                      height: 1,
-                      indent: 50,
-                    ),
-                    _LanguageSwitch(
-                      language: Language.french,
-                    ),
-                    Divider(
-                      height: 1,
-                      indent: 50,
-                    ),
-                    _LanguageSwitch(
-                      language: Language.thai,
-                    ),
-                    Divider(
-                      height: 1,
-                      indent: 50,
-                    ),
-                    _LanguageSwitch(
-                      language: Language.arabic,
-                    ),
-                    Divider(
-                      height: 1,
-                      indent: 50,
-                    ),
-                    _LanguageSwitch(
-                      language: Language.hindi,
-                    ),
-                    Divider(
-                      height: 1,
-                      indent: 50,
-                    ),
-                    _LanguageSwitch(
-                      language: Language.russian,
-                    ),
-                  ],
-                )
-              : Container(),
-        ),
-        const Divider(
-          height: 1,
-          indent: 50,
+          alignment: Alignment.topLeft,
+          child: Column(
+            children: languageWidgets,
+          ),
         ),
         MenuSettings.expandable(
           expanded: showAllLanguages.value,
@@ -112,6 +106,7 @@ class _LanguageSwitch extends StatelessWidget {
     );
 
     return SwitchSettings(
+      key: Key(language.name),
       isChecked: isChecked,
       title: language.displayName,
       description: description,
