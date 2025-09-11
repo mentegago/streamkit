@@ -60,9 +60,10 @@ class LanguageDetectionConfigGroup extends HookWidget {
 
     final languageWidgets = useMemoized(() {
       return (showAllLanguages.value ? sortedLanguages : initialDisplayedLanguages)
-        .map(
-          (e) => [_LanguageSwitch(language: e), const Divider(height: 1, indent: 50)],
-        )
+        .mapIndexed((index, language) => [
+          if (index != 0) const Divider(height: 1, indent: 50),
+          _LanguageSwitch(language: language)
+        ])
         .expand((e) => e)
         .toList();
     }, [showAllLanguages.value, sortedLanguages, initialDisplayedLanguages]);
@@ -77,13 +78,17 @@ class LanguageDetectionConfigGroup extends HookWidget {
             children: languageWidgets,
           ),
         ),
-        MenuSettings.expandable(
-          expanded: showAllLanguages.value,
-          title: showAllLanguages.value ? "Show less languages" : "Show more languages",
-          onPressed: () {
-            showAllLanguages.value = !showAllLanguages.value;
-          },
-        ),
+        if (sortedLanguages.length > initialDisplayedLanguages.length) 
+          ...[
+              const Divider(height: 1, indent: 50),
+            MenuSettings.expandable(
+              expanded: showAllLanguages.value,
+              title: showAllLanguages.value ? "Show less languages" : "Show more languages",
+              onPressed: () {
+                showAllLanguages.value = !showAllLanguages.value;
+              },
+            ),
+          ],
       ],
     );
   }
