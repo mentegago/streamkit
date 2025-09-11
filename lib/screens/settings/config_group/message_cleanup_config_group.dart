@@ -73,10 +73,9 @@ class _RemoveBttvEmotesConfig extends StatelessWidget {
                         .read<Config>()
                         .setTtsConfig(ignoreBttvEmotes: value);
                   },
-                  left: Container(
-                    width: iconThemeData.size,
-                    height: iconThemeData.size,
-                    padding: const EdgeInsets.all(2),
+                  left: SizedBox(
+                    width: (iconThemeData.size ?? 1) - 6,
+                    height: (iconThemeData.size ?? 1) - 6,
                     child: SvgPicture.asset(
                       "assets/images/betterttv_icon.svg",
                       colorFilter: ColorFilter.mode(
