@@ -36,6 +36,15 @@ class NameFixMiddleware implements Middleware {
 
             case Language.thai:
               return (name.original, name.th);
+
+            case Language.arabic:
+              return (name.original, name.ar);
+
+            case Language.hindi:
+              return (name.original, name.hi);
+
+            case Language.russian:
+              return (name.original, name.ru);
           }
         })
         .where((name) => name.$2 != null)

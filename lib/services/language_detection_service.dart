@@ -48,6 +48,21 @@ class AppLanguageDetectionService implements LanguageDetectionService {
       return Language.thai;
     }
 
+    if (whitelistedLanguages.contains(Language.hindi) &&
+        (whitelistedLanguages.length == 1 || _isHindi(text))) {
+      return Language.hindi;
+    }
+
+    if (whitelistedLanguages.contains(Language.russian) &&
+        (whitelistedLanguages.length == 1 || _isRussian(text))) {
+      return Language.russian;
+    }
+
+    if (whitelistedLanguages.contains(Language.arabic) &&
+        (whitelistedLanguages.length == 1 || _isArabic(text))) {
+      return Language.arabic;
+    }
+
     final textProfile = _getLanguageProfile(text);
 
     final enScore = Tuple2(
@@ -86,6 +101,18 @@ class AppLanguageDetectionService implements LanguageDetectionService {
 
   bool _isThai(String text) {
     return text.contains(RegExp(r'[ก-๙]'));
+  }
+
+  bool _isHindi(String text) {
+    return text.contains(RegExp(r'[\u0900-\u097F]'));
+  }
+
+  bool _isRussian(String text) {
+    return text.contains(RegExp(r'[\u0400-\u04FF]'));
+  }
+
+  bool _isArabic(String text) {
+    return text.contains(RegExp(r'[\u0600-\u06FF]'));
   }
 
   int _languageScore(List<String> profile, Map<String, dynamic> language) {

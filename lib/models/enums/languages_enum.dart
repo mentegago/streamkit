@@ -1,6 +1,15 @@
 import 'package:flag/flag_enum.dart';
 
-enum Language { english, indonesian, japanese, french, thai }
+enum Language { 
+  english, 
+  indonesian, 
+  japanese, 
+  french, 
+  thai, 
+  arabic,
+  hindi,
+  russian,
+}
 
 extension LanguageExtension on Language {
   String get google {
@@ -15,21 +24,12 @@ extension LanguageExtension on Language {
         return 'fr';
       case Language.thai:
         return 'th';
-    }
-  }
-
-  String get tikTokSpeaker {
-    switch (this) {
-      case Language.english:
-        return 'en_us_001';
-      case Language.indonesian:
-        return 'id_001';
-      case Language.japanese:
-        return 'jp_001';
-      case Language.french:
-        return 'fr_001';
-      case Language.thai:
-        return 'th_001';
+      case Language.arabic:
+        return 'ar';
+      case Language.hindi:
+        return 'hi';
+      case Language.russian:
+        return 'ru';
     }
   }
 
@@ -45,6 +45,12 @@ extension LanguageExtension on Language {
         return 'French';
       case Language.thai:
         return 'Thai';
+      case Language.arabic:
+        return 'Arabic';
+      case Language.hindi:
+        return 'Hindi';
+      case Language.russian:
+        return 'Russian';
     }
   }
 
@@ -62,6 +68,12 @@ extension LanguageExtension on Language {
         return 'FR';
       case Language.thai:
         return 'TH';
+      case Language.arabic:
+        return 'AR';
+      case Language.hindi:
+        return 'HI';
+      case Language.russian:
+        return 'RU';
     }
   }
 
@@ -77,6 +89,12 @@ extension LanguageExtension on Language {
         return FlagsCode.FR;
       case Language.thai:
         return FlagsCode.TH;
+      case Language.arabic:
+        return FlagsCode.SA;
+      case Language.hindi:
+        return FlagsCode.IN;
+      case Language.russian:
+        return FlagsCode.RU;
     }
   }
 }
@@ -94,6 +112,12 @@ class LanguageParser {
         return Language.french;
       case "th":
         return Language.thai;
+      case "ar":
+        return Language.arabic;
+      case "hi":
+        return Language.hindi;
+      case "ru":
+        return Language.russian;
       default:
         return null;
     }
@@ -101,16 +125,22 @@ class LanguageParser {
 
   static Language? fromForceCode(String lang) {
     switch (lang) {
-      case "EN":
+      case "EN" || "?EN":
         return Language.english;
-      case "ID":
+      case "ID" || "?ID":
         return Language.indonesian;
-      case "JP":
+      case "JP" || "?JP":
         return Language.japanese;
-      case "FR":
+      case "FR" || "?FR":
         return Language.french;
-      case "TH":
+      case "?TH":
         return Language.thai;
+      case "?AR":
+        return Language.arabic;
+      case "?HI":
+        return Language.hindi;
+      case "?RU":
+        return Language.russian;
       default:
         return null;
     }
