@@ -72,6 +72,7 @@ class LanguageDetectionConfigGroup extends HookWidget {
       title: "Auto Language Detection",
       children: [
         AnimatedSize(
+          curve: Curves.easeInOut,
           duration: Durations.short4,
           alignment: Alignment.topLeft,
           child: Column(
