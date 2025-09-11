@@ -43,7 +43,8 @@ class _ReadBsrRequests extends StatelessWidget {
 
     return SwitchSettings(
       isChecked: isChecked,
-      title: "Announce song request / !bsr command",
+      left: const Icon(Icons.notification_important),
+      title: "Announce !bsr song request",
       onChanged: (value) {
         context.read<Config>().setBsrSpecificConfig(readBsr: value);
       },
@@ -75,10 +76,9 @@ class _ReadBsrRequestsSafely extends StatelessWidget {
                 ),
                 SwitchSettings(
                   isChecked: isChecked,
-                  title: "Read song request name",
-                  subtitle: isChecked
-                      ? "StreamKit will read the requested song's name"
-                      : "StreamKit will only say that a song request has been made",
+                  left: const Icon(Icons.music_note),
+                  title: "Read the requested song name",
+                  subtitle: "Enable to include the song name in the announcement",
                   onChanged: (value) {
                     context
                         .read<Config>()

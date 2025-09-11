@@ -34,6 +34,23 @@ class MenuSettings extends StatelessWidget {
         right: const Icon(Icons.chevron_right),
       );
 
+  factory MenuSettings.expandable({
+    key,
+    required title,
+    description,
+    required onPressed,
+    required expanded,
+    left,
+  }) => 
+    MenuSettings(
+      key: key, 
+      onPressed: onPressed, 
+      title: title, 
+      description: description, 
+      left: left, 
+      right: AnimatedRotation(turns: expanded ? 0.5 : 0, duration: Durations.medium1, child: const Icon(Icons.expand_more)),
+      );
+
   @override
   Widget build(BuildContext context) {
     final left = this.left;

@@ -107,7 +107,7 @@ class _ReadUsernameEmptyMessageConfig extends StatelessWidget {
                 SwitchSettings(
                   isChecked: isChecked,
                   title: "Read name even when there is no readable message",
-                  subtitle: "Enable to read username even when all the message content is filtered out",
+                  subtitle: "Enable to read the chat sender's name even when there's no readable message due to the \"Message Clean-up\" settings",
                   onChanged: (value) {
                     context
                         .read<Config>()

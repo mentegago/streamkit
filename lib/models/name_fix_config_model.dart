@@ -46,6 +46,12 @@ class NameFixConfig {
         return name.fr ?? originalName;
       case Language.thai:
         return name.th ?? originalName;
+      case Language.arabic:
+        return name.ar ?? originalName;
+      case Language.hindi:
+        return name.hi ?? originalName;
+      case Language.russian:
+        return name.ru ?? originalName;
     }
   }
 
@@ -62,6 +68,9 @@ class Name {
     this.en,
     this.fr,
     this.th,
+    this.ar,
+    this.hi,
+    this.ru,
   });
 
   String original;
@@ -70,6 +79,9 @@ class Name {
   String? en;
   String? fr;
   String? th;
+  String? ar;
+  String? hi;
+  String? ru;
 
   factory Name.fromJson(Map<String, dynamic> json) => Name(
         original: json["original"],
@@ -78,6 +90,9 @@ class Name {
         en: json["en"],
         fr: json["fr"],
         th: json["th"],
+        ar: json["ar"],
+        hi: json["hi"],
+        ru: json["ru"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -87,5 +102,8 @@ class Name {
         "en": en,
         "fr": fr,
         "th": th,
+        "ar": ar,
+        "hi": hi,
+        "ru": ru,
       };
 }
