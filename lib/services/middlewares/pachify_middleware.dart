@@ -19,7 +19,7 @@ class PachifyMiddleware implements Middleware {
     if (message is! ChatMessage) return message;
     var messageText = _miscTtsUtil.pachify(
       message.suggestedSpeechMessage,
-      username: message.username,
+      userId: message.userId,
       panciList: _externalConfig.panciList,
     );
     messageText = _miscTtsUtil.warafy(messageText);

@@ -31,9 +31,8 @@ class VersionStatus {
 }
 
 class VersionCheckService extends ChangeNotifier {
-  final _apiUrl = "https://pastebin.com/raw/Mkvrte4C";
-  final String _defaultDownloadUrl =
-      "https://github.com/mentegago/streamkit/releases/latest";
+  final _apiUrl = "https://pastebin.com/raw/2VAGpvdE";
+  final String _defaultDownloadUrl = "https://discord.nnt.gg";
 
   late VersionStatus _status;
   String? _currentVersion;

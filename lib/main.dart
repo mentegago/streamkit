@@ -28,10 +28,13 @@ import 'package:streamkit_tts/services/middlewares/remove_urls_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/skip_empty_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/skip_exclamation_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/user_filter_middleware.dart';
+import 'package:streamkit_tts/flavor_config.dart';
+import 'package:streamkit_tts/services/middlewares/vtuber_name_filter_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/word_fix_middleware.dart';
 import 'package:streamkit_tts/services/outputs/google_tts_output.dart';
-import 'package:streamkit_tts/services/server_service.dart';
 import 'package:streamkit_tts/services/sources/twitch_chat_source.dart';
+import 'package:streamkit_tts/services/sources/youtube_chat_source.dart';
+import 'package:streamkit_tts/services/server_service.dart';
 import 'package:streamkit_tts/services/version_check_service.dart';
 import 'package:streamkit_tts/utils/external_config_util.dart';
 import 'package:streamkit_tts/utils/misc_tts_util.dart';
@@ -59,7 +62,9 @@ void main() async {
 
   final ComposerService composerService = AppComposerService(
     config: config,
-    sourceService: TwitchChatSource(config: config),
+    sourceService: FlavorConfig.isYouTube
+        ? YouTubeChatSource(config: config)
+        : TwitchChatSource(config: config),
     middlewares: [
       // Filter and command handler middlewares
       DevCommandsMiddleware(
@@ -84,6 +89,7 @@ void main() async {
         languageDetectionService: languageDetectionService,
       ),
       SkipEmptyMiddleware(config: config),
+      if (FlavorConfig.isYouTube) VtuberNameFilterMiddleware(config: config),
       ReadUsernameMiddleware(config: config),
       NameFixMiddleware(externalConfig: externalConfigUtil),
       WordFixMiddleware(externalConfig: externalConfigUtil),
@@ -125,13 +131,13 @@ void main() async {
 }
 
 void saveConfigurations(Config config, {required String configPath}) {
-  final file = File('$configPath\\config.json');
+  final file = File('$configPath\\${FlavorConfig.configFileName}');
   file.writeAsStringSync(config.chatToSpeechConfiguration.toJson());
 }
 
 Future<Config> loadConfigurations(
     {required String configPath, required String appPath}) async {
-  final file = File('$configPath\\config.json');
+  final file = File('$configPath\\${FlavorConfig.configFileName}');
 
   if (file.existsSync()) {
     final config = ChatToSpeechConfiguration.fromJson(file.readAsStringSync());
@@ -153,29 +159,136 @@ class MyApp extends StatelessWidget {
       (Config config) => config.chatToSpeechConfiguration.themeMode,
     );
 
-    final baseTheme = ThemeData(
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: const Color.fromARGB(255, 170, 42, 255),
-        brightness: Brightness.light,
-        surfaceContainerHighest: Colors.white,
-        surfaceContainerLow: Colors.white,
-      ),
-      useMaterial3: true,
-      extensions: const [
-        CustomColors.light,
-      ],
-    );
+    final ThemeData baseTheme;
+    final ThemeData darkTheme;
 
-    final darkTheme = ThemeData(
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: const Color.fromARGB(255, 170, 42, 255),
-        brightness: Brightness.dark,
-      ),
-      useMaterial3: true,
-      extensions: const [
-        CustomColors.dark,
-      ],
-    );
+    if (FlavorConfig.isYouTube) {
+      baseTheme = ThemeData(
+        colorScheme: const ColorScheme(
+          brightness: Brightness.light,
+          primary: Color(0xFFDC2626),
+          onPrimary: Color(0xFFFFFFFF),
+          primaryContainer: Color(0xFFDC2626),
+          onPrimaryContainer: Color(0xFFFFFFFF),
+          primaryFixed: Color(0xFFF7D0D0),
+          primaryFixedDim: Color(0xFFEEA1A1),
+          onPrimaryFixed: Color(0xFF610F0F),
+          onPrimaryFixedVariant: Color(0xFF711212),
+          secondary: Color(0xFFF5F5F5),
+          onSecondary: Color(0xFF000000),
+          secondaryContainer: Color(0xFFF5F5F5),
+          onSecondaryContainer: Color(0xFF000000),
+          secondaryFixed: Color(0xFFFBFBFB),
+          secondaryFixedDim: Color(0xFFF1F1F1),
+          onSecondaryFixed: Color(0xFF4A4A4A),
+          onSecondaryFixedVariant: Color(0xFF6A6A6A),
+          tertiary: Color(0xFFF5F5F5),
+          onTertiary: Color(0xFF000000),
+          tertiaryContainer: Color(0xFFF5F5F5),
+          onTertiaryContainer: Color(0xFF000000),
+          tertiaryFixed: Color(0xFFFBFBFB),
+          tertiaryFixedDim: Color(0xFFF1F1F1),
+          onTertiaryFixed: Color(0xFF4A4A4A),
+          onTertiaryFixedVariant: Color(0xFF6A6A6A),
+          error: Color(0xFFEF4444),
+          onError: Color(0xFFFFFFFF),
+          errorContainer: Color(0xFFFFE6E6),
+          onErrorContainer: Color(0xFF000000),
+          surface: Color(0xFFFCFCFC),
+          onSurface: Color(0xFF111111),
+          surfaceDim: Color(0xFFE0E0E0),
+          surfaceBright: Color(0xFFFDFDFD),
+          surfaceContainerLowest: Color(0xFFFFFFFF),
+          surfaceContainerLow: Color(0xFFF8F8F8),
+          surfaceContainer: Color(0xFFF3F3F3),
+          surfaceContainerHigh: Color(0xFFEDEDED),
+          surfaceContainerHighest: Color(0xFFE7E7E7),
+          onSurfaceVariant: Color(0xFF393939),
+          outline: Color(0xFF919191),
+          outlineVariant: Color(0xFFD1D1D1),
+          shadow: Color(0xFF000000),
+          scrim: Color(0xFF000000),
+          inverseSurface: Color(0xFF2A2A2A),
+          onInverseSurface: Color(0xFFF1F1F1),
+          inversePrimary: Color(0xFFFFBFBF),
+          surfaceTint: Color(0xFFDC2626),
+        ),
+        useMaterial3: true,
+        extensions: const [CustomColors.light],
+      );
+      darkTheme = ThemeData(
+        colorScheme: const ColorScheme(
+          brightness: Brightness.dark,
+          primary: Color(0xFFDC2626),
+          onPrimary: Color(0xFFFFFFFF),
+          primaryContainer: Color(0xFFDC2626),
+          onPrimaryContainer: Color(0xFFFFFFFF),
+          primaryFixed: Color(0xFFF7D0D0),
+          primaryFixedDim: Color(0xFFEEA1A1),
+          onPrimaryFixed: Color(0xFF610F0F),
+          onPrimaryFixedVariant: Color(0xFF711212),
+          secondary: Color(0xFF262626),
+          onSecondary: Color(0xFFFFFFFF),
+          secondaryContainer: Color(0xFF262626),
+          onSecondaryContainer: Color(0xFFFFFFFF),
+          secondaryFixed: Color(0xFFFBFBFB),
+          secondaryFixedDim: Color(0xFFF1F1F1),
+          onSecondaryFixed: Color(0xFF4A4A4A),
+          onSecondaryFixedVariant: Color(0xFF6A6A6A),
+          tertiary: Color(0xFF262626),
+          onTertiary: Color(0xFFFFFFFF),
+          tertiaryContainer: Color(0xFF262626),
+          onTertiaryContainer: Color(0xFFFFFFFF),
+          tertiaryFixed: Color(0xFFFBFBFB),
+          tertiaryFixedDim: Color(0xFFF1F1F1),
+          onTertiaryFixed: Color(0xFF4A4A4A),
+          onTertiaryFixedVariant: Color(0xFF6A6A6A),
+          error: Color(0xFF7F1D1D),
+          onError: Color(0xFFFFFFFF),
+          errorContainer: Color(0xFF410F0F),
+          onErrorContainer: Color(0xFFFFFFFF),
+          surface: Color.fromARGB(255, 24, 24, 24),
+          onSurface: Color(0xFFF1F1F1),
+          surfaceDim: Color(0xFF060606),
+          surfaceBright: Color(0xFF2C2C2C),
+          surfaceContainerLowest: Color.fromARGB(255, 37, 37, 37),
+          surfaceContainerLow: Color.fromARGB(255, 31, 31, 31),
+          surfaceContainer: Color(0xFF151515),
+          surfaceContainerHigh: Color(0xFF1D1D1D),
+          surfaceContainerHighest: Color(0xFF282828),
+          onSurfaceVariant: Color(0xFFCACACA),
+          outline: Color(0xFF777777),
+          outlineVariant: Color(0xFF414141),
+          shadow: Color(0xFF000000),
+          scrim: Color(0xFF000000),
+          inverseSurface: Color(0xFFE8E8E8),
+          onInverseSurface: Color(0xFF2A2A2A),
+          inversePrimary: Color(0xFF621919),
+          surfaceTint: Color(0xFFDC2626),
+        ),
+        useMaterial3: true,
+        extensions: const [CustomColors.dark],
+      );
+    } else {
+      baseTheme = ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color.fromARGB(255, 170, 42, 255),
+          brightness: Brightness.light,
+          surfaceContainerHighest: Colors.white,
+          surfaceContainerLow: Colors.white,
+        ),
+        useMaterial3: true,
+        extensions: const [CustomColors.light],
+      );
+      darkTheme = ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color.fromARGB(255, 170, 42, 255),
+          brightness: Brightness.dark,
+        ),
+        useMaterial3: true,
+        extensions: const [CustomColors.dark],
+      );
+    }
 
     return WindowBorder(
       color: baseTheme.primaryColor,

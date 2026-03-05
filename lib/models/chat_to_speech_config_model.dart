@@ -1,11 +1,13 @@
 import 'dart:convert';
 
+import 'package:streamkit_tts/flavor_config.dart';
 import 'package:streamkit_tts/models/enums/languages_enum.dart';
 import 'package:streamkit_tts/models/enums/app_theme_mode.dart';
 import 'package:streamkit_tts/models/enums/tts_source.dart';
 
 class ChatToSpeechConfiguration {
   final Set<String> channels;
+  final String youtubeVideoId;
   final bool readUsername;
   final bool ignoreExclamationMark;
   final bool ignoreEmotes;
@@ -16,15 +18,17 @@ class ChatToSpeechConfiguration {
   final bool readBsr;
   final bool readBsrSafely;
   final TtsSource ttsSource;
-  final Set<String> filteredUsernames;
+  final Set<String> filteredUserIds;
   final bool isWhitelistingFilter;
   final bool ignoreEmptyMessage;
   final bool ignoreUrls;
+  final bool ignoreVtuberGroupName;
   final bool disableAKeongFilter;
   final AppThemeMode themeMode;
 
   ChatToSpeechConfiguration({
     required this.channels,
+    required this.youtubeVideoId,
     required this.readUsername,
     required this.ignoreExclamationMark,
     required this.ignoreEmotes,
@@ -35,16 +39,18 @@ class ChatToSpeechConfiguration {
     required this.readBsr,
     required this.readBsrSafely,
     required this.ttsSource,
-    required this.filteredUsernames,
+    required this.filteredUserIds,
     required this.isWhitelistingFilter,
     required this.ignoreEmptyMessage,
     required this.ignoreUrls,
+    required this.ignoreVtuberGroupName,
     required this.disableAKeongFilter,
     required this.themeMode,
   });
 
   ChatToSpeechConfiguration copyWith({
     Set<String>? channels,
+    String? youtubeVideoId,
     bool? readUsername,
     bool? readUsernameOnEmptyMessage,
     bool? ignoreExclamationMark,
@@ -56,15 +62,17 @@ class ChatToSpeechConfiguration {
     bool? readBsr,
     bool? readBsrSafely,
     TtsSource? ttsSource,
-    Set<String>? filteredUsernames,
+    Set<String>? filteredUserIds,
     bool? isWhitelistingFilter,
     bool? ignoreEmptyMessage,
     bool? ignoreUrls,
+    bool? ignoreVtuberGroupName,
     bool? disableAKeongFilter,
     AppThemeMode? themeMode,
   }) {
     return ChatToSpeechConfiguration(
       channels: channels ?? this.channels,
+      youtubeVideoId: youtubeVideoId ?? this.youtubeVideoId,
       readUsername: readUsername ?? this.readUsername,
       ignoreExclamationMark:
           ignoreExclamationMark ?? this.ignoreExclamationMark,
@@ -76,10 +84,12 @@ class ChatToSpeechConfiguration {
       readBsr: readBsr ?? this.readBsr,
       readBsrSafely: readBsrSafely ?? this.readBsrSafely,
       ttsSource: ttsSource ?? this.ttsSource,
-      filteredUsernames: filteredUsernames ?? this.filteredUsernames,
+      filteredUserIds: filteredUserIds ?? this.filteredUserIds,
       isWhitelistingFilter: isWhitelistingFilter ?? this.isWhitelistingFilter,
       ignoreEmptyMessage: ignoreEmptyMessage ?? this.ignoreEmptyMessage,
       ignoreUrls: ignoreUrls ?? this.ignoreUrls,
+      ignoreVtuberGroupName:
+          ignoreVtuberGroupName ?? this.ignoreVtuberGroupName,
       disableAKeongFilter: disableAKeongFilter ?? this.disableAKeongFilter,
       themeMode: themeMode ?? this.themeMode,
     );
@@ -89,6 +99,7 @@ class ChatToSpeechConfiguration {
     final result = <String, dynamic>{};
 
     result.addAll({'channels': channels.toList()});
+    result.addAll({'youtubeVideoId': youtubeVideoId});
     result.addAll({'readUsername': readUsername});
     result.addAll({'ignoreExclamationMark': ignoreExclamationMark});
     result.addAll({'ignoreEmotes': ignoreEmotes});
@@ -99,10 +110,11 @@ class ChatToSpeechConfiguration {
     result.addAll({'readBsr': readBsr});
     result.addAll({'readBsrSafely': readBsrSafely});
     result.addAll({'ttsSource': ttsSource.string});
-    result.addAll({'filteredUsernames': filteredUsernames.toList()});
+    result.addAll({'filteredUsernames': filteredUserIds.toList()});
     result.addAll({'isWhitelistingFilter': isWhitelistingFilter});
     result.addAll({'ignoreEmptyMessage': ignoreEmptyMessage});
     result.addAll({'ignoreUrls': ignoreUrls});
+    result.addAll({'ignoreVtuberGroupName': ignoreVtuberGroupName});
     result.addAll({'disableAKeongFilter': disableAKeongFilter});
     result.addAll({'themeMode': themeMode.name});
     return result;
@@ -111,6 +123,7 @@ class ChatToSpeechConfiguration {
   factory ChatToSpeechConfiguration.fromMap(Map<String, dynamic> map) {
     return ChatToSpeechConfiguration(
       channels: Set<String>.from(map['channels'] ?? []),
+      youtubeVideoId: map["youtubeVideoId"] ?? "",
       readUsername: map['readUsername'] ?? true,
       ignoreExclamationMark: map['ignoreExclamationMark'] ?? true,
       ignoreEmotes: map['ignoreEmotes'] ?? true,
@@ -118,16 +131,19 @@ class ChatToSpeechConfiguration {
       languages: Set<Language>.from(
           map['languages']?.map((x) => LanguageParser.fromGoogle(x)) ??
               [Language.english, Language.indonesian, Language.japanese]),
-      enabled: map['enabled'] ?? false,
+      enabled: FlavorConfig.isYouTube
+          ? false // For YouTube, always start disabled — video ID may be stale.
+          : (map['enabled'] ?? false),
       volume: map['volume']?.toDouble() ?? 100.0,
       readBsr: map['readBsr'] ?? false,
       readBsrSafely: map['readBsrSafely'] ?? false,
       ttsSource: TtsSourceParser.fromString(map['ttsSource'] ?? '') ??
           TtsSource.google,
-      filteredUsernames: Set<String>.from(map['filteredUsernames'] ?? []),
+      filteredUserIds: Set<String>.from(map['filteredUsernames'] ?? []),
       isWhitelistingFilter: map['isWhitelistingFilter'] ?? false,
       ignoreEmptyMessage: map['ignoreEmptyMessage'] ?? true,
       ignoreUrls: map['ignoreUrls'] ?? true,
+      ignoreVtuberGroupName: map['ignoreVtuberGroupName'] ?? true,
       disableAKeongFilter: map['disableAKeongFilter'] ?? false,
       themeMode: AppThemeMode.values.byName(map['themeMode'] ?? 'dark'),
     );

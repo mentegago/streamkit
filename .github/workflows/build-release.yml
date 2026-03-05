@@ -7,6 +7,14 @@ on:
         description: Start release process (create tag and draft release)
         type: boolean
         default: false
+      build_twitch:
+        description: Build Twitch flavor
+        type: boolean
+        default: true
+      build_youtube:
+        description: Build YouTube flavor
+        type: boolean
+        default: true
 
 permissions:
   contents: write
@@ -44,10 +52,17 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Build Windows release
+      - name: Set icon (Twitch)
+        if: inputs.build_twitch
+        shell: bash
+        run: cp windows/runner/resources/app_icon_twitch.ico windows/runner/resources/app_icon.ico
+
+      - name: Build Windows release (Twitch)
+        if: inputs.build_twitch
         run: flutter build windows --release
 
-      - name: Build installer
+      - name: Build installer (Twitch)
+        if: inputs.build_twitch
         shell: cmd
         run: >
           "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
@@ -55,6 +70,25 @@ jobs:
           /DSourceDir=build\windows\x64\runner\Release
           /DOutputDir=installer\builds
           installer\installer.iss
+
+      - name: Set icon (YouTube)
+        if: inputs.build_youtube
+        shell: bash
+        run: cp windows/runner/resources/app_icon_youtube.ico windows/runner/resources/app_icon.ico
+
+      - name: Build Windows release (YouTube)
+        if: inputs.build_youtube
+        run: flutter build windows --release --dart-define=FLAVOR=youtube
+
+      - name: Build installer (YouTube)
+        if: inputs.build_youtube
+        shell: cmd
+        run: >
+          "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+          /DMyAppVersion=${{ steps.version.outputs.version }}
+          /DSourceDir=build\windows\x64\runner\Release
+          /DOutputDir=installer\builds
+          installer\installer-youtube.iss
 
       - name: Create draft GitHub Release
         if: inputs.release

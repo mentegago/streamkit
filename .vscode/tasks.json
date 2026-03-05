@@ -1,0 +1,17 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "set-icon-twitch",
+            "type": "shell",
+            "command": "Copy-Item -Force windows/runner/resources/app_icon_twitch.ico windows/runner/resources/app_icon.ico",
+            "presentation": { "reveal": "silent", "panel": "shared" }
+        },
+        {
+            "label": "set-icon-youtube",
+            "type": "shell",
+            "command": "Copy-Item -Force windows/runner/resources/app_icon_youtube.ico windows/runner/resources/app_icon.ico",
+            "presentation": { "reveal": "silent", "panel": "shared" }
+        }
+    ]
+}

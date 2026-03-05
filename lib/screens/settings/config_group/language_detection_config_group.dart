@@ -33,39 +33,53 @@ class LanguageDetectionConfigGroup extends HookWidget {
   Widget build(BuildContext context) {
     final showAllLanguages = useState<bool>(false);
 
-    final selectedLanguages = useMemoized(() => context.read<Config>().chatToSpeechConfiguration.languages);
+    final selectedLanguages = useMemoized(
+        () => context.read<Config>().chatToSpeechConfiguration.languages);
     final sortedLanguages = useMemoized(() {
       // Priority languages are at the top, followed by selected languages, followed by the rest of the languages.
-      return languages.toList()..sort((a, b) {
-        final aIndex = languages.indexOf(a)
-          + (priorityLanguages.contains(a) ? 0 : selectedLanguages.contains(a) ? 1000 : 10000);
-        final bIndex = languages.indexOf(b)
-          + (priorityLanguages.contains(b) ? 0 : selectedLanguages.contains(b) ? 1000 : 10000);
+      return languages.toList()
+        ..sort((a, b) {
+          final aIndex = languages.indexOf(a) +
+              (priorityLanguages.contains(a)
+                  ? 0
+                  : selectedLanguages.contains(a)
+                      ? 1000
+                      : 10000);
+          final bIndex = languages.indexOf(b) +
+              (priorityLanguages.contains(b)
+                  ? 0
+                  : selectedLanguages.contains(b)
+                      ? 1000
+                      : 10000);
 
-        return aIndex.compareTo(bIndex);
-      });
+          return aIndex.compareTo(bIndex);
+        });
     }, [selectedLanguages]);
 
     final initialDisplayedLanguages = useMemoized(() {
       // Only display priority languages and selected languages.
       return sortedLanguages
-        .asMap()
-        .entries
-        .where(
-          (e) => priorityLanguages.contains(e.value) || selectedLanguages.contains(e.value),
-        )
-        .map((e) => e.value)
-        .toList();
+          .asMap()
+          .entries
+          .where(
+            (e) =>
+                priorityLanguages.contains(e.value) ||
+                selectedLanguages.contains(e.value),
+          )
+          .map((e) => e.value)
+          .toList();
     }, [sortedLanguages]);
 
     final languageWidgets = useMemoized(() {
-      return (showAllLanguages.value ? sortedLanguages : initialDisplayedLanguages)
-        .mapIndexed((index, language) => [
-          if (index != 0) const Divider(height: 1, indent: 50),
-          _LanguageSwitch(language: language)
-        ])
-        .expand((e) => e)
-        .toList();
+      return (showAllLanguages.value
+              ? sortedLanguages
+              : initialDisplayedLanguages)
+          .mapIndexed((index, language) => [
+                if (index != 0) const Divider(height: 1, indent: 50),
+                _LanguageSwitch(language: language)
+              ])
+          .expand((e) => e)
+          .toList();
     }, [showAllLanguages.value, sortedLanguages, initialDisplayedLanguages]);
 
     return ConfigContainer(
@@ -79,17 +93,18 @@ class LanguageDetectionConfigGroup extends HookWidget {
             children: languageWidgets,
           ),
         ),
-        if (sortedLanguages.length > initialDisplayedLanguages.length) 
-          ...[
-              const Divider(height: 1, indent: 50),
-            MenuSettings.expandable(
-              expanded: showAllLanguages.value,
-              title: showAllLanguages.value ? "Show less languages" : "Show more languages",
-              onPressed: () {
-                showAllLanguages.value = !showAllLanguages.value;
-              },
-            ),
-          ],
+        if (sortedLanguages.length > initialDisplayedLanguages.length) ...[
+          const Divider(height: 1, indent: 50),
+          MenuSettings.expandable(
+            expanded: showAllLanguages.value,
+            title: showAllLanguages.value
+                ? "Show less languages"
+                : "Show more languages",
+            onPressed: () {
+              showAllLanguages.value = !showAllLanguages.value;
+            },
+          ),
+        ],
       ],
     );
   }
@@ -101,6 +116,7 @@ class _LanguageSwitch extends StatelessWidget {
 
   const _LanguageSwitch({
     required this.language,
+    // ignore: unused_element_parameter
     this.description,
   });
 

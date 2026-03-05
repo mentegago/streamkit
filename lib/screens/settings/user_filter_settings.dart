@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:streamkit_tts/flavor_config.dart';
 import 'package:streamkit_tts/models/config_model.dart';
 import 'package:streamkit_tts/widgets/config_container.dart';
 import 'package:streamkit_tts/widgets/inner_screen.dart';
@@ -55,7 +56,7 @@ class _FilterModeConfigGroup extends StatelessWidget {
                   usernames: context
                       .read<Config>()
                       .chatToSpeechConfiguration
-                      .filteredUsernames,
+                      .filteredUserIds,
                   isWhitelistingFilter: value,
                 );
           },
@@ -71,7 +72,7 @@ class _FilterListConfigGroup extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final filteredUsernames = context.select(
-      (Config config) => config.chatToSpeechConfiguration.filteredUsernames,
+      (Config config) => config.chatToSpeechConfiguration.filteredUserIds,
     );
 
     final isWhitelistingFilter = context.select(
@@ -177,46 +178,124 @@ class _AddUserButton extends StatelessWidget {
   }
 
   void _showAddUserDialog(BuildContext context) {
-    final TextEditingController controller = TextEditingController();
+    _showUserDialog(context, isEditing: false);
+  }
+
+  void _showUserDialog(BuildContext context,
+      {required bool isEditing, String? initialUsername}) {
+    final TextEditingController controller = TextEditingController(
+      text: initialUsername ?? '',
+    );
     final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Add User'),
+        title: Text(isEditing ? 'Edit User' : 'Add User'),
         content: Form(
           key: formKey,
-          child: TextFormField(
-            controller: controller,
-            decoration: const InputDecoration(
-              labelText: 'Username',
-              hintText: 'Enter username',
-              border: OutlineInputBorder(),
-            ),
-            validator: (value) {
-              if (value == null || value.trim().isEmpty) {
-                return 'Username cannot be empty';
-              }
-              if (value.trim().contains(' ')) {
-                return 'Username cannot contain spaces';
-              }
-              // Check if username already exists
-              final existingUsernames = context
-                  .read<Config>()
-                  .chatToSpeechConfiguration
-                  .filteredUsernames;
-              if (existingUsernames.contains(value.trim().toLowerCase())) {
-                return 'Username already exists in the list';
-              }
-              return null;
-            },
-            textInputAction: TextInputAction.done,
-            onFieldSubmitted: (value) {
-              if (formKey.currentState!.validate()) {
-                _addUser(context, controller.text.trim());
-                Navigator.of(context).pop();
-              }
-            },
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (FlavorConfig.isYouTube) ...[
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color:
+                        Theme.of(context).colorScheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.info_outline,
+                            size: 16,
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'How to find YouTube Channel ID:',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant,
+                                ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        '1. Go to the YouTube channel\n2. Click "More" in the description section\n3. Click "Share Channel"\n4. Click "Copy Channel ID"',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
+                            ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
+              TextFormField(
+                controller: controller,
+                decoration: const InputDecoration(
+                  labelText:
+                      FlavorConfig.isYouTube ? 'YouTube Channel ID' : 'Username',
+                  hintText: FlavorConfig.isYouTube ? null : 'Enter username',
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Username cannot be empty';
+                  }
+                  if (value.trim().contains(' ')) {
+                    return 'Username cannot contain spaces';
+                  }
+
+                  final normalizedValue = value.trim().toLowerCase();
+                  final existingUsernames = context
+                      .read<Config>()
+                      .chatToSpeechConfiguration
+                      .filteredUserIds;
+
+                  if (isEditing) {
+                    // For editing, only check if the new value is different and already exists
+                    if (normalizedValue != initialUsername?.toLowerCase() &&
+                        existingUsernames.contains(normalizedValue)) {
+                      return 'Username already exists in the list';
+                    }
+                  } else {
+                    // For adding, check if username already exists
+                    if (existingUsernames.contains(normalizedValue)) {
+                      return 'Username already exists in the list';
+                    }
+                  }
+                  return null;
+                },
+                textInputAction: TextInputAction.done,
+                onFieldSubmitted: (value) {
+                  if (formKey.currentState!.validate()) {
+                    if (isEditing) {
+                      _editUser(
+                          context, initialUsername!, controller.text.trim());
+                    } else {
+                      _addUser(context, controller.text.trim());
+                    }
+                    Navigator.of(context).pop();
+                  }
+                },
+              ),
+            ],
           ),
         ),
         actions: [
@@ -227,11 +306,15 @@ class _AddUserButton extends StatelessWidget {
           FilledButton(
             onPressed: () {
               if (formKey.currentState!.validate()) {
-                _addUser(context, controller.text.trim());
+                if (isEditing) {
+                  _editUser(context, initialUsername!, controller.text.trim());
+                } else {
+                  _addUser(context, controller.text.trim());
+                }
                 Navigator.of(context).pop();
               }
             },
-            child: const Text('Add'),
+            child: Text(isEditing ? 'Save' : 'Add'),
           ),
         ],
       ),
@@ -242,7 +325,7 @@ class _AddUserButton extends StatelessWidget {
     if (username.isEmpty) return;
 
     final config = context.read<Config>();
-    final currentUsernames = config.chatToSpeechConfiguration.filteredUsernames;
+    final currentUsernames = config.chatToSpeechConfiguration.filteredUserIds;
     final normalizedUsername = username.toLowerCase();
 
     if (!currentUsernames.contains(normalizedUsername)) {
@@ -252,6 +335,26 @@ class _AddUserButton extends StatelessWidget {
             config.chatToSpeechConfiguration.isWhitelistingFilter,
       );
     }
+  }
+
+  void _editUser(BuildContext context, String oldUsername, String newUsername) {
+    if (newUsername.isEmpty ||
+        newUsername.toLowerCase() == oldUsername.toLowerCase()) return;
+
+    final config = context.read<Config>();
+    final currentUsernames = config.chatToSpeechConfiguration.filteredUserIds;
+    final normalizedNewUsername = newUsername.toLowerCase();
+
+    // Remove old username and add new one
+    final updatedUsernames =
+        currentUsernames.where((u) => u != oldUsername).toSet();
+    updatedUsernames.add(normalizedNewUsername);
+
+    config.setUserFilter(
+      usernames: updatedUsernames,
+      isWhitelistingFilter:
+          config.chatToSpeechConfiguration.isWhitelistingFilter,
+    );
   }
 }
 
@@ -282,50 +385,124 @@ class _UserListItem extends StatelessWidget {
   }
 
   void _showEditDialog(BuildContext context) {
-    final TextEditingController controller =
-        TextEditingController(text: username);
+    _showUserDialog(context, isEditing: true, initialUsername: username);
+  }
+
+  void _showUserDialog(BuildContext context,
+      {required bool isEditing, String? initialUsername}) {
+    final TextEditingController controller = TextEditingController(
+      text: initialUsername ?? '',
+    );
     final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Edit User'),
+        title: Text(isEditing ? 'Edit User' : 'Add User'),
         content: Form(
           key: formKey,
-          child: TextFormField(
-            controller: controller,
-            decoration: const InputDecoration(
-              labelText: 'Username',
-              hintText: 'Enter username (without @)',
-              border: OutlineInputBorder(),
-            ),
-            validator: (value) {
-              if (value == null || value.trim().isEmpty) {
-                return 'Username cannot be empty';
-              }
-              if (value.trim().contains(' ')) {
-                return 'Username cannot contain spaces';
-              }
-              final normalizedValue = value.trim().toLowerCase();
-              if (normalizedValue != username.toLowerCase()) {
-                // Check if new username already exists
-                final existingUsernames = context
-                    .read<Config>()
-                    .chatToSpeechConfiguration
-                    .filteredUsernames;
-                if (existingUsernames.contains(normalizedValue)) {
-                  return 'Username already exists in the list';
-                }
-              }
-              return null;
-            },
-            textInputAction: TextInputAction.done,
-            onFieldSubmitted: (value) {
-              if (formKey.currentState!.validate()) {
-                _editUser(context, controller.text.trim());
-                Navigator.of(context).pop();
-              }
-            },
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (FlavorConfig.isYouTube) ...[
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color:
+                        Theme.of(context).colorScheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.info_outline,
+                            size: 16,
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'How to find YouTube Channel ID:',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant,
+                                ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        '1. Go to the YouTube channel\n2. Click "More" in the description section\n3. Click "Share Channel"\n4. Click "Copy Channel ID"',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
+                            ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
+              TextFormField(
+                controller: controller,
+                decoration: const InputDecoration(
+                  labelText:
+                      FlavorConfig.isYouTube ? 'YouTube Channel ID' : 'Username',
+                  hintText: FlavorConfig.isYouTube ? null : 'Enter username',
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Username cannot be empty';
+                  }
+                  if (value.trim().contains(' ')) {
+                    return 'Username cannot contain spaces';
+                  }
+
+                  final normalizedValue = value.trim().toLowerCase();
+                  final existingUsernames = context
+                      .read<Config>()
+                      .chatToSpeechConfiguration
+                      .filteredUserIds;
+
+                  if (isEditing) {
+                    // For editing, only check if the new value is different and already exists
+                    if (normalizedValue != initialUsername?.toLowerCase() &&
+                        existingUsernames.contains(normalizedValue)) {
+                      return 'Username already exists in the list';
+                    }
+                  } else {
+                    // For adding, check if username already exists
+                    if (existingUsernames.contains(normalizedValue)) {
+                      return 'Username already exists in the list';
+                    }
+                  }
+                  return null;
+                },
+                textInputAction: TextInputAction.done,
+                onFieldSubmitted: (value) {
+                  if (formKey.currentState!.validate()) {
+                    if (isEditing) {
+                      _editUser(
+                          context, initialUsername!, controller.text.trim());
+                    } else {
+                      _addUser(context, controller.text.trim());
+                    }
+                    Navigator.of(context).pop();
+                  }
+                },
+              ),
+            ],
           ),
         ),
         actions: [
@@ -336,28 +513,32 @@ class _UserListItem extends StatelessWidget {
           FilledButton(
             onPressed: () {
               if (formKey.currentState!.validate()) {
-                _editUser(context, controller.text.trim());
+                if (isEditing) {
+                  _editUser(context, initialUsername!, controller.text.trim());
+                } else {
+                  _addUser(context, controller.text.trim());
+                }
                 Navigator.of(context).pop();
               }
             },
-            child: const Text('Save'),
+            child: Text(isEditing ? 'Save' : 'Add'),
           ),
         ],
       ),
     );
   }
 
-  void _editUser(BuildContext context, String newUsername) {
+  void _editUser(BuildContext context, String oldUsername, String newUsername) {
     if (newUsername.isEmpty ||
-        newUsername.toLowerCase() == username.toLowerCase()) return;
+        newUsername.toLowerCase() == oldUsername.toLowerCase()) return;
 
     final config = context.read<Config>();
-    final currentUsernames = config.chatToSpeechConfiguration.filteredUsernames;
+    final currentUsernames = config.chatToSpeechConfiguration.filteredUserIds;
     final normalizedNewUsername = newUsername.toLowerCase();
 
     // Remove old username and add new one
     final updatedUsernames =
-        currentUsernames.where((u) => u != username).toSet();
+        currentUsernames.where((u) => u != oldUsername).toSet();
     updatedUsernames.add(normalizedNewUsername);
 
     config.setUserFilter(
@@ -367,9 +548,25 @@ class _UserListItem extends StatelessWidget {
     );
   }
 
+  void _addUser(BuildContext context, String username) {
+    if (username.isEmpty) return;
+
+    final config = context.read<Config>();
+    final currentUsernames = config.chatToSpeechConfiguration.filteredUserIds;
+    final normalizedUsername = username.toLowerCase();
+
+    if (!currentUsernames.contains(normalizedUsername)) {
+      config.setUserFilter(
+        usernames: {...currentUsernames, normalizedUsername},
+        isWhitelistingFilter:
+            config.chatToSpeechConfiguration.isWhitelistingFilter,
+      );
+    }
+  }
+
   void _removeUser(BuildContext context) {
     final config = context.read<Config>();
-    final currentUsernames = config.chatToSpeechConfiguration.filteredUsernames;
+    final currentUsernames = config.chatToSpeechConfiguration.filteredUserIds;
 
     config.setUserFilter(
       usernames: currentUsernames.where((u) => u != username).toSet(),

@@ -19,6 +19,7 @@ class ChatMessage extends Message {
   ChatMessage({
     required super.id,
     required super.username,
+    required super.userId,
     required super.suggestedSpeechMessage,
     super.language,
     super.isSuggestedSpeechMessageFinalized = false,
@@ -30,6 +31,7 @@ class ChatMessage extends Message {
   @override
   ChatMessage copyWith({
     String? username,
+    String? userId,
     String? suggestedSpeechMessage,
     Language? language,
     bool? isSuggestedSpeechMessageFinalized,
@@ -40,6 +42,7 @@ class ChatMessage extends Message {
     return ChatMessage(
       id: id,
       username: username ?? this.username,
+      userId: userId ?? this.userId,
       suggestedSpeechMessage:
           suggestedSpeechMessage ?? this.suggestedSpeechMessage,
       language: language ?? this.language,

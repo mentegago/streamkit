@@ -29,6 +29,13 @@ class Config extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setYouTubeVideoId(String videoId) {
+    chatToSpeechConfiguration = chatToSpeechConfiguration.copyWith(
+      youtubeVideoId: videoId,
+    );
+    notifyListeners();
+  }
+
   void setLanguage(Language language, {required bool enabled}) {
     if (enabled) {
       setChatToSpeechConfiguration(
@@ -67,6 +74,7 @@ class Config extends ChangeNotifier {
     bool? ignoreBttvEmotes,
     bool? ignoreFfzEmotes,
     bool? ignoreUrls,
+    bool? ignoreVtuberGroupName,
   }) {
     setChatToSpeechConfiguration(
       chatToSpeechConfiguration.copyWith(
@@ -79,6 +87,8 @@ class Config extends ChangeNotifier {
         ignoreBttvEmotes:
             ignoreBttvEmotes ?? chatToSpeechConfiguration.ignoreBttvEmotes,
         ignoreUrls: ignoreUrls ?? chatToSpeechConfiguration.ignoreUrls,
+        ignoreVtuberGroupName: ignoreVtuberGroupName ??
+            chatToSpeechConfiguration.ignoreVtuberGroupName,
       ),
     );
   }
@@ -104,7 +114,7 @@ class Config extends ChangeNotifier {
     setChatToSpeechConfiguration(
       chatToSpeechConfiguration.copyWith(
         isWhitelistingFilter: isWhitelistingFilter,
-        filteredUsernames: usernames,
+        filteredUserIds: usernames,
       ),
     );
   }

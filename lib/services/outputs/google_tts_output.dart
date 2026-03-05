@@ -75,8 +75,8 @@ class GoogleTtsOutput implements OutputService {
             await getTemporaryDirectory().then((dir) async {
               final directory = Directory(
                 Platform.isWindows
-                    ? '${dir.path}\\Mentega StreamKit'
-                    : '${dir.path}/Mentega StreamKit',
+                    ? '${dir.path}\\Mentega StreamKit for YouTube'
+                    : '${dir.path}/Mentega StreamKit for YouTube',
               );
 
               if (await directory.exists()) {

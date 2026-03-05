@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
+import 'package:streamkit_tts/flavor_config.dart';
 import 'package:streamkit_tts/models/config_model.dart';
 import 'package:streamkit_tts/screens/home/widgets/account_box.dart';
 import 'package:streamkit_tts/screens/home/widgets/dialogs/channel_selection_dialog.dart';
+import 'package:streamkit_tts/screens/home/widgets/dialogs/youtube_video_selection_dialog.dart';
+import 'package:streamkit_tts/screens/home/widgets/youtube_account_box.dart';
 import 'package:streamkit_tts/services/composers/composer_service.dart';
 
 class MainControl extends StatelessWidget {
@@ -26,7 +29,9 @@ class MainControl extends StatelessWidget {
             ),
             width: 600,
             padding: const EdgeInsets.all(12),
-            child: const AccountBox(),
+            child: FlavorConfig.isYouTube
+                ? const YoutubeAccountBox()
+                : const AccountBox(),
           ),
         ),
         const SizedBox(height: 12),
@@ -57,18 +62,25 @@ class _StartButton extends HookWidget {
       case ComposerStatus.inactive:
         return TextButton(
           onPressed: () {
-            if (context
-                .read<Config>()
-                .chatToSpeechConfiguration
-                .channels
-                .isEmpty) {
+            final cfg = context.read<Config>().chatToSpeechConfiguration;
+            final notReady = FlavorConfig.isYouTube
+                ? cfg.youtubeVideoId.isEmpty
+                : cfg.channels.isEmpty;
+
+            if (notReady) {
               showDialog(
                 context: context,
-                builder: (context) => ChannelSelectionDialog(
-                  onSelected: (_) {
-                    context.read<Config>().setEnabled(true);
-                  },
-                ),
+                builder: (context) => FlavorConfig.isYouTube
+                    ? YoutubeVideoSelectionDialog(
+                        onSelected: (_) {
+                          context.read<Config>().setEnabled(true);
+                        },
+                      )
+                    : ChannelSelectionDialog(
+                        onSelected: (_) {
+                          context.read<Config>().setEnabled(true);
+                        },
+                      ),
               );
               return;
             }
@@ -76,8 +88,12 @@ class _StartButton extends HookWidget {
             context.read<Config>().setEnabled(true);
           },
           style: TextButton.styleFrom(
-            backgroundColor: Theme.of(context).colorScheme.primaryFixedDim,
-            foregroundColor: Theme.of(context).colorScheme.onPrimaryFixed,
+            backgroundColor: FlavorConfig.isYouTube
+                ? Theme.of(context).colorScheme.primary
+                : Theme.of(context).colorScheme.primaryFixedDim,
+            foregroundColor: FlavorConfig.isYouTube
+                ? Theme.of(context).colorScheme.onPrimary
+                : Theme.of(context).colorScheme.onPrimaryFixed,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
