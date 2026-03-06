@@ -67,8 +67,8 @@ jobs:
         run: >
           "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
           /DMyAppVersion=${{ steps.version.outputs.version }}
-          /DSourceDir=build\windows\x64\runner\Release
-          /DOutputDir=installer\builds
+          /DSourceDir=%CD%\build\windows\x64\runner\Release
+          /DOutputDir=%CD%\installer\builds
           installer\installer.iss
 
       - name: Set icon (YouTube)
@@ -86,8 +86,8 @@ jobs:
         run: >
           "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
           /DMyAppVersion=${{ steps.version.outputs.version }}
-          /DSourceDir=build\windows\x64\runner\Release
-          /DOutputDir=installer\builds
+          /DSourceDir=%CD%\build\windows\x64\runner\Release
+          /DOutputDir=%CD%\installer\builds
           installer\installer-youtube.iss
 
       - name: Create draft GitHub Release
