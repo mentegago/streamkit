@@ -36,12 +36,24 @@ class _ReplaceListConfigGroup extends StatelessWidget {
       ),
       right: const _AddRuleButton(),
       children: [
-        if (rules.isNotEmpty) ...[
-          for (int i = 0; i < rules.length; i++) ...[
-            _RuleListItem(rule: rules[i], index: i),
-            if (i < rules.length - 1) const Divider(height: 1, indent: 48),
-          ],
-        ],
+        if (rules.isNotEmpty)
+          ReorderableListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            buildDefaultDragHandles: false,
+            itemCount: rules.length,
+            onReorder: (oldIndex, newIndex) {
+              if (newIndex > oldIndex) newIndex--;
+              final updated = List<ReplaceStringRule>.from(rules);
+              updated.insert(newIndex, updated.removeAt(oldIndex));
+              context.read<Config>().setReplaceStringRules(updated);
+            },
+            itemBuilder: (context, i) => _RuleListItem(
+              key: ValueKey(i),
+              rule: rules[i],
+              index: i,
+            ),
+          ),
         if (rules.isEmpty)
           Padding(
             padding: const EdgeInsets.all(24.0),
@@ -230,7 +242,7 @@ class _RuleListItem extends StatelessWidget {
   final ReplaceStringRule rule;
   final int index;
 
-  const _RuleListItem({required this.rule, required this.index});
+  const _RuleListItem({super.key, required this.rule, required this.index});
 
   @override
   Widget build(BuildContext context) {
@@ -305,6 +317,24 @@ class _RuleListItem extends StatelessWidget {
               foregroundColor: Colors.red,
               minimumSize: const Size(32, 32),
               iconSize: 18,
+            ),
+          ),
+          const SizedBox(width: 4),
+          MouseRegion(
+            cursor: SystemMouseCursors.move,
+            child: ReorderableDragStartListener(
+              index: index,
+              child: Tooltip(
+                message: 'Drag to reorder',
+                child: Icon(
+                  Icons.drag_handle,
+                  size: 24,
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.3),
+                ),
+              ),
             ),
           ),
         ],
