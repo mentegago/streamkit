@@ -3,6 +3,7 @@ import 'package:streamkit_tts/models/chat_to_speech_config_model.dart';
 import 'package:streamkit_tts/models/enums/languages_enum.dart';
 import 'package:streamkit_tts/models/enums/app_theme_mode.dart';
 import 'package:streamkit_tts/models/enums/tts_source.dart';
+import 'package:streamkit_tts/models/replace_string_rule.dart';
 
 class Config extends ChangeNotifier {
   ChatToSpeechConfiguration chatToSpeechConfiguration;
@@ -123,6 +124,14 @@ class Config extends ChangeNotifier {
     setChatToSpeechConfiguration(
       chatToSpeechConfiguration.copyWith(
         themeMode: themeMode,
+      ),
+    );
+  }
+
+  void setReplaceStringRules(List<ReplaceStringRule> rules) {
+    setChatToSpeechConfiguration(
+      chatToSpeechConfiguration.copyWith(
+        replaceStringRules: rules,
       ),
     );
   }
