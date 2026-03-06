@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:streamkit_tts/models/chat_to_speech_config_model.dart';
 import 'package:streamkit_tts/models/config_model.dart';
@@ -295,14 +294,12 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'StreamKit Chat Reader',
         theme: baseTheme.copyWith(
-          textTheme: GoogleFonts.plusJakartaSansTextTheme(baseTheme.textTheme),
           iconTheme: baseTheme.iconTheme.copyWith(
             size: 24,
             color: baseTheme.colorScheme.onSurface,
           ),
         ),
         darkTheme: darkTheme.copyWith(
-          textTheme: GoogleFonts.plusJakartaSansTextTheme(darkTheme.textTheme),
           iconTheme: darkTheme.iconTheme.copyWith(
             size: 24,
             color: darkTheme.colorScheme.onSurface,
