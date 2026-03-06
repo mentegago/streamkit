@@ -167,7 +167,7 @@ void showRuleDialog(
                 onFieldSubmitted: (_) {
                   if (formKey.currentState!.validate()) {
                     _saveRule(context, fromController, toController,
-                        caseSensitive, wholeWord, index);
+                        caseSensitive, wholeWord, index, existingRule?.id);
                     Navigator.of(context).pop();
                   }
                 },
@@ -199,7 +199,7 @@ void showRuleDialog(
             onPressed: () {
               if (formKey.currentState!.validate()) {
                 _saveRule(context, fromController, toController, caseSensitive,
-                    wholeWord, index);
+                    wholeWord, index, existingRule?.id);
                 Navigator.of(context).pop();
               }
             },
@@ -218,11 +218,13 @@ void _saveRule(
   bool caseSensitive,
   bool wholeWord,
   int? index,
+  String? existingId,
 ) {
   final config = context.read<Config>();
   final rules = List<ReplaceStringRule>.from(
       config.chatToSpeechConfiguration.replaceStringRules);
   final newRule = ReplaceStringRule(
+    id: existingId,
     from: fromController.text,
     to: toController.text,
     caseSensitive: caseSensitive,
