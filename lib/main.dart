@@ -10,6 +10,7 @@ import 'package:streamkit_tts/models/enums/app_theme_mode.dart';
 import 'package:streamkit_tts/screens/home/home.dart';
 import 'package:streamkit_tts/screens/settings/beat_saber_settings.dart';
 import 'package:streamkit_tts/screens/settings/settings.dart';
+import 'package:streamkit_tts/screens/settings/replace_strings_settings.dart';
 import 'package:streamkit_tts/screens/settings/user_filter_settings.dart';
 import 'package:streamkit_tts/services/composers/app_composer_service.dart';
 import 'package:streamkit_tts/services/composers/composer_service.dart';
@@ -24,6 +25,7 @@ import 'package:streamkit_tts/services/middlewares/pachify_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/read_username_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/remove_emotes_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/remove_urls_middleware.dart';
+import 'package:streamkit_tts/services/middlewares/replace_strings_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/skip_empty_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/skip_exclamation_middleware.dart';
 import 'package:streamkit_tts/services/middlewares/user_filter_middleware.dart';
@@ -77,6 +79,7 @@ void main() async {
       // Message clean-up middlewares
       RemoveEmotesMiddleware(config: config),
       RemoveUrlsMiddleware(config: config),
+      ReplaceStringsMiddleware(config: config),
 
       ForcedLanguageMiddleware(),
       PachifyMiddleware(
@@ -314,6 +317,8 @@ class MyApp extends StatelessWidget {
           '/settings': (context) => const SettingsScreen(),
           '/settings/user_filter': (context) =>
               const UserFilterSettingsScreen(),
+          '/settings/replace_strings': (context) =>
+              const ReplaceStringsSettingsScreen(),
         },
         debugShowCheckedModeBanner: false,
       ),

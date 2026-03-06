@@ -4,6 +4,7 @@ import 'package:streamkit_tts/flavor_config.dart';
 import 'package:streamkit_tts/models/enums/languages_enum.dart';
 import 'package:streamkit_tts/models/enums/app_theme_mode.dart';
 import 'package:streamkit_tts/models/enums/tts_source.dart';
+import 'package:streamkit_tts/models/replace_string_rule.dart';
 
 class ChatToSpeechConfiguration {
   final Set<String> channels;
@@ -25,6 +26,7 @@ class ChatToSpeechConfiguration {
   final bool ignoreVtuberGroupName;
   final bool disableAKeongFilter;
   final AppThemeMode themeMode;
+  final List<ReplaceStringRule> replaceStringRules;
 
   ChatToSpeechConfiguration({
     required this.channels,
@@ -46,6 +48,7 @@ class ChatToSpeechConfiguration {
     required this.ignoreVtuberGroupName,
     required this.disableAKeongFilter,
     required this.themeMode,
+    required this.replaceStringRules,
   });
 
   ChatToSpeechConfiguration copyWith({
@@ -69,6 +72,7 @@ class ChatToSpeechConfiguration {
     bool? ignoreVtuberGroupName,
     bool? disableAKeongFilter,
     AppThemeMode? themeMode,
+    List<ReplaceStringRule>? replaceStringRules,
   }) {
     return ChatToSpeechConfiguration(
       channels: channels ?? this.channels,
@@ -92,6 +96,7 @@ class ChatToSpeechConfiguration {
           ignoreVtuberGroupName ?? this.ignoreVtuberGroupName,
       disableAKeongFilter: disableAKeongFilter ?? this.disableAKeongFilter,
       themeMode: themeMode ?? this.themeMode,
+      replaceStringRules: replaceStringRules ?? this.replaceStringRules,
     );
   }
 
@@ -117,6 +122,7 @@ class ChatToSpeechConfiguration {
     result.addAll({'ignoreVtuberGroupName': ignoreVtuberGroupName});
     result.addAll({'disableAKeongFilter': disableAKeongFilter});
     result.addAll({'themeMode': themeMode.name});
+    result.addAll({'replaceStringRules': replaceStringRules.map((r) => r.toMap()).toList()});
     return result;
   }
 
@@ -146,6 +152,10 @@ class ChatToSpeechConfiguration {
       ignoreVtuberGroupName: map['ignoreVtuberGroupName'] ?? true,
       disableAKeongFilter: map['disableAKeongFilter'] ?? false,
       themeMode: AppThemeMode.values.byName(map['themeMode'] ?? 'dark'),
+      replaceStringRules: (map['replaceStringRules'] as List<dynamic>?)
+              ?.map((e) => ReplaceStringRule.fromMap(e as Map<String, dynamic>))
+              .toList() ??
+          [],
     );
   }
 

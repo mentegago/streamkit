@@ -1,60 +1,35 @@
 extension CleanMessage on String {
-  String replaceWords(
+  String replaceStrings(
     List<String> replaceList, {
     String replacement = "",
-    bool replaceEndOfSentenceWord = false,
+    bool wholeWord = false,
     bool caseInsensitive = false,
     bool isUsername = false,
   }) {
     String result = this;
 
-    // Define punctuation characters to include
-    String punctuation = '.,!?:;';
-
     for (String toReplace in replaceList) {
-      // Build the leading pattern
-      String leadingPattern;
-      if (isUsername) {
-        leadingPattern = r'(^|\s|@)';
+      if (wholeWord) {
+        final leadingPattern = isUsername ? r'(^|\s|@)' : r'(^|\s)';
+        final patternString =
+            leadingPattern + RegExp.escape(toReplace) + r'(\s|[.,!?:;]|$)';
+
+        final pattern = RegExp(patternString, caseSensitive: !caseInsensitive);
+
+        result = result.replaceAllMapped(pattern, (match) {
+          final before = match.group(1) ?? '';
+          final after = match.group(2) ?? '';
+          return before + replacement + after;
+        });
       } else {
-        leadingPattern = r'(^|\s)';
+        final pattern = RegExp(
+          RegExp.escape(toReplace),
+          caseSensitive: !caseInsensitive,
+        );
+        result = result.replaceAll(pattern, replacement);
       }
-
-      // Build the regular expression pattern using string interpolation
-      String patternString;
-      if (replaceEndOfSentenceWord) {
-        patternString = leadingPattern +
-            RegExp.escape(toReplace) +
-            r'(\s|[' +
-            RegExp.escape(punctuation) +
-            r']|$)';
-      } else {
-        patternString = r'(^|\s)' + RegExp.escape(toReplace) + r'(\s|$)';
-      }
-
-      // Build the regex with the appropriate options
-      RegExp pattern = RegExp(
-        patternString,
-        caseSensitive: !caseInsensitive,
-      );
-
-      result = result.replaceAllMapped(pattern, (match) {
-        // Capture leading and trailing characters
-        String before = match.group(1) ?? '';
-        String after = match.group(2) ?? '';
-
-        // If after is punctuation and we are removing the word, remove the punctuation
-        if (replaceEndOfSentenceWord &&
-            replacement.isEmpty &&
-            punctuation.contains(after.trim())) {
-          after = '';
-        }
-
-        return before + replacement + after;
-      });
     }
 
-    // Trim any extra spaces from the result
     return result.trim();
   }
 
