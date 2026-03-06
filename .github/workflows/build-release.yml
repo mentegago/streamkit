@@ -90,6 +90,12 @@ jobs:
           /DOutputDir=%CD%\installer\builds
           installer\installer-youtube.iss
 
+      - name: Upload installer artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: installers
+          path: installer/builds/*.exe
+
       - name: Create draft GitHub Release
         if: inputs.release
         uses: softprops/action-gh-release@v2
