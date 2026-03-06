@@ -51,10 +51,10 @@ class WordFixMiddleware implements Middleware {
         .fold(
           message.suggestedSpeechMessage,
           (message, name) {
-            final replacedMessaged = message.replaceWords(
+            final replacedMessaged = message.replaceStrings(
               [name.$1],
               replacement: name.$2 ?? '',
-              replaceEndOfSentenceWord: true,
+              wholeWord: true,
               caseInsensitive: true,
             );
 

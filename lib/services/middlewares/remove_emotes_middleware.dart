@@ -34,7 +34,7 @@ class RemoveEmotesMiddleware implements Middleware {
           '',
         );
       },
-    ).replaceWords(emoteList);
+    ).replaceStrings(emoteList, wholeWord: true);
 
     return message.copyWith(suggestedSpeechMessage: emotelessMessage);
   }
