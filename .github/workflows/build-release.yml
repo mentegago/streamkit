@@ -90,11 +90,19 @@ jobs:
           /DOutputDir=%CD%\installer\builds
           installer\installer-youtube.iss
 
-      - name: Upload installer artifacts
+      - name: Upload installer artifact (Twitch)
+        if: inputs.build_twitch
         uses: actions/upload-artifact@v4
         with:
-          name: installers
-          path: installer/builds/*.exe
+          name: installer-twitch
+          path: installer/builds/StreamKit_Twitch_${{ steps.version.outputs.version }}_Setup.exe
+
+      - name: Upload installer artifact (YouTube)
+        if: inputs.build_youtube
+        uses: actions/upload-artifact@v4
+        with:
+          name: installer-youtube
+          path: installer/builds/StreamKit_YouTube_*_Setup.exe
 
       - name: Create draft GitHub Release
         if: inputs.release
