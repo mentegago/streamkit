@@ -49,7 +49,7 @@ class _ReplaceListConfigGroup extends StatelessWidget {
               context.read<Config>().setReplaceStringRules(updated);
             },
             itemBuilder: (context, i) => _RuleListItem(
-              key: ValueKey(i),
+              key: ValueKey(rules[i].id),
               rule: rules[i],
               index: i,
             ),
@@ -305,14 +305,12 @@ class _RuleListItem extends StatelessWidget {
             onPressed: () =>
                 showRuleDialog(context, existingRule: rule, index: index),
             icon: const Icon(Icons.edit),
-            tooltip: 'Edit rule',
             style: IconButton.styleFrom(
                 minimumSize: const Size(32, 32), iconSize: 18),
           ),
           IconButton(
             onPressed: () => _removeRule(context),
             icon: const Icon(Icons.delete),
-            tooltip: 'Delete rule',
             style: IconButton.styleFrom(
               foregroundColor: Colors.red,
               minimumSize: const Size(32, 32),
@@ -324,16 +322,13 @@ class _RuleListItem extends StatelessWidget {
             cursor: SystemMouseCursors.move,
             child: ReorderableDragStartListener(
               index: index,
-              child: Tooltip(
-                message: 'Drag to reorder',
-                child: Icon(
-                  Icons.drag_handle,
-                  size: 24,
-                  color: Theme.of(context)
-                      .colorScheme
-                      .onSurface
-                      .withValues(alpha: 0.3),
-                ),
+              child: Icon(
+                Icons.drag_handle,
+                size: 24,
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.3),
               ),
             ),
           ),
