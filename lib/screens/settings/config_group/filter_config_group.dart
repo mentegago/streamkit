@@ -33,14 +33,14 @@ class FilterConfig extends StatelessWidget {
           indent: 50,
         ),
         MenuSettings.submenu(
-          title: "Find & Replace",
+          title: "Word Filter",
           onPressed: () {
             Navigator.pushNamed(
               context,
-              '/settings/replace_strings',
+              '/settings/word_filter',
             );
           },
-          left: const Icon(Icons.find_replace),
+          left: const Icon(Icons.short_text_outlined),
         ),
       ],
     );

@@ -12,6 +12,8 @@ import 'package:streamkit_tts/screens/settings/beat_saber_settings.dart';
 import 'package:streamkit_tts/screens/settings/settings.dart';
 import 'package:streamkit_tts/screens/settings/replace_strings_settings.dart';
 import 'package:streamkit_tts/screens/settings/user_filter_settings.dart';
+import 'package:streamkit_tts/screens/settings/word_filter_settings.dart';
+import 'package:streamkit_tts/services/middlewares/word_filter_middleware.dart';
 import 'package:streamkit_tts/services/composers/app_composer_service.dart';
 import 'package:streamkit_tts/services/composers/composer_service.dart';
 import 'package:streamkit_tts/services/language_detection_service.dart';
@@ -73,6 +75,7 @@ void main() async {
         versionCheckService: versionCheckService,
       ),
       UserFilterMiddleware(config: config),
+      WordFilterMiddleware(config: config),
       BsrMiddleware(config: config),
       SkipExclamationMiddleware(config: config),
 
@@ -319,6 +322,8 @@ class MyApp extends StatelessWidget {
               const UserFilterSettingsScreen(),
           '/settings/replace_strings': (context) =>
               const ReplaceStringsSettingsScreen(),
+          '/settings/word_filter': (context) =>
+              const WordFilterSettingsScreen(),
         },
         debugShowCheckedModeBanner: false,
       ),
