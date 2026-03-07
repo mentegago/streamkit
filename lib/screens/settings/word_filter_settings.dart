@@ -345,7 +345,7 @@ class _WordListItem extends StatelessWidget {
     final config = context.read<Config>();
     final rules = List<WordFilterRule>.from(
         config.chatToSpeechConfiguration.wordFilterRules);
-    rules.removeAt(index);
+    rules.removeWhere((r) => r.id == rule.id);
     config.setWordFilter(
       rules: rules,
       isWhitelistingFilter:
