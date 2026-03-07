@@ -1,3 +1,4 @@
+import 'package:streamkit_tts/flavor_config.dart';
 import 'package:streamkit_tts/models/messages/chat_message.dart';
 import 'package:streamkit_tts/models/messages/message.dart';
 import 'package:streamkit_tts/services/middlewares/middleware.dart';
@@ -17,11 +18,14 @@ class PachifyMiddleware implements Middleware {
   @override
   Future<Message?> process(Message message) async {
     if (message is! ChatMessage) return message;
+    final user = FlavorConfig.isYouTube ? message.userId : message.username;
+
     var messageText = _miscTtsUtil.pachify(
       message.suggestedSpeechMessage,
-      userId: message.userId,
+      user: user,
       panciList: _externalConfig.panciList,
     );
+
     messageText = _miscTtsUtil.warafy(messageText);
 
     return message.copyWith(

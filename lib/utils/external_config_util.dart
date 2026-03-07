@@ -49,9 +49,10 @@ class ExternalConfig {
   Future<void> loadPanciList() async {
     try {
       final response = await http.get(Uri.parse(
-        "https://pastebin.com/raw/NtEsN3nQ",
+        "https://mentegago.github.io/streamkit-config/panci.txt",
       ));
 
+      print("Panci list response: ${response.body}");
       if (response.statusCode != 200) return;
       _panciList.clear();
 
@@ -59,15 +60,16 @@ class ExternalConfig {
         if (element.trim().isEmpty) return;
         _panciList.add(element);
       });
-    } catch (_) {
+    } catch (e) {
+      print(e);
       rethrow;
     }
   }
 
   Future<void> loadNameFixList() async {
     try {
-      final response =
-          await http.get(Uri.parse("https://pastebin.com/raw/vrrsngeG"));
+      final response = await http.get(Uri.parse(
+          "https://mentegago.github.io/streamkit-config/name-fix.json"));
       if (response.statusCode != 200) return;
       _nameFixConfig = NameFixConfig.fromJson(json.decode(response.body));
     } catch (_) {
@@ -77,8 +79,8 @@ class ExternalConfig {
 
   Future<void> loadWordFixList() async {
     try {
-      final response =
-          await http.get(Uri.parse("https://pastebin.com/raw/q6yjNmSi"));
+      final response = await http.get(Uri.parse(
+          "https://mentegago.github.io/streamkit-config/word-fix.json"));
       if (response.statusCode != 200) return;
       _wordFixConfig = NameFixConfig.fromJson(json.decode(response.body));
     } catch (_) {
