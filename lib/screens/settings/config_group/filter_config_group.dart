@@ -42,20 +42,6 @@ class FilterConfig extends StatelessWidget {
           },
           left: const Icon(Icons.short_text_outlined),
         ),
-        const Divider(
-          height: 1,
-          indent: 50,
-        ),
-        MenuSettings.submenu(
-          title: "Find & Replace",
-          onPressed: () {
-            Navigator.pushNamed(
-              context,
-              '/settings/replace_strings',
-            );
-          },
-          left: const Icon(Icons.find_replace),
-        ),
       ],
     );
   }

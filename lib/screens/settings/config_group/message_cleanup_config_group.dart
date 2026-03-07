@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:streamkit_tts/flavor_config.dart';
 import 'package:streamkit_tts/models/config_model.dart';
 import 'package:streamkit_tts/widgets/config_container.dart';
+import 'package:streamkit_tts/widgets/menu_settings.dart';
 import 'package:streamkit_tts/widgets/switch_settings.dart';
 
 class MessageCleanUpConfig extends StatelessWidget {
@@ -11,13 +12,15 @@ class MessageCleanUpConfig extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ConfigContainer(
+    return const ConfigContainer(
       title: "Message Clean-up",
       children: [
-        const _RemoveEmotesConfig(),
-        const Divider(height: 1, indent: 50),
-        if (FlavorConfig.isTwitch) const _RemoveBttvEmotesConfig(),
-        const _RemoveUrlsConfig(),
+        _RemoveEmotesConfig(),
+        Divider(height: 1, indent: 50),
+        if (FlavorConfig.isTwitch) _RemoveBttvEmotesConfig(),
+        _RemoveUrlsConfig(),
+        Divider(height: 1, indent: 50),
+        _FindAndReplaceConfig(),
       ],
     );
   }
@@ -110,6 +113,24 @@ class _RemoveUrlsConfig extends StatelessWidget {
         context.read<Config>().setTtsConfig(ignoreUrls: value);
       },
       left: const Icon(Icons.link_rounded),
+    );
+  }
+}
+
+class _FindAndReplaceConfig extends StatelessWidget {
+  const _FindAndReplaceConfig();
+
+  @override
+  Widget build(BuildContext context) {
+    return MenuSettings.submenu(
+      title: "Find & Replace",
+      onPressed: () {
+        Navigator.pushNamed(
+          context,
+          '/settings/replace_strings',
+        );
+      },
+      left: const Icon(Icons.find_replace),
     );
   }
 }
