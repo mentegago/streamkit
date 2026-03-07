@@ -80,20 +80,16 @@ class _WordListConfigGroup extends StatelessWidget {
 
     return ConfigContainer(
       title: "Word List",
-      subtitle: Row(
-        children: [
-          Text(
-            isWhitelist
-                ? "Only messages containing these words will be read"
-                : "Messages containing these words will not be read",
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: isWhitelist
-                  ? context.customColors.success
-                  : context.customColors.failure,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-        ],
+      subtitle: Text(
+        isWhitelist
+            ? "Only messages containing these words will be read"
+            : "Messages containing these words will not be read",
+        style: theme.textTheme.bodySmall?.copyWith(
+          color: isWhitelist
+              ? context.customColors.success
+              : context.customColors.failure,
+          fontWeight: FontWeight.w800,
+        ),
       ),
       right: const _AddWordButton(),
       children: [
