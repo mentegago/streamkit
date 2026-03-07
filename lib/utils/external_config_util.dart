@@ -52,6 +52,7 @@ class ExternalConfig {
         "https://mentegago.github.io/streamkit-config/panci.txt",
       ));
 
+      print("Panci list response: ${response.body}");
       if (response.statusCode != 200) return;
       _panciList.clear();
 
@@ -59,7 +60,8 @@ class ExternalConfig {
         if (element.trim().isEmpty) return;
         _panciList.add(element);
       });
-    } catch (_) {
+    } catch (e) {
+      print(e);
       rethrow;
     }
   }

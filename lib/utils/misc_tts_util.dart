@@ -1,7 +1,7 @@
 class MiscTts {
   String pachify(
     String text, {
-    required String userId,
+    required String user,
     required Set<String> panciList,
   }) {
     final defaultUsernameList = [
@@ -19,9 +19,9 @@ class MiscTts {
     final usernameList = panciList.isEmpty ? defaultUsernameList : panciList;
 
     String pachiReplacement = 'パチパチパチ';
-    if (usernameList.contains(userId.toLowerCase()) ||
+    if (usernameList.contains(user.toLowerCase()) ||
         usernameList.contains(
-          userId, // Handle YouTube case where userId is case-sensitive
+          user, // Handle YouTube case where userId is case-sensitive
         )) {
       pachiReplacement = 'panci panci panci';
     }
