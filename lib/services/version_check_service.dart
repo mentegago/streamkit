@@ -1,10 +1,10 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:fluent_ui/fluent_ui.dart';
-
 import 'package:http/http.dart' as http;
-import 'package:package_info_plus/package_info_plus.dart';
-import 'package:version/version.dart';
+import 'package:streamkit_tts/app_version.dart';
+import 'package:streamkit_tts/flavor_config.dart';
 
 enum VersionState {
   loading,
@@ -17,22 +17,25 @@ enum VersionState {
 class VersionStatus {
   final VersionState state;
   final String latestVersion;
-  final String downloadUrl;
+  final String? downloadUrl;
   final String? announcement;
   final String? announcementUrl;
+  final String? md5;
 
   VersionStatus({
     required this.state,
     this.latestVersion = "0.0.0",
-    required this.downloadUrl,
+    this.downloadUrl,
     this.announcement,
     this.announcementUrl,
+    this.md5,
   });
 }
 
 class VersionCheckService extends ChangeNotifier {
-  final _apiUrl = "https://pastebin.com/raw/2VAGpvdE";
-  final String _defaultDownloadUrl = "https://discord.nnt.gg";
+  final _apiUrl = FlavorConfig.isYouTube
+      ? "https://mentegago.github.io/streamkit-config/app-yt.json"
+      : "https://mentegago.github.io/streamkit-config/app-ttv.json";
 
   late VersionStatus _status;
   String? _currentVersion;
@@ -53,53 +56,72 @@ class VersionCheckService extends ChangeNotifier {
   void _checkLatestVersion() async {
     // I really don't want version checking system to crash the app.
     try {
-      _updateState(VersionStatus(
-        state: VersionState.loading,
-        downloadUrl: _defaultDownloadUrl,
-      ));
+      _updateState(
+        VersionStatus(
+          state: VersionState.loading,
+          downloadUrl: null,
+        ),
+        currentVersion: appDisplayVersion,
+      );
 
       final response = await http.get(
         Uri.parse(_apiUrl),
       );
 
       if (response.statusCode != 200) {
-        _updateState(VersionStatus(
-          state: VersionState.error,
-          downloadUrl: _defaultDownloadUrl,
-        ));
+        _updateState(
+          VersionStatus(
+            state: VersionState.error,
+            downloadUrl: null,
+          ),
+          currentVersion: appDisplayVersion,
+        );
         return;
       }
 
       final Map<String, dynamic> json = jsonDecode(response.body);
-      final String latestVersionString = json["latestVersion"];
-      final String downloadUrl = json["downloadUrl"] ?? _defaultDownloadUrl;
 
-      final packageInfo = await PackageInfo.fromPlatform();
+      final String? platformKey = Platform.isWindows ? "windows" : null;
+      if (platformKey == null || !json.containsKey(platformKey)) {
+        _updateState(
+          VersionStatus(
+            state: VersionState.error,
+            downloadUrl: null,
+          ),
+          currentVersion: appDisplayVersion,
+        );
+        return;
+      }
 
-      final currentVersion = Version.parse(packageInfo.version);
-      final latestVersion = Version.parse(latestVersionString);
+      final platform = json[platformKey] as Map<String, dynamic>;
+      final int latestBuildNumber = platform["latestBuildNumber"] as int;
+      final String latestVersionString = platform["latestVersion"] as String;
+      final String? downloadUrl = platform["downloadUrl"] as String?;
+      final String? md5 = platform["md5"] as String?;
 
-      if (latestVersion > currentVersion) {
+      if (latestBuildNumber > appBuildNumber) {
         _updateState(
           VersionStatus(
             state: VersionState.outdated,
             latestVersion: latestVersionString,
             downloadUrl: downloadUrl,
-            announcement: json["outOfDateAnnouncement"],
-            announcementUrl: json["outOfDateAnnouncementUrl"],
+            announcement: platform["outOfDateAnnouncement"] as String?,
+            announcementUrl: platform["outOfDateAnnouncementUrl"] as String?,
+            md5: md5,
           ),
-          currentVersion: packageInfo.version,
+          currentVersion: appDisplayVersion,
         );
-      } else if (latestVersion == currentVersion) {
+      } else if (latestBuildNumber == appBuildNumber) {
         _updateState(
           VersionStatus(
             state: VersionState.upToDate,
             latestVersion: latestVersionString,
             downloadUrl: downloadUrl,
-            announcement: json["currentAnnouncement"],
-            announcementUrl: json["currentAnnouncementUrl"],
+            announcement: platform["upToDateAnnouncement"] as String?,
+            announcementUrl: platform["upToDateAnnouncementUrl"] as String?,
+            md5: md5,
           ),
-          currentVersion: packageInfo.version,
+          currentVersion: appDisplayVersion,
         );
       } else {
         _updateState(
@@ -107,17 +129,22 @@ class VersionCheckService extends ChangeNotifier {
             state: VersionState.beta,
             latestVersion: latestVersionString,
             downloadUrl: downloadUrl,
-            announcement: json["currentAnnouncement"],
-            announcementUrl: json["currentAnnouncementUrl"],
+            announcement: platform["betaAnnouncement"] as String?,
+            announcementUrl: platform["betaAnnouncementUrl"] as String?,
+            md5: md5,
           ),
-          currentVersion: packageInfo.version,
+          currentVersion: appDisplayVersion,
         );
       }
     } catch (e) {
-      _updateState(VersionStatus(
-        state: VersionState.error,
-        downloadUrl: _defaultDownloadUrl,
-      ));
+      debugPrint("Error checking latest version: $e");
+      _updateState(
+        VersionStatus(
+          state: VersionState.error,
+          downloadUrl: null,
+        ),
+        currentVersion: appDisplayVersion,
+      );
     }
   }
 }

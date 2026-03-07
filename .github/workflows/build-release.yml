@@ -28,11 +28,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Extract version from pubspec.yaml
+      - name: Extract version from app_version.dart
         id: version
         shell: bash
         run: |
-          VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: //' | sed 's/+.*//' | tr -d '[:space:]')
+          VERSION=$(grep 'appDisplayVersion' lib/app_version.dart | sed 's/.*"\(.*\)".*/\1/')
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Create and push tag
