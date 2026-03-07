@@ -40,7 +40,7 @@ class FilterConfig extends StatelessWidget {
               '/settings/word_filter',
             );
           },
-          left: const Icon(Icons.filter_list),
+          left: const Icon(Icons.short_text_outlined),
         ),
         const Divider(
           height: 1,

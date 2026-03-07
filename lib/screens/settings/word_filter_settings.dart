@@ -110,7 +110,7 @@ class _WordListConfigGroup extends StatelessWidget {
               child: Column(
                 children: [
                   Icon(
-                    Icons.filter_list,
+                    Icons.short_text,
                     size: 48,
                     color: Theme.of(context)
                         .colorScheme
@@ -119,7 +119,9 @@ class _WordListConfigGroup extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    isWhitelist ? "No words allowed yet" : "No words blocked yet",
+                    isWhitelist
+                        ? "No words allowed yet"
+                        : "No words blocked yet",
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(context)
                               .colorScheme
@@ -156,7 +158,8 @@ class _AddWordButton extends StatelessWidget {
     );
 
     return FilledButton.icon(
-      onPressed: () => _showWordDialog(context, existingRule: null, index: null),
+      onPressed: () =>
+          _showWordDialog(context, existingRule: null, index: null),
       icon: const Icon(Icons.add, size: 18),
       label: Text(isWhitelist ? "Allow Word" : "Block Word"),
       style: FilledButton.styleFrom(
@@ -279,8 +282,7 @@ void _saveRule(
 
   config.setWordFilter(
     rules: rules,
-    isWhitelistingFilter:
-        config.chatToSpeechConfiguration.isWordlistWhitelist,
+    isWhitelistingFilter: config.chatToSpeechConfiguration.isWordlistWhitelist,
   );
 }
 
