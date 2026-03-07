@@ -4,6 +4,7 @@ import 'package:streamkit_tts/models/enums/languages_enum.dart';
 import 'package:streamkit_tts/models/enums/app_theme_mode.dart';
 import 'package:streamkit_tts/models/enums/tts_source.dart';
 import 'package:streamkit_tts/models/replace_string_rule.dart';
+import 'package:streamkit_tts/models/word_filter_rule.dart';
 
 class Config extends ChangeNotifier {
   ChatToSpeechConfiguration chatToSpeechConfiguration;
@@ -124,6 +125,18 @@ class Config extends ChangeNotifier {
     setChatToSpeechConfiguration(
       chatToSpeechConfiguration.copyWith(
         themeMode: themeMode,
+      ),
+    );
+  }
+
+  void setWordFilter({
+    required List<WordFilterRule> rules,
+    required bool isWhitelistingFilter,
+  }) {
+    setChatToSpeechConfiguration(
+      chatToSpeechConfiguration.copyWith(
+        wordFilterRules: rules,
+        isWordlistWhitelist: isWhitelistingFilter,
       ),
     );
   }

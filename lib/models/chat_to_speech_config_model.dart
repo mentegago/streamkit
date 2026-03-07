@@ -5,6 +5,7 @@ import 'package:streamkit_tts/models/enums/languages_enum.dart';
 import 'package:streamkit_tts/models/enums/app_theme_mode.dart';
 import 'package:streamkit_tts/models/enums/tts_source.dart';
 import 'package:streamkit_tts/models/replace_string_rule.dart';
+import 'package:streamkit_tts/models/word_filter_rule.dart';
 
 class ChatToSpeechConfiguration {
   final Set<String> channels;
@@ -27,6 +28,8 @@ class ChatToSpeechConfiguration {
   final bool disableAKeongFilter;
   final AppThemeMode themeMode;
   final List<ReplaceStringRule> replaceStringRules;
+  final List<WordFilterRule> wordFilterRules;
+  final bool isWordlistWhitelist;
 
   ChatToSpeechConfiguration({
     required this.channels,
@@ -49,6 +52,8 @@ class ChatToSpeechConfiguration {
     required this.disableAKeongFilter,
     required this.themeMode,
     required this.replaceStringRules,
+    required this.wordFilterRules,
+    required this.isWordlistWhitelist,
   });
 
   ChatToSpeechConfiguration copyWith({
@@ -73,6 +78,8 @@ class ChatToSpeechConfiguration {
     bool? disableAKeongFilter,
     AppThemeMode? themeMode,
     List<ReplaceStringRule>? replaceStringRules,
+    List<WordFilterRule>? wordFilterRules,
+    bool? isWordlistWhitelist,
   }) {
     return ChatToSpeechConfiguration(
       channels: channels ?? this.channels,
@@ -97,6 +104,8 @@ class ChatToSpeechConfiguration {
       disableAKeongFilter: disableAKeongFilter ?? this.disableAKeongFilter,
       themeMode: themeMode ?? this.themeMode,
       replaceStringRules: replaceStringRules ?? this.replaceStringRules,
+      wordFilterRules: wordFilterRules ?? this.wordFilterRules,
+      isWordlistWhitelist: isWordlistWhitelist ?? this.isWordlistWhitelist,
     );
   }
 
@@ -123,6 +132,8 @@ class ChatToSpeechConfiguration {
     result.addAll({'disableAKeongFilter': disableAKeongFilter});
     result.addAll({'themeMode': themeMode.name});
     result.addAll({'replaceStringRules': replaceStringRules.map((r) => r.toMap()).toList()});
+    result.addAll({'wordFilterRules': wordFilterRules.map((r) => r.toMap()).toList()});
+    result.addAll({'isWordlistWhitelist': isWordlistWhitelist});
     return result;
   }
 
@@ -156,6 +167,11 @@ class ChatToSpeechConfiguration {
               ?.map((e) => ReplaceStringRule.fromMap(e as Map<String, dynamic>))
               .toList() ??
           [],
+      wordFilterRules: (map['wordFilterRules'] as List<dynamic>?)
+              ?.map((e) => WordFilterRule.fromMap(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+      isWordlistWhitelist: map['isWordlistWhitelist'] as bool? ?? false,
     );
   }
 

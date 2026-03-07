@@ -33,6 +33,20 @@ class FilterConfig extends StatelessWidget {
           indent: 50,
         ),
         MenuSettings.submenu(
+          title: "Word Filter",
+          onPressed: () {
+            Navigator.pushNamed(
+              context,
+              '/settings/word_filter',
+            );
+          },
+          left: const Icon(Icons.filter_list),
+        ),
+        const Divider(
+          height: 1,
+          indent: 50,
+        ),
+        MenuSettings.submenu(
           title: "Find & Replace",
           onPressed: () {
             Navigator.pushNamed(
