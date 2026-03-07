@@ -9,28 +9,37 @@ extension CleanMessage on String {
     String result = this;
 
     for (String toReplace in replaceList) {
+      final pattern = _buildStringMatchPattern(
+        toReplace,
+        wholeWord: wholeWord,
+        caseInsensitive: caseInsensitive,
+        isUsername: isUsername,
+      );
+
       if (wholeWord) {
-        final leadingPattern = isUsername ? r'(^|\s|@)' : r'(^|\s)';
-        final patternString =
-            leadingPattern + RegExp.escape(toReplace) + r'(\s|[.,!?:;]|$)';
-
-        final pattern = RegExp(patternString, caseSensitive: !caseInsensitive);
-
         result = result.replaceAllMapped(pattern, (match) {
           final before = match.group(1) ?? '';
           final after = match.group(2) ?? '';
           return before + replacement + after;
         });
       } else {
-        final pattern = RegExp(
-          RegExp.escape(toReplace),
-          caseSensitive: !caseInsensitive,
-        );
         result = result.replaceAll(pattern, replacement);
       }
     }
 
     return result.trim();
+  }
+
+  bool containsString(
+    String needle, {
+    bool wholeWord = false,
+    bool caseInsensitive = false,
+  }) {
+    return _buildStringMatchPattern(
+      needle,
+      wholeWord: wholeWord,
+      caseInsensitive: caseInsensitive,
+    ).hasMatch(this);
   }
 
   String removeUrls() {
@@ -39,5 +48,21 @@ extension CleanMessage on String {
       caseSensitive: false,
     );
     return replaceAll(urlPattern, '');
+  }
+
+  RegExp _buildStringMatchPattern(
+    String word, {
+    required bool wholeWord,
+    required bool caseInsensitive,
+    bool isUsername = false,
+  }) {
+    if (wholeWord) {
+      final leadingPattern = isUsername ? r'(^|\s|@)' : r'(^|\s)';
+      final patternString =
+          leadingPattern + RegExp.escape(word) + r'(\s|[.,!?:;]|$)';
+      return RegExp(patternString, caseSensitive: !caseInsensitive);
+    } else {
+      return RegExp(RegExp.escape(word), caseSensitive: !caseInsensitive);
+    }
   }
 }
